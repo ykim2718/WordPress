@@ -1,3 +1,8 @@
+<?php
+// WordPress 6.8.3
+// WordPress PHP 8.2
+// WordPress bbPress Version 2.6.14
+
 // Y, 2025.12.6
 function prevent_duplicate_topics($topic_id) {
     $topic_title = bbp_get_topic_title($topic_id);
