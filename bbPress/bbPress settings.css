@@ -1,0 +1,70 @@
+/* Y, 2025.12.8
+ * bbPress 포럼 리스트 박스
+ */
+.my-forum-text-inline {
+    /* Flexbox 컨테이너로 지정 */
+    display: flex;
+    
+    /* 자식 요소(이미지, span)들을 가로(row) 방향으로 정렬 */
+    flex-direction: row; 
+    
+    /* 이미지와 텍스트를 세로 축(수직)에서 상단으로 지정 */
+    align-items: flex-start; 
+    
+    /* 필요에 따라 이미지와 텍스트 사이에 간격을 추가할 수 있습니다. */
+    gap: 15px; /* 이미지와 span 사이에 15px 간격 추가 (선택 사항) */
+}
+
+/* 이미지에 적용된 인라인 스타일을 유지하거나 필요한 추가 조정 (선택 사항) */
+.my-forum-text-inline img {
+    /* 이미지가 텍스트 내용에 맞게 축소되지 않도록 고정 */
+    flex-shrink: 0; 
+	/* 이미지 크기를 높이 기준으로 고정 */
+	height: 100px;
+	width: auto;
+}
+
+/* 텍스트(span)가 나머지 공간을 차지하도록 설정 (선택 사항) */
+.my-forum-text-inline span {
+	/* 인라인 요소인 span을 블록처럼 다루어 margin/padding 조정이 용이하게 할 수 있습니다. */
+    /* display: block; */
+    /* 텍스트가 줄 바꿈이 필요하면 자동으로 되도록 합니다. */
+    /* flex-grow: 1; */
+}
+
+/* Y, 2025.12.9
+ * bbPress 포럼 페이지
+ */
+.forum-archive-title {
+    background-color: #29412F;   /* 짙은 녹색 */
+}
+.forum-archive-title .page-title{
+    color: #EDF2F7;              /* 하얀 회색 */
+}
+/* #bbpress-forums ul .bbp-header { */
+#bbpress-forums ul.bbp-forums li.bbp-header ul.forum-titles li {
+    color: #29412F;              /* 짙은 녹색 */
+}
+
+
+/* Y, 2025.12.9
+ * bbPress 검색 input 박스 크기 조정
+ */
+.bbp-search-form {
+    width: 70% !important;        /* 부모 컨테이너 너비의 70% */
+	min-width: 250px;
+	max-width: 500px;
+    /* box-sizing: border-box;  패딩/보더 포함 계산 */
+	/* display: block; */
+}
+
+
+
+/* Y, 2026.1.19
+ * pdfjs 다운로드 및 인쇄 버튼 강제 숨김
+ * */
+#download, #print, #secondaryDownload, #secondaryPrint, #toolbarViewerRight {
+    display: none !important;
+}
+
+
