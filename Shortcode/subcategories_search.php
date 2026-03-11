@@ -56,8 +56,12 @@ function _subcategories_search($atts) {
         .sub-search-button { 
             position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
             background: none; border: none; cursor: pointer; padding: 5px;
+			transition: all 0.3s ease;
+            border-radius: 4px;
         }
         .sub-search-button svg { width: 20px; height: 20px; fill: #555; }
+		.sub-search-button:hover { background-color: #0073aa; }
+        .sub-search-button:hover svg { fill: #ffffff; }
     </style>
 
     <div class="sub-search-container">
