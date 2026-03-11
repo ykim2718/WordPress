@@ -1,5 +1,4 @@
-<?php
-/* Y, 2025.12.16 - 17
+/* Y, 2025.12.16 - 17; 2026.3.11
  * WordPress에서 유튜브 채널의 특정 제목 최신 비디오 표시
    - title 파라미터를 정규표현식 패턴으로 인식하여 영상 제목과 대조: title="/개장전/i", title="/^\[특보\]/", title="/(개장전|마감전)/"
    - max를 통해 "최근 영상 몇 개까지 뒤져볼 것인가"를 결정
@@ -7,7 +6,7 @@
    - 매칭되는 영상을 찾는 순간 즉시 API 호출을 중단하고 결과를 반환
    - 캐시 (cache="900" << 15min)를 반드시 사용하여 서버와 API의 부하를 최소화
  **
- * Shortcode: [yt_latest_video title="..." channel_id="UC..." exact="0" max="10" cache="900"]
+ * Shortcode: [yt_latest_video title="..." handle="UC..." max_searches="10" cache="900"]
  * - video_id: 고정 라이브 스트리밍 주소
  * - title: 제목 키워드 (필수), "/개장전/i", "/^\[특보\]/", "/(개장전|마감전)/", 모든 제목 허용 "/./" 
  * - handle: @hkglobalmarket 한경글로벌마켓, @hkwowtv  한국경제TV
@@ -34,7 +33,6 @@ add_shortcode('yt_latest_video', function ($atts) {
 		'video_id'          => '',       // NJUjU9ALj4A [한국경제TV LIVE]
         'title'             => '',       // "/개장전/i", "/^\[특보\]/", "/(개장전|마감전)/", 모든 제목 허용 "/./" 
         'handle'            => '',       // 기본값을 비워두어 필수 입력 체크를 수행
-        'api_key'           => '',       // 기본값을 비워두어 필수 입력 체크를 수행
         'cache'             => '900',    // 15 min
         'max_searches'      => '500',    // 최대 검색 범위, YouTube 기본은 max 50
         'show_last_if_none' => '1',      // 0: 매칭 안되면 'No Videos', 1: 매칭 안되면 최신영상
@@ -53,8 +51,7 @@ add_shortcode('yt_latest_video', function ($atts) {
     }
 
     // 3. API 키 및 캐시 설정
-    $api_key = $args['api_key'] ?: (defined('YOUTUBE_API_KEY') ? YOUTUBE_API_KEY : '');
-    if (!$api_key) return 'API Key Missing.';
+    $api_key = MY_YOUTUBE_API_KEY;
 
     // 정규식 패턴 안전 처리 (슬래시가 없는 일반 텍스트 입력 시에도 작동하게 보완)
     $pattern = trim($args['title']);
@@ -127,6 +124,90 @@ add_shortcode('yt_latest_video', function ($atts) {
 
     if ($args['cache'] !== '0') {
         set_transient($transient_key, $output, intval($args['cache']));
+    }
+
+    return $output;
+});
+
+
+
+
+/* Y, 2026.1.19, 3.11
+ * shortcode: [yt_latest_video_grid handle="@hhh" latest_count='4' row='2' cols='2' duration='3600']
+ */
+add_shortcode('yt_latest_video_grid', function ($atts) {
+    // 1. 파라미터 정의 (cache 대신 duration 사용)
+    $args = shortcode_atts([
+        'handle'        => '',      // 유튜브 핸들 (@channelname)
+        'latest_count'  => '4',     // 가져올 영상 개수
+        'cols'          => '2',     // 그리드 열 수
+        'rows'          => '2',     // 그리드 행 수
+        'duration'      => '3600',  // 캐시 시간 (0이면 실시간)
+    ], $atts);
+
+    // 2. 입력값 검증 및 로직 체크
+    if (empty($args['handle'])) return '<strong>Error:</strong> handle은 필수입니다.';
+    
+    $latest_count = intval($args['latest_count']);
+    $max_cells = intval($args['rows']) * intval($args['cols']);
+
+    // 조건 검토: latest_count <= rows * cols
+    if ($latest_count > $max_cells) {
+        return "<strong>Error:</strong> 요청된 영상 개수($latest_count)가 그리드 칸 수($max_cells)보다 많습니다. (rows * cols 확인)";
+    }
+
+    $api_key = MY_YOUTUBE_API_KEY;
+
+    // 3. 캐시 처리 (duration이 0이면 무시)
+    $duration = intval($args['duration']);
+    $transient_key = 'yt_grid_v2_' . md5($args['handle'] . $latest_count . $args['cols']);
+    
+    if ($duration !== 0 && ($cached = get_transient($transient_key)) !== false) {
+        return $cached;
+    }
+
+    // 4. YouTube API 호출: 채널 정보 및 업로드 플레이리스트 ID
+    $handle_raw = ltrim(trim($args['handle']), '@');
+    $ch_url = "https://www.googleapis.com/youtube/v3/channels?part=contentDetails&forHandle=" . urlencode($handle_raw) . "&key=" . $api_key;
+    $ch_res = wp_remote_get($ch_url);
+    
+    if (is_wp_error($ch_res)) return 'Network Error.';
+    $ch_data = json_decode(wp_remote_retrieve_body($ch_res), true);
+    if (empty($ch_data['items'])) return 'Channel Not Found.';
+
+    $playlist_id = $ch_data['items'][0]['contentDetails']['relatedPlaylists']['uploads'];
+
+    // 5. 최신 영상 데이터 가져오기 (latest_count 만큼)
+    $list_url = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=$playlist_id&maxResults=$latest_count&key=$api_key";
+    $list_res = wp_remote_get($list_url);
+    if (is_wp_error($list_res)) return 'Video List Error.';
+    
+    $video_data = json_decode(wp_remote_retrieve_body($list_res), true);
+    if (empty($video_data['items'])) return 'No Videos Found.';
+
+    // 6. 그리드 렌더링
+    $col_count = intval($args['cols']);
+    $output = '<div class="yt-video-grid" style="display:grid; grid-template-columns: repeat(' . $col_count . ', 1fr); gap: 20px; width: 100%;">';
+
+    foreach ($video_data['items'] as $item) {
+        $v_id = $item['snippet']['resourceId']['videoId'];
+        $v_title = esc_html($item['snippet']['title']);
+        
+        $output .= '<div class="yt-video-item" style="min-width: 0;">';
+        $output .= '<div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; background:#000;">';
+        $output .= '<iframe src="https://www.youtube.com/embed/' . $v_id . '" 
+                    style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" 
+                    allowfullscreen title="' . $v_title . '"></iframe>';
+        $output .= '</div>';
+        $output .= '<p style="font-size:14px; margin-top:10px; line-height:1.4; font-weight:500; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">' . $v_title . '</p>';
+        $output .= '</div>';
+    }
+
+    $output .= '</div>';
+
+    // 7. 캐시 저장 (duration이 0이 아닐 때만)
+    if ($duration !== 0) {
+        set_transient($transient_key, $output, $duration);
     }
 
     return $output;
