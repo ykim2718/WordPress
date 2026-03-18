@@ -72,6 +72,8 @@ function _rocket_fly() {
         var MIN_DISTANCE = 20;
         var EASE = 0.015;  // 기존 값: 0.04 (숫자가 작을수록 유영속도가 느려지고 부드러워집니다)
 		var FRICTION = 0.9; // 관성 마찰 계수 (1에 가까울수록 관성이 오래 유지됨)
+		var ROCKET_SIZE = 80;  // 이모지 크기 (px)
+		var rotateAngle = 45;  // 초기값과 함께 선언 (메모리 역할)
 
         setTimeout(function() {
             rocket.style.opacity = '1';
@@ -97,18 +99,25 @@ function _rocket_fly() {
                 if (!isMouseMoving) {
                     currentDistance += (MIN_DISTANCE - currentDistance) * 0.08;
                 }
+				
+				// 머리 끝을 맞추기 위한 오프셋 계산
+                var headOffset = Math.round(ROCKET_SIZE / 2) + 5; // 중심에서 머리까지 거리 + 간격 (5px)
 
+				// (rocketX, rocketY)는 이모지 정사각형의 정중앙을 의미
                 var dx = mouseX - rocketX;
                 var dy = mouseY - rocketY;
                 var distToMouse = Math.sqrt(dx * dx + dy * dy);
-                var angle = Math.atan2(dy, dx);
+				
+                // 마우스를 바라보는 각도 (타겟팅용)
+                var angleToMouse = Math.atan2(dy, dx);
 
-                var targetX = mouseX;
-                var targetY = mouseY;
+				// 목표 지점을 마우스 포인트에서 로켓 머리 길이만큼 뒤로 이동
+                var targetX = mouseX - Math.cos(angleToMouse) * headOffset;
+                var targetY = mouseY - Math.sin(angleToMouse) * headOffset;
                 
-                if (distToMouse > currentDistance) {
-                    targetX = mouseX - Math.cos(angle) * currentDistance;
-                    targetY = mouseY - Math.sin(angle) * currentDistance;
+                if (distToMouse > currentDistance + headOffset) {
+                    targetX = mouseX - Math.cos(angleToMouse) * (currentDistance + headOffset);
+                    targetY = mouseY - Math.sin(angleToMouse) * (currentDistance + headOffset);
                 }
 				
 				// 속도에 가속도 (EASE) 고려
@@ -128,17 +137,18 @@ function _rocket_fly() {
                 if (dynamicScale > 1.8) dynamicScale = 1.8; // 최대 길이 제한
 
                 // 로켓 머리 각도 보정 (45도 기울어진 아이콘 대응)
-                //var rotateAngle = (angle * 180 / Math.PI) + 45;
-				// 방향 전환이 너무 민감하게 변하지 않도록 속도가 있을 때만 각도 업데이트
-                if (moveDist > 2) {  // 2 px
-                    var rotateAngle = (Math.atan2(velY, velX) * 180 / Math.PI) + 45;
-                    rocket.style.transform = 'translate(-50%, -50%) rotate(' + rotateAngle + 'deg)';
+				// 방향 전환이 너무 민감하게 변하지 않도록 움직임이 확실할 때만 각도 업데이트
+                if (moveDist > 0.5) {  // 1 px
+                    var moveAngle = Math.atan2(velY, velX);
+                    rotateAngle = (moveAngle * 180 / Math.PI) + 45;  // 'var' 없이 상위 변수를 업데이트
                 }
-
-                rocket.style.left = rocketX + 'px';
-                rocket.style.top = rocketY + 'px';
-                rocket.style.transform = 'translate(-50%, -50%) rotate(' + rotateAngle + 'deg)';
                 
+				// 계산된 좌표값(rocketX, rocketY)을 실제 웹 브라우저 화면상의 시각적 위치로 출력
+				rocket.style.left = rocketX + 'px';
+                rocket.style.top = rocketY + 'px';
+				// transform은 moveDist와 상관없이 '항상' 현재의 rotateAngle로 적용
+				rocket.style.transform = 'translate(-50%, -50%) rotate(' + rotateAngle + 'deg)';
+					
                 // 화염에 동적 스케일 적용 (CSS 애니메이션 대체)
                 flame.style.transform = 'rotate(225deg) scaleY(' + dynamicScale + ')';
 
