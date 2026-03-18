@@ -17,8 +17,8 @@ function _rocket_fly() {
             opacity: 0;
             transition: opacity 1s ease-in;
         }
-        .rocket-icon { 
-            font-size: 60px; 
+        .rocket-icon {
+            font-size: 60px;
             position: relative;
             display: inline-block;
         }
@@ -66,7 +66,8 @@ function _rocket_fly() {
         var lastX = rocketX; // 이전 X 좌표 저장
         var lastY = rocketY; // 이전 Y 좌표 저장
         var isLaunching = true;
-        
+		var animationId; // requestAnimationFrame() 함수는 실행될 때마다 고유한 정수(Integer)를 저장
+
         var currentDistance = 337;
         var MAX_DISTANCE = 337;
         var MIN_DISTANCE = 20;
@@ -99,70 +100,73 @@ function _rocket_fly() {
                 if (!isMouseMoving) {
                     currentDistance += (MIN_DISTANCE - currentDistance) * 0.08;
                 }
-				
-				// 머리 끝을 맞추기 위한 오프셋 계산
-                var headOffset = Math.round(ROCKET_SIZE / 2) + 5; // 중심에서 머리까지 거리 + 간격 (5px)
 
-				// (rocketX, rocketY)는 이모지 정사각형의 정중앙을 의미
-                var dx = mouseX - rocketX;
+                var headOffset = Math.round(ROCKET_SIZE / 2) + 5; // // 머리 끝을 맞추기 위한 오프셋 계산, 간격 (5px)
+                var dx = mouseX - rocketX;  // (rocketX, rocketY)는 이모지 정사각형의 정중앙을 의미
                 var dy = mouseY - rocketY;
-                var distToMouse = Math.sqrt(dx * dx + dy * dy);
-				
-                // 마우스를 바라보는 각도 (타겟팅용)
-                var angleToMouse = Math.atan2(dy, dx);
+                var distToMouse = Math.sqrt(dx * dx + dy * dy);  // 마우스까지의 거리
+                var angleToMouse = Math.atan2(dy, dx);  // 마우스를 바라보는 각도
 
 				// 목표 지점을 마우스 포인트에서 로켓 머리 길이만큼 뒤로 이동
-                var targetX = mouseX - Math.cos(angleToMouse) * headOffset;
-                var targetY = mouseY - Math.sin(angleToMouse) * headOffset;
+                var offset;
+				if (distToMouse > currentDistance + headOffset) {
+				    offset = currentDistance + headOffset;  // 항상 (간격 + 머리길이)를 고려하여 목표를 잡음
+                } else {
+				    offset = headOffset;
+				}
+				var targetX = mouseX - Math.cos(angleToMouse) * offset;
+                var targetY = mouseY - Math.sin(angleToMouse) * offset;
                 
-                if (distToMouse > currentDistance + headOffset) {
-                    targetX = mouseX - Math.cos(angleToMouse) * (currentDistance + headOffset);
-                    targetY = mouseY - Math.sin(angleToMouse) * (currentDistance + headOffset);
-                }
-				
 				// 속도에 가속도 (EASE) 고려
                 velX += (targetX - rocketX) * EASE;
                 velY += (targetY - rocketY) * EASE;
 				// 속도에 마찰력(FRICTION)을 곱해 관성 구현
                 velX *= FRICTION;
                 velY *= FRICTION;
-				
+
 				// '속도(Velocity)'를 실제 '위치(Position)'에 반영: 거리 = 속도 × 시간
                 rocketX += velX;
                 rocketY += velY;
 
                 // 실시간 이동 속도 계산
                 var moveDist = Math.sqrt(Math.pow(rocketX - lastX, 2) + Math.pow(rocketY - lastY, 2));
-                var dynamicScale = 0.7 + (moveDist * 0.2); // 속도에 따른 스케일 계산
-                if (dynamicScale > 1.8) dynamicScale = 1.8; // 최대 길이 제한
 
                 // 로켓 머리 각도 보정 (45도 기울어진 아이콘 대응)
 				// 방향 전환이 너무 민감하게 변하지 않도록 움직임이 확실할 때만 각도 업데이트
-                if (moveDist > 0.5) {  // 1 px
+				
+                //if (moveDist > 0.2) {  // 1 px
+                if (Math.abs(velX) > 1.1 || Math.abs(velY) > 1.1) {
+				    //console.log('DEBUGGING', velX, velY);
                     var moveAngle = Math.atan2(velY, velX);
                     rotateAngle = (moveAngle * 180 / Math.PI) + 45;  // 'var' 없이 상위 변수를 업데이트
                 }
-                
+
 				// 계산된 좌표값(rocketX, rocketY)을 실제 웹 브라우저 화면상의 시각적 위치로 출력
 				rocket.style.left = rocketX + 'px';
                 rocket.style.top = rocketY + 'px';
-				// transform은 moveDist와 상관없이 '항상' 현재의 rotateAngle로 적용
+				// transform은 항상 마지막 저장된 rotateAngle 사용
 				rocket.style.transform = 'translate(-50%, -50%) rotate(' + rotateAngle + 'deg)';
-					
+
                 // 화염에 동적 스케일 적용 (CSS 애니메이션 대체)
+				var dynamicScale = 0.7 + (moveDist * 0.2); // 속도에 따른 스케일 계산
+                if (dynamicScale > 1.8) dynamicScale = 1.8; // 최대 길이 제한
                 flame.style.transform = 'rotate(225deg) scaleY(' + dynamicScale + ')';
 
                 lastX = rocketX; // 현재 위치 업데이트
                 lastY = rocketY; // 현재 위치 업데이트
             }
-            requestAnimationFrame(animate);
+            animationId = requestAnimationFrame(animate);
         }
         animate();
 
         document.addEventListener('keydown', function() {
             rocket.style.transition = 'opacity 0.4s';
             rocket.style.opacity = '0';
-            setTimeout(function() { rocket.style.display = 'none'; }, 400);
+			cancelAnimationFrame(animationId);
+            setTimeout(function() { 
+			    rocket.style.display = 'none';
+				document.removeEventListener('mousemove', onMouseMove);
+			}, 400);
         });
     });
     </script>
