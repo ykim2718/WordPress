@@ -1,12 +1,13 @@
-/** Y, 2026.3.7 - 9, 3.13
+/** Y, 2026.3.7 - 9, 3.13, 3.21
  * 계층 구조와 체크박스가 포함된 카테고리 검색 리스트
- * 쇼트코드: [subcategories_list_with_filters_and_shopify  parent="0" shopify="true"]
+ * 쇼트코드: [subcategories_list_with_search_button  parent="0" show_tag_check_box="true"]
  */
-add_shortcode('subcategories_list_with_filters_and_shopify', '_subcategory_list_with_filters_and_shopify');
-function _subcategory_list_with_filters_and_shopify($atts) {
+add_shortcode('subcategories_list_with_search_button', '_subcategories_list_with_search_button');
+function _subcategories_list_with_search_button($atts) {
     $a = shortcode_atts(array(
         'parent' => 0,
-        'shopify' => 'true',   // find Shopify tag
+        'show_tag_check_box' => 'true',   // find special tags such as 'shopify', 'selling'
+        'tag_check_box_text'  => 'Currently Selling',
 		'search_result_page_id' => 1615
     ), $atts);
 	$search_result_page_id = $a['search_result_page_id'];
@@ -32,11 +33,11 @@ function _subcategory_list_with_filters_and_shopify($atts) {
 	$output .= '<button type="button" id="btn-cat-check-all">Check All</button>';
     $output .= '</div>';
 
-    // shopify true인 경우만 체크박스 표시
-    if ($a['shopify'] === 'true') {
+    // show_tag_check_box true인 경우만 체크박스 표시
+    if ($a['show_tag_check_box'] === 'true') {
         $output .= '<div class="cat-selling-toggle" style="margin-top: 7px;">';
-        $output .= '<label class="shopify-label" style="cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 0.95em;">';
-        $output .= '<input type="checkbox" id="chk-shopify" style="-webkit-appearance: checkbox;"> Currently Selling';
+        $output .= '<label class="check-tags-label" style="cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 0.95em;">';
+        $output .= '<input type="checkbox" id="tag-check-box" style="-webkit-appearance: checkbox;"> ' . $a['tag_check_box_text'];
         $output .= '</label>';
 		$output .= '</div>';
     }
@@ -70,24 +71,25 @@ function _subcategory_list_with_filters_and_shopify($atts) {
         });
         updateCheckAllButtonText();
     });
-	
+
     document.querySelectorAll('.cat-checkbox').forEach(cb => {
         cb.addEventListener('change', updateCheckAllButtonText);
     });
-	
+
     document.getElementById('btn-cat-search-conditionally').addEventListener('click', function() {
         const checkedBoxes = document.querySelectorAll('.cat-checkbox:checked');
         const selectedIds = Array.from(checkedBoxes).map(cb => cb.value);
 
-        const shopifyChk = document.getElementById('chk-shopify');
-        const isShopifyChecked = shopifyChk ? shopifyChk.checked : false;
+        const chkQueryTags = document.getElementById('tag-check-box');
+        const isQueryTagsChecked = chkQueryTags ? chkQueryTags.checked : false;
 
         if (selectedIds.length === 0) {
             alert('Please select a category.');
             return;
         }
 
-        const targetUrl = '{$ajax_url}?action=filter_my_posts&cats=' + selectedIds.join(',') + '&selling_only=' + isShopifyChecked;
+        const targetUrl = '{$ajax_url}?action=filter_my_posts&cats=' + selectedIds.join(',')
+            + '&show_tag_check_box=' + isQueryTagsChecked;
 
     fetch(targetUrl)
         .then(res => res.json())
@@ -179,8 +181,11 @@ add_action('wp_ajax_nopriv_filter_my_posts', 'ajax_filter_my_posts_handler');
 function ajax_filter_my_posts_handler() {
     global $wpdb;
 
+	$query_tag_names = array('shopify', 'selling');  // 소문자로 작성
+	$query_tags_in_clause = "'" . implode("', '", array_map('esc_sql', $query_tag_names)) . "'";
+
     $cats = isset($_GET['cats']) ? explode(',', $_GET['cats']) : array();
-    $selling_only = isset($_GET['selling_only']) ? $_GET['selling_only'] : 'false';
+    $show_tag_check_box = isset($_GET['show_tag_check_box']) ? $_GET['show_tag_check_box'] : 'false';
 
     if (empty($cats)) wp_send_json_error('No categories provided');
 
@@ -195,14 +200,14 @@ function ajax_filter_my_posts_handler() {
     $where_clause = "tt_cat.term_id IN ($in_clause) AND tt_cat.taxonomy = 'category' AND p.post_status = 'publish' AND p.post_type = 'post'";
 
     // Currently Selling(shopify 태그)이 체크된 경우 추가 조인 및 필터링
-    if ($selling_only === 'true') {
+    if ($show_tag_check_box === 'true') {
         $joins .= "
             INNER JOIN {$wpdb->term_relationships} tr_tag ON (p.ID = tr_tag.object_id)
             INNER JOIN {$wpdb->term_taxonomy} tt_tag ON (tr_tag.term_taxonomy_id = tt_tag.term_taxonomy_id)
             INNER JOIN {$wpdb->terms} t_tag ON (tt_tag.term_id = t_tag.term_id)
         ";
-        
-        $where_clause .= " AND tt_tag.taxonomy = 'post_tag' AND LOWER(t_tag.name) = 'shopify'";
+
+        $where_clause .= " AND tt_tag.taxonomy = 'post_tag' AND TRIM(LOWER(t_tag.name)) IN ($query_tags_in_clause)";
     }
 
     $sql = "
