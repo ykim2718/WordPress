@@ -24,51 +24,59 @@ add_shortcode('subcategories_posts', function($atts) {
     $category_ids = get_term_children($parent_id, 'category');
     $category_ids[] = $parent_id; // 부모 카테고리 자신도 포함
 
-    $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
+    //$paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
+    $paged = get_query_var('paged') ? get_query_var('paged') : (get_query_var('page') ? get_query_var('page') : 1);
     $grid_column = intval($a['column']);
     $posts_per_page = intval($a['row']) * $grid_column;
 	
-	$sticky_all = get_option('sticky_posts');
+	// 1. 해당 카테고리의 모든 고정글 ID 찾기
+    $sticky_all = get_option('sticky_posts');
     $sticky_in_cats = array();
     if (!empty($sticky_all)) {
-        $sticky_query = new WP_Query(array(
+        $sticky_in_cats = get_posts(array(
             'post__in' => $sticky_all,
             'category__in' => $category_ids,
             'posts_per_page' => -1,
-            'fields' => 'ids'
+            'fields' => 'ids',
+            'ignore_sticky_posts' => true
         ));
-        $sticky_in_cats = $sticky_query->posts;
     }
+	
+	// 2. 해당 카테고리의 모든 일반글 ID 찾기 (고정글 제외)
+    $normal_post_ids = get_posts(array(
+        'category__in' => $category_ids,
+        'post__not_in' => $sticky_in_cats,
+        'posts_per_page' => -1, // 전체를 다 가져옴
+        'fields' => 'ids',
+        'orderby' => 'date',
+        'order' => 'DESC',
+        'ignore_sticky_posts' => true
+    ));
 
+    // 3. 두 리스트 합치기 (고정글이 항상 위로)
+    $all_post_ids = array_merge($sticky_in_cats, $normal_post_ids);
+    $total_count = count($all_post_ids);
+
+    // 4. 현재 페이지에 보여줄 ID들만 추출 (Pagination 처리)
+    $offset = ($paged - 1) * $posts_per_page;
+    $paged_post_ids = array_slice($all_post_ids, $offset, $posts_per_page);
+
+    // 5. 최종 쿼리 실행
     $args = array(
-        'category__in'   => $category_ids,
-        'post_type'      => 'post',
-        'posts_per_page' => $posts_per_page,
-        'paged'          => $paged,
-        'ignore_sticky_posts' => true   // WordPress 기본 기능을 끄고 수동 정렬
+        'post__in'            => !empty($paged_post_ids) ? $paged_post_ids : array(0),
+        'post_type'           => 'post',
+        'posts_per_page'      => $posts_per_page,
+        'paged'               => 1, // 이미 위에서 잘라왔으므로 여기선 1로 고정
+        'orderby'             => 'post__in',
+        'ignore_sticky_posts' => true
     );
 
-	// 1페이지이고 고정글이 있는 경우, ID 배열을 직접 조합
-    if ($paged == 1 && !empty($sticky_in_cats)) {
-        // 일반 글 ID들 가져오기 (Sticky 제외)
-        $normal_post_ids = get_posts(array(
-            'category__in'   => $category_ids,
-            'post__not_in'   => $sticky_in_cats,
-            'posts_per_page' => $posts_per_page - count($sticky_in_cats),
-            'fields'         => 'ids',
-            'orderby'        => 'date',
-            'order'          => 'DESC'
-        ));
-
-        $args['post__in'] = array_merge($sticky_in_cats, $normal_post_ids);
-        $args['orderby']  = 'post__in'; // 배열에 넣은 순서대로 정렬 (Sticky 우선)
-    } else {
-        // 2페이지 이후거나 고정글이 없는 경우 정상 날짜순 정렬
-        $args['orderby'] = 'date';
-        $args['order']   = 'DESC';
-    }
-
     $query = new WP_Query($args);
+
+    // 6. 페이지네이션 정보 강제 주입 (이게 없으면 번호가 안 나옵니다)
+    $query->found_posts = $total_count;
+    $query->max_num_pages = ceil($total_count / $posts_per_page);
+	
 
 	// Create HTML
     $html = '<div class="yrkt-custom-grid-wrapper">';
@@ -154,10 +162,12 @@ add_shortcode('subcategories_posts', function($atts) {
         $total_pages = $query->max_num_pages;
         if ($total_pages > 1) {
             $html .= '<div class="yrkt-pagination">';
+			$big = 999999999;
             $html .= paginate_links(array(
+				'base'      => str_replace($big, '%#%', esc_url(get_pagenum_link($big))),
+                'format'    => '?paged=%#%',
                 'total'   => $total_pages,
                 'current' => $paged,
-                'format'  => '?paged=%#%',
                 'prev_text' => '« Prev',
                 'next_text' => 'Next »',
             ));
