@@ -1,0 +1,85 @@
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css');
+
+
+/* Y, 2025.11.14, 12.3 - 4
+ */
+.label-color-tomato a {
+  font-style: italic;
+  color: Tomato !important;
+}
+
+.label-color-tomato a:hover {
+  font-style: italic;
+  color: DarkOrange !important;
+}
+
+
+/* Y, 2025.12.2 - 3
+ */
+.label-color-gainsboro  a { color: #DCDCDC; }  /* Gainsboro */
+/*.label-color-gainsboro  a:hover { color: #AFEEEE; }  /* PaleTurquoise */
+.label-color-gainsboro  a:hover { color: #87CEEB; !important}  /* SkyBlue */
+
+
+/* Y, 2026.3.1
+ */
+#primary-menu .menu-item a {
+    color: #ffffff !important;  /* 기본 메뉴 글자색을 흰색으로 강제 지정 */
+}/
+#primary-menu .menu-item a:hover {
+    color: #f0f0f0 !important;
+}
+
+
+/* Y, 2026.3.8, 3.12
+ */
+.hide_link_underscore a {
+    text-decoration: none !important; /* 밑줄 강제 제거 */
+}
+.make_link_strong_on_hover a:hover {
+    font-weight: bold;
+}
+.make_link_opaque_on_hover a:hover {
+    opacity: 0.8; /* 살짝 흐려지는 효과로 클릭 가능함을 표시 */
+}
+.make_row_gap_zero {
+	row-gap: 0;
+}
+.force_no_margin {
+	margin: 0 !important;
+}
+.force_no_child_margin > * {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+.force_no_child_padding > * {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Y, 2026.3.8
+ * Query Loop Excerpt style
+ */
+.wp-block-post-excerpt__excerpt {
+	margin-bottom: 0.7em !important;
+}
+.wp-block-post-excerpt__more-text a {
+	text-decoration: none !important;
+}
+.wp-block-post-excerpt__more-text a:hover {
+	font-weight: bold;
+	color: #275EF5;
+}
+
+
+/* Y, 2026.3.19
+ */
+@keyframes yrckt_wiggle {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(-1.5px, 1px) rotate(-0.5deg); }
+    50% { transform: translate(1.5px, -1px) rotate(0.5deg); }
+    75% { transform: translate(-1px, -1.5px) rotate(-0.2deg); }
+    100% { transform: translate(1px, 1.5px) rotate(0.2deg); }
+}
+
+
