@@ -1,9 +1,11 @@
-/** Y, 2026.3.11
- * 2026.3.23 (get_kadence_archive_color, get_dynamic_badge_on_featured_image, sticky_badge)
- * 2026.3.24 (get_subcategory_ids)
- *
+/* (copyLeft) yRocket
  * [subcategories_posts parent=10, row=3, column=4, excerpt_length=30]
- * parent: 10 (Software), 4 (Semiconducotr), 1408 (Beauty), 1392 (MusicEye)
+ * parent: 10 (Software), 4 (Semiconducotr), 1408 (Beauty), 1392 (MusicEye),
+           "10, 4, 1408", "10, Semicoducntor, sofware-slug"
+ * [Change Log]
+ * 2026.3.11: Kick-off
+ * 2026.3.23: get_kadence_archive_color, get_dynamic_badge_on_featured_image, sticky_badge
+ * 2026.3.24: get_subcategory_ids
  */
 add_shortcode('subcategories_posts', function($atts) {
     // 1. 속성 추출 (기본값 설정 - parent 추가)
@@ -108,7 +110,7 @@ add_shortcode('subcategories_posts', function($atts) {
 				}
 				
             }
-            $cat_html = implode('<span style="color:#ddd; margin:0 5px;">|</span>', $cat_output);
+            $cat_html = implode('<span style="color:#ddd;">|</span>', $cat_output);
 			
 			// Dynamic Post Badge			
 			$badge_html = get_dynamic_badge_on_featured_image($post_id);

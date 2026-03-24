@@ -1,5 +1,5 @@
 /* Y, 2026.3.24 */
-function echo_variale_value($name, $a) {
+function echo_variable_value($name, $a) {
 	echo '<pre> ' . $name;
 	if (is_array($a)) {
 	    // echo '<pre> ' . $name . print_r($a, true) . '</pre>';

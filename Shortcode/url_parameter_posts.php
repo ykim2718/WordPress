@@ -1,5 +1,7 @@
-/* Y, 2026.3.8 - 9, 3.23 (get_kadence_archive_color, get_dynamic_badge_on_featured_image)
+/* (copyLeft) yRocket
  * [url_parameter_posts row=3, columnn=4, excerpt_length=30]
+ * 2026.3.8 - 9: Kick-off
+ * 2026.3.23: get_kadence_archive_color, get_dynamic_badge_on_featured_image
  */
 add_shortcode('url_parameter_posts', function($atts) {
     // 1. 속성 추출 (기본값 설정)
