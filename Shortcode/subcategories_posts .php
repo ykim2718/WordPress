@@ -1,6 +1,9 @@
-/** Y, 2026.3.11, 3.23 (get_kadence_archive_color, get_dynamic_badge_on_featured_image, sticky_badge)
+/** Y, 2026.3.11
+ * 2026.3.23 (get_kadence_archive_color, get_dynamic_badge_on_featured_image, sticky_badge)
+ * 2026.3.24 (get_subcategory_ids)
+ *
  * [subcategories_posts parent=10, row=3, column=4, excerpt_length=30]
- * parent: 10 (Software), 4 (Semiconducotr), 1408 (Beauty)
+ * parent: 10 (Software), 4 (Semiconducotr), 1408 (Beauty), 1392 (MusicEye)
  */
 add_shortcode('subcategories_posts', function($atts) {
     // 1. 속성 추출 (기본값 설정 - parent 추가)
@@ -16,14 +19,9 @@ add_shortcode('subcategories_posts', function($atts) {
         'read_more_font_size' => '0.9rem',
     ), $atts);
 
-    // 2. 카테고리 ID 처리
-    $parent_id = intval($a['parent']);
-    if ($parent_id <= 0) return "<p style='text-align:center; padding:50px;'>Please provide a valid parent category ID.</p>";
-
-    // 해당 카테고리와 모든 하위 카테고리 ID 가져오기
-    $category_ids = get_term_children($parent_id, 'category');
-    $category_ids[] = $parent_id; // 부모 카테고리 자신도 포함
-
+    // 2. 카테고리 ID 처리: 해당 카테고리와 모든 하위 카테고리 ID 가져오기
+    $category_ids = get_subcategory_ids($a['parent']);
+	
     //$paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
     $paged = get_query_var('paged') ? get_query_var('paged') : (get_query_var('page') ? get_query_var('page') : 1);
     $grid_column = intval($a['column']);

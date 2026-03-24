@@ -1,3 +1,22 @@
+/* Y, 2026.3.24 */
+function echo_variale_value($name, $a) {
+	echo '<pre> ' . $name;
+	if (is_array($a)) {
+	    // echo '<pre> ' . $name . print_r($a, true) . '</pre>';
+        var_dump($a);
+	} else {
+		print_r($a);
+	}
+	echo '</pre>';
+}
+/* Y, 2026.3.24 */
+function echo_variable_type($name, $a) {
+	echo '<pre> ' . $name;
+	echo gettype($a);
+	echo '</pre>';
+}
+
+
 /* Y, 2026.3.23
  * 해당 카테고리의 '모든' 메타 데이터를 가져옵
  */
@@ -125,10 +144,11 @@ function get_dynamic_badge_on_featured_image($post_id) {
         }
     }
 
-    if (empty($badge_elements)) return $style;
-
-    // 중복 제거 후 컨테이너로 감싸서 스타일과 함께 반환
-    return $style . '<div class="yrkt-dynamic-badge-container">' . implode('', array_unique($badge_elements)) . '</div>';
+    if (empty($badge_elements)) {
+		return $style;
+	} else {
+        return $style . '<div class="yrkt-dynamic-badge-container">' . implode('', array_unique($badge_elements)) . '</div>';
+	}
 }
 
 
@@ -142,4 +162,41 @@ function is_sticky_post_by_id($post_id) {
         return true;
     }
     return false;
+}
+
+
+
+/* Y, 2026.3.11, 3.24
+ * [subcategories_posts parent=10, row=3, column=4, excerpt_length=30] 에서 사용중
+ */
+function get_subcategory_ids($parent_input) {
+    $parent_id = 0;
+    if (is_numeric($parent_input)) {
+        // 입력값이 숫자인 경우 (ID로 처리)
+        $parent_id = intval($parent_input);
+    } else {
+        // 입력값이 문자열인 경우 (슬러그 먼저 검색 후 이름으로 검색)
+        $term = get_term_by('slug', $parent_input, 'category');
+        
+        if (!$term) {
+            $term = get_term_by('name', $parent_input, 'category');
+        }
+
+        if ($term) {
+            $parent_id = $term->term_id;
+        }
+    }
+	//echo_variale_value('$parent_input=', $parent_input);
+	//echo_variale_value('parent_id=', $parent_id);
+	
+	$category_ids = [];  // 초기화
+    if ($parent_id <= 0) {
+		// 예외 처리: ID를 찾지 못했거나 유효하지 않은 경우
+    } else {
+		$category_ids = get_term_children($parent_id, 'category');
+        $category_ids[] = $parent_id;  // 부모 카테고리 자신도 포함
+	}
+	//echo_variale_value('$category_ids=', $category_ids);
+
+    return $category_ids;
 }
