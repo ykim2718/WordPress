@@ -1,6 +1,6 @@
 /* Y, 2026.3.24 */
 function echo_variable_value($name, $a) {
-	echo '<pre> ' . $name;
+	echo '<pre>🚀 ' . $name . ' = ';
 	if (is_array($a)) {
 	    // echo '<pre> ' . $name . print_r($a, true) . '</pre>';
         var_dump($a);
@@ -11,10 +11,26 @@ function echo_variable_value($name, $a) {
 }
 /* Y, 2026.3.24 */
 function echo_variable_type($name, $a) {
-	echo '<pre> ' . $name;
+	echo '<pre>🚀 ' . $name . ' = ';
 	echo gettype($a);
 	echo '</pre>';
 }
+/* Y, 2026.3.26 */
+function echo_array_element($name, $a, $index) {
+	echo '<pre>🚀 ' . esc_html($name) . '[' . esc_html($index) . '] = ';
+	if (isset($a) && is_array($a) && !empty($a)) {
+		if ($index == -1) {
+			$result = $a[array_key_last($a)];
+		} else {
+			$result = isset($a[$index]) ? $a[$index] : "Index {$index} not found";
+		}
+	    echo esc_html(json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));	
+	} else {
+		echo 'empty or null array';
+	}
+	echo '</pre>';
+}
+
 
 
 /* Y, 2026.3.23
@@ -165,38 +181,64 @@ function is_sticky_post_by_id($post_id) {
 }
 
 
-
 /* Y, 2026.3.11, 3.24
  * [subcategories_posts parent=10, row=3, column=4, excerpt_length=30] 에서 사용중
+ * Argument parent: 10 or Software or software-slug or "4, 10" or "Semiconductor or 10" or "Semiconductor or Software"
  */
 function get_subcategory_ids($parent_input) {
-    $parent_id = 0;
-    if (is_numeric($parent_input)) {
-        // 입력값이 숫자인 경우 (ID로 처리)
-        $parent_id = intval($parent_input);
+    // 1. 입력값이 없으면 빈 배열 반환
+    if (empty($parent_input)) return [];
+
+    // 2. 입력값을 배열로 변환 (콤마 기준 분리 및 공백 제거)
+    // 만약 "10, Semiconductor" 라면 [ "10", "Semiconductor" ] 배열이 됨
+    if (is_string($parent_input)) {
+        $inputs = array_map('trim', explode(',', $parent_input));
     } else {
-        // 입력값이 문자열인 경우 (슬러그 먼저 검색 후 이름으로 검색)
-        $term = get_term_by('slug', $parent_input, 'category');
-        
-        if (!$term) {
-            $term = get_term_by('name', $parent_input, 'category');
+        $inputs = (array) $parent_input;
+    }
+
+    $all_parent_ids = [];
+
+    // 3. 각 입력 항목을 순회하며 실제 카테고리 ID 찾기
+    foreach ($inputs as $input) {
+        $found_id = 0;
+
+        if (is_numeric($input)) {
+            $found_id = intval($input);
+        } else {
+            // 슬러그로 먼저 찾기
+            $term = get_term_by('slug', $input, 'category');
+            // 슬러그가 없으면 이름으로 찾기
+            if (!$term) {
+                $term = get_term_by('name', $input, 'category');
+            }
+            if ($term) {
+                $found_id = $term->term_id;
+            }
         }
 
-        if ($term) {
-            $parent_id = $term->term_id;
+        if ($found_id > 0) {
+            $all_parent_ids[] = $found_id;
         }
     }
-	//echo_variale_value('$parent_input=', $parent_input);
-	//echo_variale_value('parent_id=', $parent_id);
-	
-	$category_ids = [];  // 초기화
-    if ($parent_id <= 0) {
-		// 예외 처리: ID를 찾지 못했거나 유효하지 않은 경우
-    } else {
-		$category_ids = get_term_children($parent_id, 'category');
-        $category_ids[] = $parent_id;  // 부모 카테고리 자신도 포함
-	}
-	//echo_variale_value('$category_ids=', $category_ids);
 
-    return $category_ids;
+    // 중복 제거 (여러 입력이 동일한 카테고리를 가리킬 경우 대비)
+    $all_parent_ids = array_unique($all_parent_ids);
+
+    // 4. 찾은 모든 부모 ID들에 대해 자식 카테고리 수집
+    $final_category_ids = [];
+    foreach ($all_parent_ids as $p_id) {
+        $final_category_ids[] = $p_id; // 부모 자신 포함
+        
+        $children = get_term_children($p_id, 'category');
+        if (!is_wp_error($children) && is_array($children)) {
+            $final_category_ids = array_merge($final_category_ids, $children);
+        }
+    }
+
+    // 최종 결과 반환 (중복 제거 및 숫자 정렬)
+    $final_category_ids = array_unique($final_category_ids);
+    sort($final_category_ids);
+
+    return $final_category_ids;
 }

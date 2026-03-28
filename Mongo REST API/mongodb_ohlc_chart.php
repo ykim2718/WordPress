@@ -1,4 +1,4 @@
-/* Y, 2026.3.1 - 6, 3.10, 3.12 - 20
+/* Y, 2026.3.1 - 6, 3.10, 3.12 - 20, 3.26 - 28
  * MongoDB 데이터를 가져와서 실시간 다중 종목 차트를 그리는 숏코드
  * [mongodb_ohlc_chart type="find" collection="watching_usa" interval="60" x_span_hours="24" timeout="7"]
    {
@@ -24,19 +24,21 @@ add_shortcode('mongodb_ohlc_chart', '_mongodb_ohlc_chart');
 function _mongodb_ohlc_chart($atts, $content = null) {
     // 1. 파라미터 설정 (timeout, x_span_hours 추가)
     $atts = shortcode_atts(array(
-        'collection'   => 'heartbeat',
-        'port'         => '3000',      // yControl collection
-        'type'         => 'find',      // find or aggregate
-        'interval'     => '60',        // 갱신 주기 (초)
-        'duration'     => '86400',     // 전체 작동 시간 (초)
-        'timeout'      => '7',         // API 타임아웃 (초)
-        'x_span_hours' => '24',        // X축 표시 범위 (시간)
-		'time_field'   => '_id.time'
+        'collection'    => 'heartbeat',
+        'port'          => '3000',      // yControl collection
+        'type'          => 'find',      // find or aggregate
+        'interval'      => '60',        // 갱신 주기 (초)
+        'duration'      => '86400',     // 전체 작동 시간 (초)
+        'timeout'       => '7',         // API 타임아웃 (초)
+        'x_span_hours'  => '24',        // X축 표시 범위 (시간)
+		'time_field'    => '_id.time',
+		'canvas_height' => '600px'
     ), $atts);
     $collection = $atts['collection'];
     $port = $atts['port'];
 	$interval = (int)((float)$atts['interval']);   // sec
 	$time_field = $atts['time_field'];
+	$canvas_height = $atts['canvas_height'];
 	
 	// 숏코드 사이의 내용($content)을 쿼리로 사용합니다.
     if (null === $content || empty(trim($content))) {
@@ -46,14 +48,16 @@ function _mongodb_ohlc_chart($atts, $content = null) {
 	$query = wp_strip_all_tags($query); // 워드프레스 권장 태그 제거
 	$query = html_entity_decode($query, ENT_QUOTES, 'UTF-8');
     $query = str_replace(array('<p>', '</p>', '<br />', '<br>'), '', $query);
-	$query = str_replace(array('“', '”', '‘', '’'), '"', $query); // 스마트 따옴표 치환
+	$query = str_replace(array("'", '“', '”', '‘', '’'), '"', $query); // 스마트 따옴표 치환
     $query = !empty($query) ? trim(strip_tags($query)) : '';
 	if (empty($query)) {
         return "❌ Query 다듬기 후 내용이 사라졌습니다. 원본: " . esc_html($content);
     }
 	// JSON 유효성 검사
     if (!json_decode($query)) {
-        return "❌ 유효하지 않은 JSON 형식입니다."; 
+		$error_msg = json_last_error_msg();  // "Syntax error", "State mismatch" 등 출력
+		echo_variable_value('$query=', $query);
+        return "❌ Query가 유효하지 않은 JSON 형식입니다: " . $error_msg; 
     }
 	
 	// 1. ID 및 $query 생성
@@ -71,8 +75,8 @@ function _mongodb_ohlc_chart($atts, $content = null) {
 	$query = convert_dynamic_time_keywords_in_query($query, $end_time=$lastest_timestamp);
 
 	// 2. URL 구성
-    $pc_ip = MY_DESKTOP_IP; 
-    $url = add_query_arg(array($atts['type'] => $query), "http://{$pc_ip}:{$atts['port']}/api/{$atts['collection']}");
+    $pc_ip = MY_DESKTOP_IP;
+	$url = add_query_arg(array($atts['type'] => $query), "http://{$pc_ip}:{$atts['port']}/api/{$atts['collection']}");
 
     // 3. API 호출 (timeout 설정 반영)
     $response = wp_remote_get($url, array('timeout' => (int)$atts['timeout']));
@@ -94,6 +98,24 @@ function _mongodb_ohlc_chart($atts, $content = null) {
 			   </div>';
     }
 	
+	// 5. Field mapping
+    $mapping = [
+        '현재가' => 'close',
+        '시가'   => 'open',
+        '고가'   => 'high',
+        '저가'   => 'low',
+        '거래량' => 'volume'
+    ];
+	foreach ($node_data['data'] as &$item) {
+        foreach ($mapping as $old_key => $new_key) {
+            if (isset($item[$old_key])) {
+                $item[$new_key] = $item[$old_key];
+                unset($item[$old_key]);
+            }
+        }
+    }
+    unset($item);
+	
 	// 6. 제어 정보 생성
     $control_info = array(
         'refresh_interval' => $interval,  // sec
@@ -102,6 +124,7 @@ function _mongodb_ohlc_chart($atts, $content = null) {
         'instance_id'     => $instance_id,
         'chart_canvas_id' => $chart_canvas_id,
         'chart_status_id' => $chart_status_id,
+		'canvas_height'   => $canvas_height,
 		'ajax_url'        => add_query_arg(
                 array('ajax_update' => '1', 'instance_id' => $instance_id), 
                 set_url_scheme( 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] )
@@ -135,7 +158,6 @@ function _mongodb_ohlc_chart($atts, $content = null) {
     }
 	
     // 8. 초기 렌더링 호출
-	//echo '<strong>🚀 DEBUGGING: $node_data[\'data\']=</strong><pre>' . esc_html(json_encode($node_data['data'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)) . '</pre>';
 	return render_mongo_chart_html($node_data['data'], $control_info);
 }
 
@@ -149,6 +171,8 @@ function render_mongo_chart_html($chart_data, $control) {
         $last_index = $data_count - 1;
         $last_item = $chart_data[$last_index];
         $last_time_value = get_nested_value_by_key($last_item, '_id.time');
+		$last_time_value = get_date_from_gmt($last_time_value, 'Y-m-d H:i:s');
+	    $timezone_string = wp_timezone_string();
     } else {
         return '<div style="color:red; padding:20px; border:1px solid #eee;">⚠️ 표시할 데이터가 없습니다.</div>';
     }
@@ -196,14 +220,15 @@ function render_mongo_chart_html($chart_data, $control) {
         //console.log("PHP 데이터 전달 완료:", !!window.mongoChartVars);
     </script>
     <div class="mongo-chart-outer-wrapper" style="margin:20px auto; max-width:900px; font-family: sans-serif;">
-        <div id="' . $control['chart_canvas_id'] . '" style="width:100%; height:500px; border:1px solid #ddd; background:#fff;"></div>
-        <div id="err-' . $control['instance_id'] . '" style="display:none; margin-top:10px; padding:15px; background:#fff5f5; color:#d35400; border:1px solid #feb2b2; font-size:12px; border-radius:4px;"></div>
+        <div id="' . $control['chart_canvas_id'] . '" style="width:100%; height:' . $control['canvas_height'] . '; background:#fff;"></div>
+        <div id="err-' . $control['instance_id'] . '" style="display:none; margin-top:10px; padding:15px; background:#fff5f5; color:#d35400; font-size:12px;"></div>
         <div style="display:flex; justify-content: space-between; font-size:11px; color:#666; margin-top:10px;">
             <span id="' . $control['chart_status_id'] . '" style="text-align: left; flex: 1; color:green;">● Plotly 엔진 가동 중</span>
             <span style="text-align: right;">
                 X-span: ' . esc_html($control['x_span_hours']) . 'h | 
                 Count: ' . esc_html($data_count) . ' | 
-                Last time: ' . esc_html($last_time_value) . '
+                Last data time: ' . esc_html($last_time_value) . ' |
+                Time zone: ' . esc_html($timezone_string) . '
 			</span>
         </div>
     </div>';
