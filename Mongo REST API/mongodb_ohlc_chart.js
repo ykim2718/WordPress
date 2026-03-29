@@ -1,4 +1,4 @@
-/* Y, 2026.3.5 - 6, 3.10 - 20
+/* Y, 2026.3.5 - 6, 3.10 - 20, 3.29
  * AJAX & Plotly.react Version
  */
 (function() {
@@ -28,7 +28,29 @@
             console.error("❌ 오류: ajax_url이 정의되지 않았습니다.");
             return;
         }
-        
+		
+		// 사용자가 다른 브라우저 탭을 보고 있다면 갱신 로직을 건너뜀
+        if (document.hidden) {
+            console.log("⛅ 브라우저 탭이 가려져 있어 이번 갱신은 건너뜁니다.");
+            // 다음 주기에 다시 시도하도록 타이머만 예약하고 리턴
+            scheduleNext(instanceId); 
+            return;
+        }
+	
+		// 시간 기한 체크 로직
+		const now = new Date();
+        const endTime = new Date(chartVars.refresh_end_time);
+        if (now > endTime) {
+            console.log(`🛑 [${instanceId}] 기한 시간 만료. 갱신을 중단합니다.`);
+            const chartStatusTag = document.getElementById(chartVars.chart_status_id);
+            if (chartStatusTag) {
+                chartStatusTag.innerText = "● 갱신 종료 (시간 초과)";
+                chartStatusTag.style.color = "gray";
+            }
+            if (window.mongoRefreshTimer) clearTimeout(window.mongoRefreshTimer);
+            return; // 다음 타이머를 예약하지 않고 종료
+        }
+		
         const container = document.getElementById(chartVars.chart_canvas_id);
         const chartStatusTag = document.getElementById(chartVars.chart_status_id);
 
@@ -64,12 +86,12 @@
             
 			// 4. 다음 갱신 예약
 			window.mongoRefreshTimer = setTimeout(() => {
-				console.log(`🔥 [${instanceId}] ${refreshCount + 1}번째 갱신! (예약시각 ${timeString})`);
+				//console.log(`🔥 [${instanceId}] ${refreshCount + 1}번째 갱신! (예약시각 ${timeString})`);
                 fetchDataAndRender(instanceId); 
             }, nextInterval);
 			
 			// 5. 로그 출력 (정확한 시각 포함)
-			console.log(`⏱️ [${instanceId}] #${refreshCount} 완료. 다음 갱신은 ${rawInterval}초 후인 ${timeString} 입니다.`);
+			//console.log(`⏱️ [${instanceId}] #${refreshCount} 완료. 다음 갱신은 ${rawInterval}초 후인 ${timeString} 입니다.`);
         }
     }
 
@@ -78,8 +100,8 @@
         const tracesMap = {};
 
         initialData.forEach((item) => {
-            if (!item || !item._id || !item._id.time) return;
-            let code = (item._id && item._id.code) ? item._id['code'] : "Unknown";
+            if (!item || !item._id || !item._id.time || !item._id.code || !item.close) return;
+            let code = item._id['code'];
             
             if (!tracesMap[code]) {
                 tracesMap[code] = {
@@ -101,8 +123,37 @@
         const layout = {
             margin: { t: 40, b: 40, l: 60, r: 40 },
             hovermode: 'x unified',
-            xaxis: { type: 'date', rangeslider: { visible: true, thickness: 0.05 } },
-            yaxis: { autorange: true, tickformat: ',d' },
+            xaxis: {
+				type: 'date',
+				rangeselector: {
+                    buttons: [{count: 10, label: '10m', step: 'minute', stepmode: 'backward'},
+                              {count: 1, label: '1H', step: 'hour', stepmode: 'backward'},
+							  {count: 6, label: '6H', step: 'hour', stepmode: 'backward'},
+                              {step: 'all', label: 'All'} // 전체 보기 버튼
+                             ],
+                    x: 0.07,
+                    y: 1.02 // 그래프 바로 위에 배치
+                },
+				rangeslider: {
+					visible: true, thickness: 0.05
+				}
+			},
+			annotations: [{
+                text: 'Period:',
+                showarrow: false,
+                x: 0,       // x축 시작점
+                y: 1.02,  // 버튼의 y 위치와 비슷하게 맞춤
+                xref: 'paper',
+                yref: 'paper',
+                xanchor: 'left',
+				yanchor: 'bottom',
+                font: { size: 13, color: 'black' }
+            }],
+            yaxis: {
+				type: 'log',
+				autorange: true,
+				tickformat: ',d'
+			},
             showlegend: true
         };
 		const config = {

@@ -1,4 +1,4 @@
-/* Y, 2026.3.1 - 6, 3.10, 3.12 - 20, 3.26 - 28
+/* Y, 2026.3.1 - 6, 3.10, 3.12 - 20, 3.26 - 29
  * MongoDB 데이터를 가져와서 실시간 다중 종목 차트를 그리는 숏코드
  * [mongodb_ohlc_chart type="find" collection="watching_usa" interval="60" x_span_hours="24" timeout="7"]
    {
@@ -28,7 +28,7 @@ function _mongodb_ohlc_chart($atts, $content = null) {
         'port'          => '3000',      // yControl collection
         'type'          => 'find',      // find or aggregate
         'interval'      => '60',        // 갱신 주기 (초)
-        'duration'      => '86400',     // 전체 작동 시간 (초)
+        'duration'      => '3600',      // 전체 작동 시간 (초)
         'timeout'       => '7',         // API 타임아웃 (초)
         'x_span_hours'  => '24',        // X축 표시 범위 (시간)
 		'time_field'    => '_id.time',
@@ -83,7 +83,7 @@ function _mongodb_ohlc_chart($atts, $content = null) {
     
     if (is_wp_error($response)) return "❌ API 연결 실패: " . $response->get_error_message();
 
-    $node_data = json_decode(wp_remote_retrieve_body($response), true);
+    $node_data = json_decode(wp_remote_retrieve_body($response), true);   // {"data": [...], "status": "ok"}
 	
 	// 4. 데이터 존재 여부 확인 (isset은 키 존재 여부, is_array는 형식 확인)
     if (!isset($node_data['data']) || !is_array($node_data['data']) || empty($node_data['data'])) {
@@ -200,7 +200,7 @@ function render_mongo_chart_html($chart_data, $control) {
     $js_code = trim(str_ireplace(['<script>', '</script>'], '', $js_code));
 
     $js_vars = json_encode([
-		'chart_data'       => $chart_data,
+		'chart_data'       => $chart_data,  // 첫 화면용 데이터, One time data
         'x_span_hours'     => (int)$control['x_span_hours'],
         'refresh_interval' => (int)$control['refresh_interval'],  // sec
 		'refresh_end_time' => $control['refresh_end_time'],
