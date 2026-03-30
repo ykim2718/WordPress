@@ -1,4 +1,4 @@
-/* Y, 2026.3.1 - 6, 3.10, 3.12 - 20, 3.26 - 29
+/* Y, 2026.3.1 - 6, 3.10, 3.12 - 20, 3.26 - 30
  * MongoDB 데이터를 가져와서 실시간 다중 종목 차트를 그리는 숏코드
  * [mongodb_ohlc_chart type="find" collection="watching_usa" interval="60" x_span_hours="24" timeout="7"]
    {
@@ -234,6 +234,7 @@ function render_mongo_chart_html($chart_data, $control) {
     </div>';
 
     // JS 실행 로직을 Plotly 최적화로 변경
+    //file_put_contents(WP_CONTENT_DIR . '/debug_before.txt', $js_code);
     $output .= '
     <script type="text/javascript">
     (function() {
@@ -250,7 +251,7 @@ function render_mongo_chart_html($chart_data, $control) {
         function startPlotlyRender() {
             if (typeof Plotly !== "undefined") {
                 try {
-                    (function() { ' . $js_code . ' })();  // 스니펫 코드 실행
+					' . $js_code . '
                 } catch (e) {
                     errorBox.style.display = "block";
                     errorBox.innerHTML = "<strong>Runtime Error:</strong> " + e.message;
@@ -263,13 +264,15 @@ function render_mongo_chart_html($chart_data, $control) {
         }
 
         // DOM 로드 완료 후 실행
-        if (document.readyState === "complete") {
-            startPlotlyRender();
+        if (document.readyState === "loading") {
+		    // 아직 HTML 파싱 중 → DOMContentLoaded 이벤트 기다림
+            window.addEventListener("DOMContentLoaded", startPlotlyRender, { once: true });
         } else {
-            window.addEventListener("load", startPlotlyRender);
+		    // 그 외 (interactive, complete) → 즉시 실행
+		    startPlotlyRender();
         }
     })();
     </script>';
-
+    //file_put_contents(WP_CONTENT_DIR . '/debug_after.txt', $output);
     return $output;
 }

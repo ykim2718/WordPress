@@ -1,4 +1,4 @@
-/* Y, 2026.3.5 - 6, 3.10 - 20, 3.29
+/* Y, 2026.3.5 - 6, 3.10 - 20, 3.29 - 30
  * AJAX & Plotly.react Version
  */
 (function() {
@@ -101,37 +101,47 @@
 
         initialData.forEach((item) => {
             if (!item || !item._id || !item._id.time || !item._id.code || !item.close) return;
-            let code = item._id['code'];
-            
-            if (!tracesMap[code]) {
-                tracesMap[code] = {
-                    x: [], y: [], name: code,
+            let ticker = item._id['code'];
+			// 일부 플러그인 (예: SyntaxHighlighter, Enlighter 등)이 [code]를 숏코드로 등록해서 WordPress가 제거하는 것 같음. 2026.3.29
+            let isEmpty = tracesMap[ticker] === undefined || Object.keys(tracesMap[ticker]).length === 0;
+            if (isEmpty) {
+                let newTrace = {
+                    x: [], y: [], name: ticker,
                     type: 'scatter', mode: 'lines+markers',
                     marker: { size: 4, symbol: 'circle' },
                     line: { width: 1.5 },
                     connectgaps: true
                 };
+				tracesMap[ticker] = newTrace;  // 2026.3.29$
             }
-            
-            if (tracesMap[code] && Array.isArray(tracesMap[code].x)) {
-                tracesMap[code].x.push(new Date(item._id.time));
-                tracesMap[code].y.push(Number(item.close || 0));
+			
+            if (tracesMap[ticker] && Array.isArray(tracesMap[ticker].x)) {
+                tracesMap[ticker].x.push(new Date(item._id.time));
+                tracesMap[ticker].y.push(Number(item.close || 0));
             }
         });
 
         const finalData = Object.values(tracesMap);
+		
+		let currentXRange = null;
+        let currentYRange = null;
+        if (container._fullLayout) {
+            currentXRange = container._fullLayout.xaxis.range;
+            currentYRange = container._fullLayout.yaxis.range;
+        }
         const layout = {
             margin: { t: 40, b: 40, l: 60, r: 40 },
             hovermode: 'x unified',
             xaxis: {
 				type: 'date',
+				range: currentXRange || undefined,
 				rangeselector: {
                     buttons: [{count: 10, label: '10m', step: 'minute', stepmode: 'backward'},
                               {count: 1, label: '1H', step: 'hour', stepmode: 'backward'},
 							  {count: 6, label: '6H', step: 'hour', stepmode: 'backward'},
                               {step: 'all', label: 'All'} // 전체 보기 버튼
                              ],
-                    x: 0.07,
+                    x: 0.09,
                     y: 1.02 // 그래프 바로 위에 배치
                 },
 				rangeslider: {
@@ -151,7 +161,7 @@
             }],
             yaxis: {
 				type: 'log',
-				autorange: true,
+				autorange: currentYRange ? false : true,
 				tickformat: ',d'
 			},
             showlegend: true
