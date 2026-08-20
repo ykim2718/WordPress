@@ -1,8 +1,9 @@
-name: Build image index
+name: Build gallery artifacts
 
-# Images/ 안의 그림이 바뀌면 index.json과 480px 썸네일을 다시 만들어 커밋한다.
-# 자기가 만든 파일이 다시 자기를 부르지 않도록 index.json과 .thumbs는 트리거에서 뺀다.
-# (GITHUB_TOKEN으로 민 커밋은 워크플로를 다시 트리거하지 않지만, 그래도 명시해 둔다.)
+# 두 가지를 자동으로 만든다.
+#   Images/ 가 바뀌면      -> index.json 과 480px 썸네일
+#   플러그인이 바뀌면      -> plugins/dist/ 의 zip 과 version.json (헤더 Version이 올랐을 때만)
+# 태그도 릴리스도 쓰지 않는다. 버전만 올려서 push하면 워드프레스에 업데이트가 뜬다.
 
 on:
   push:
@@ -11,7 +12,9 @@ on:
       - 'Images/**'
       - '!Images/index.json'
       - '!Images/.thumbs/**'
+      - 'plugins/github-image-gallery/**'
       - 'tools/build_image_index.py'
+      - 'tools/build_plugin_dist.sh'
       - '.github/workflows/image-index.yml'
   workflow_dispatch:
 
@@ -19,7 +22,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: image-index
+  group: gallery-artifacts
   cancel-in-progress: true
 
 jobs:
@@ -37,17 +40,20 @@ jobs:
       - name: Install Pillow
         run: pip install --quiet 'pillow>=10'
 
-      - name: Build index and thumbnails
+      - name: Build the image index and thumbnails
         run: python3 tools/build_image_index.py
 
-      - name: Commit if anything changed
+      - name: Build the plugin zip when the version changed
+        run: bash tools/build_plugin_dist.sh
+
+      - name: Commit whatever changed
         run: |
-          if git diff --quiet -- Images/index.json Images/.thumbs; then
+          if git diff --quiet -- Images/index.json Images/.thumbs plugins/dist; then
             echo "nothing to commit"
             exit 0
           fi
           git config user.name  'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add Images/index.json Images/.thumbs
-          git commit -m 'Rebuild the image index and thumbnails'
+          git add Images/index.json Images/.thumbs plugins/dist
+          git commit -m 'Rebuild gallery artifacts'
           git push

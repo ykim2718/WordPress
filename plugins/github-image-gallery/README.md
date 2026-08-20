@@ -72,11 +72,14 @@ define('GITHUB_GALLERY_TOKEN', 'ghp_...');
 
 ## 새 버전 내보내기
 
-1. `github-image-gallery.php`의 `Version:`과 `GIG_VERSION`을 올린다.
-2. tag를 민다. 워크플로가 tag와 헤더 버전이 같은지 검사한 뒤 zip을 만들어 release에 붙인다.
+`github-image-gallery.php`의 `Version:`과 `GIG_VERSION`을 올려서 push하면 끝이다.
+CI가 `plugins/dist/`의 zip과 `version.json`을 다시 만들고, 워드프레스 플러그인 화면에
+업데이트가 뜬다. tag도 release도 쓰지 않는다.
+
+손으로 만들려면:
 
 ```bash
-git tag plugin-v1.0.1 && git push origin plugin-v1.0.1
+bash tools/build_plugin_dist.sh
 ```
 
 ## 썸네일 다시 만들기
@@ -90,17 +93,7 @@ python3 tools/build_image_index.py            # --dir, --width, --quality
 
 바뀌지 않은 그림의 썸네일은 sha1로 걸러 다시 만들지 않는다.
 
-## 워크플로 설치가 한 단계 남았다
+## 워크플로
 
-`tools/workflows/`의 두 파일을 `.github/workflows/`로 옮겨야 CI가 돈다.
-이 세션의 토큰에 `workflow` 권한이 없어 대신 넣어 두지 못했다.
-
-```bash
-mkdir -p .github/workflows
-git mv tools/workflows/image-index.yml   .github/workflows/
-git mv tools/workflows/plugin-release.yml .github/workflows/
-git commit -m "Install the gallery workflows" && git push
-```
-
-옮기기 전까지는 `Images/`에 그림을 넣어도 `index.json`이 갱신되지 않으므로,
-위의 `python3 tools/build_image_index.py`를 직접 돌려 커밋하면 된다.
+`tools/workflows/image-index.yml`을 `.github/workflows/`에 넣으면 위 두 가지가 자동으로 돈다.
+이 세션의 토큰에 workflow 권한이 없어 대신 넣어 두지 못했다.
