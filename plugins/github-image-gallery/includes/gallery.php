@@ -244,6 +244,7 @@ function gig_render($atts) {
         'show_name'    => 1,
         'show_search'  => 1,
         'lightbox'     => 1,
+        'context_menu' => 1,
         'limit'        => 0,
         'cache'        => 60,
     ), $atts, 'github_image_gallery');
@@ -302,6 +303,8 @@ function gig_render($atts) {
     ?>
 <div class="gig" id="<?php echo esc_attr($uid); ?>"
      data-lightbox="<?php echo ((int) $a['lightbox'] === 1) ? '1' : '0'; ?>"
+     data-menu="<?php echo ((int) $a['context_menu'] === 1) ? '1' : '0'; ?>"
+     data-blob="<?php echo esc_attr('https://github.com/' . $src['owner'] . '/' . $src['repo'] . '/blob/' . $src['branch'] . ($src['path'] !== '' ? '/' . $src['path'] : '')); ?>"
      style="--gig-col:<?php echo (int) $col; ?>;--gig-gap:<?php echo (int) $gap; ?>px;--gig-ratio:<?php echo esc_attr($ratio); ?>">
 
   <div class="gig-bar">
@@ -370,7 +373,7 @@ function gig_render($atts) {
       <?php if ((int) $a['show_name'] === 1 || ((int) $a['show_date'] === 1 && $f['date'])) : ?>
       <figcaption>
         <?php if ((int) $a['show_name'] === 1) : ?>
-          <span class="gig-fn"><?php echo esc_html($f['name']); ?></span>
+          <span class="gig-fn" title="<?php echo esc_attr($f['name']); ?>"><?php echo esc_html($f['name']); ?></span>
         <?php endif; ?>
         <?php if ((int) $a['show_date'] === 1 && $f['date']) : ?>
           <span class="gig-dt"><?php echo esc_html(date_i18n(get_option('date_format'), $f['date'])); ?></span>

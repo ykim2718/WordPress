@@ -6,6 +6,70 @@
   var ALL = TXT.all || 'All groups';
   var SEL = TXT.selected || '%d selected';
 
+  /* ---- 클립보드: https가 아니면 navigator.clipboard가 없으므로 대비책을 둔다 ---- */
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text);
+    }
+    return new Promise(function (resolve, reject) {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;top:-1000px;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      ta.remove();
+      ok ? resolve() : reject();
+    });
+  }
+
+  var toastTimer;
+  function toast(msg) {
+    var old = document.querySelector('.gig-toast');
+    if (old) old.remove();
+    var el = document.createElement('div');
+    el.className = 'gig-toast';
+    el.textContent = msg;
+    document.body.appendChild(el);
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.remove(); }, 1600);
+  }
+
+  function closeMenu() {
+    var m = document.querySelector('.gig-menu');
+    if (m) m.remove();
+  }
+
+  /* 브라우저 기본 메뉴에는 항목을 추가할 수 없다. 썸네일 위에서만 자체 메뉴를 띄운다. */
+  function openMenu(x, y, entries) {
+    closeMenu();
+    var menu = document.createElement('div');
+    menu.className = 'gig-menu';
+    entries.forEach(function (e) {
+      if (e === '-') { menu.appendChild(document.createElement('hr')); return; }
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = e.label;
+      b.addEventListener('click', function () { closeMenu(); e.run(); });
+      menu.appendChild(b);
+    });
+    menu.style.left = '0px';
+    menu.style.top = '0px';
+    document.body.appendChild(menu);
+
+    var r = menu.getBoundingClientRect();          // 화면 밖으로 나가지 않게 접어 넣는다
+    var left = Math.min(x, window.innerWidth - r.width - 8);
+    var top = Math.min(y, window.innerHeight - r.height - 8);
+    menu.style.left = Math.max(8, left) + 'px';
+    menu.style.top = Math.max(8, top) + 'px';
+  }
+
+  document.addEventListener('click', closeMenu);
+  document.addEventListener('scroll', closeMenu, true);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenu(); });
+
   function init(root) {
     if (root.dataset.ready) return;
     root.dataset.ready = '1';
@@ -83,6 +147,35 @@
       query.addEventListener('input', function () {
         clearTimeout(timer);
         timer = setTimeout(apply, 120);
+      });
+    }
+
+    if (root.dataset.menu === '1') {
+      root.addEventListener('contextmenu', function (e) {
+        var link = e.target.closest && e.target.closest('.gig-link');
+        if (!link) return;
+        e.preventDefault();
+
+        var item = link.closest('.gig-item');
+        var name = item.querySelector('.gig-fn')
+                 ? item.querySelector('.gig-fn').getAttribute('title')
+                 : item.dataset.name;
+        var raw  = link.getAttribute('href');
+        var blob = (root.dataset.blob || '') + '/' + encodeURIComponent(name);
+
+        function copy(text) {
+          copyText(text).then(function () { toast(TXT.copied || 'Copied'); },
+                              function () { toast(TXT.copyFail || 'Could not copy'); });
+        }
+
+        openMenu(e.clientX, e.clientY, [
+          { label: TXT.copyLink || 'Copy GitHub image link address', run: function () { copy(raw); } },
+          { label: TXT.copyMd   || 'Copy as Markdown',               run: function () { copy('![' + name + '](' + raw + ')'); } },
+          { label: TXT.copyName || 'Copy file name',                 run: function () { copy(name); } },
+          '-',
+          { label: TXT.openTab  || 'Open image in new tab',          run: function () { window.open(raw, '_blank', 'noopener'); } },
+          { label: TXT.openGh   || 'Open on GitHub',                 run: function () { window.open(blob, '_blank', 'noopener'); } }
+        ]);
       });
     }
 

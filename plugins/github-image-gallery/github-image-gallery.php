@@ -3,7 +3,7 @@
  * Plugin Name:       GitHub Image Gallery
  * Plugin URI:        https://github.com/ykim2718/WordPress
  * Description:       Shows a folder of images from a public GitHub repository as a filterable thumbnail gallery. Groups are derived from the file names and offered as a multi-select dropdown.
- * Version:           1.0.1
+ * Version:           1.0.2
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Author:            yRocket
@@ -22,7 +22,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('GIG_VERSION', '1.0.1');
+define('GIG_VERSION', '1.0.2');
 define('GIG_FILE', __FILE__);
 define('GIG_DIR', plugin_dir_path(__FILE__));
 define('GIG_URL', plugin_dir_url(__FILE__));
@@ -41,6 +41,13 @@ function gig_enqueue_assets() {
         'all'      => __('All groups', 'github-image-gallery'),
         /* translators: %d: number of selected groups */
         'selected' => __('%d selected', 'github-image-gallery'),
+        'copyLink' => __('Copy GitHub image link address', 'github-image-gallery'),
+        'copyName' => __('Copy file name', 'github-image-gallery'),
+        'copyMd'   => __('Copy as Markdown', 'github-image-gallery'),
+        'openTab'  => __('Open image in new tab', 'github-image-gallery'),
+        'openGh'   => __('Open on GitHub', 'github-image-gallery'),
+        'copied'   => __('Copied', 'github-image-gallery'),
+        'copyFail' => __('Could not copy', 'github-image-gallery'),
     ));
 }
 
