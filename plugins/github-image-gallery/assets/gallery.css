@@ -1,0 +1,88 @@
+/* GitHub Image Gallery -- 인스턴스별 값은 root의 CSS 변수로 들어온다 */
+
+.gig { --gig-col: 4; --gig-gap: 14px; --gig-ratio: 4/3; }
+
+.gig-bar {
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px;
+  margin: 0 0 16px; padding: 12px 14px;
+  border: 1px solid rgba(128, 128, 128, .28); border-radius: 10px;
+}
+.gig-field { position: relative; display: flex; flex-direction: column; gap: 4px; }
+.gig-grow  { flex: 1 1 180px; min-width: 140px; }
+.gig-lab   { font-size: .72rem; letter-spacing: .04em; opacity: .7; }
+
+.gig-sort, .gig-q, .gig-drop-btn {
+  font: inherit; font-size: .9rem; padding: 7px 10px; line-height: 1.2;
+  border: 1px solid rgba(128, 128, 128, .45); border-radius: 7px;
+  background: transparent; color: inherit; max-width: 100%;
+}
+.gig-drop-btn { display: flex; align-items: center; gap: 8px; cursor: pointer; min-width: 150px; }
+.gig-caret    { opacity: .6; margin-left: auto; }
+
+.gig-drop {
+  position: absolute; z-index: 30; top: 100%; left: 0; margin-top: 6px;
+  min-width: 220px; max-width: 320px; max-height: 320px; overflow: auto; padding: 8px;
+  border: 1px solid rgba(128, 128, 128, .45); border-radius: 9px;
+  background: #fff; color: inherit; box-shadow: 0 10px 26px rgba(0, 0, 0, .18);
+}
+@media (prefers-color-scheme: dark) { .gig-drop { background: #1e1e1e; } }
+
+.gig-drop-head { display: flex; gap: 6px; padding: 2px 2px 8px; }
+.gig-mini {
+  font: inherit; font-size: .75rem; padding: 3px 8px; cursor: pointer; color: inherit;
+  border: 1px solid rgba(128, 128, 128, .45); border-radius: 999px; background: transparent;
+}
+.gig-drop-list { list-style: none; margin: 0; padding: 0; }
+.gig-drop-list li { margin: 0; }
+.gig-drop-list label {
+  display: flex; align-items: center; gap: 8px; padding: 6px; border-radius: 6px;
+  font-size: .88rem; cursor: pointer;
+}
+.gig-drop-list label:hover { background: rgba(128, 128, 128, .14); }
+.gig-gname { flex: 1; }
+.gig-gnum  { font-size: .75rem; opacity: .6; }
+
+.gig-count { margin-left: auto; font-size: .8rem; opacity: .7; padding-bottom: 8px; }
+.gig-hint  { font-size: .78rem; opacity: .7; margin-top: 14px; }
+
+.gig-grid {
+  display: grid; gap: var(--gig-gap);
+  grid-template-columns: repeat(auto-fill,
+    minmax(min(100%, calc((100% - (var(--gig-col) - 1) * var(--gig-gap)) / var(--gig-col))), 1fr));
+}
+.gig-item { margin: 0; min-width: 0; }
+.gig-item[hidden] { display: none; }
+
+.gig-link {
+  display: block; overflow: hidden; border-radius: 9px;
+  background: rgba(128, 128, 128, .12); aspect-ratio: var(--gig-ratio);
+}
+.gig-link img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform .25s ease;
+}
+.gig-link:hover img { transform: scale(1.045); }
+@media (prefers-reduced-motion: reduce) {
+  .gig-link img { transition: none; }
+  .gig-link:hover img { transform: none; }
+}
+
+.gig figcaption {
+  display: flex; gap: 8px; align-items: baseline; margin-top: 6px;
+  font-size: .74rem; line-height: 1.35; opacity: .8;
+}
+.gig-fn { overflow-wrap: anywhere; }
+.gig-dt { margin-left: auto; white-space: nowrap; opacity: .75; }
+.gig-empty { padding: 28px 0; text-align: center; opacity: .7; }
+
+/* 라이트박스 */
+.gig-box {
+  position: fixed; inset: 0; z-index: 99999;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, .86); padding: 24px; cursor: zoom-out;
+}
+.gig-box img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; }
+.gig-box .gig-cap {
+  position: absolute; left: 0; right: 0; bottom: 14px; text-align: center;
+  color: #fff; font-size: .82rem; opacity: .85; pointer-events: none;
+}

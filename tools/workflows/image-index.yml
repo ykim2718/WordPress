@@ -1,0 +1,53 @@
+name: Build image index
+
+# Images/ 안의 그림이 바뀌면 index.json과 480px 썸네일을 다시 만들어 커밋한다.
+# 자기가 만든 파일이 다시 자기를 부르지 않도록 index.json과 .thumbs는 트리거에서 뺀다.
+# (GITHUB_TOKEN으로 민 커밋은 워크플로를 다시 트리거하지 않지만, 그래도 명시해 둔다.)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Images/**'
+      - '!Images/index.json'
+      - '!Images/.thumbs/**'
+      - 'tools/build_image_index.py'
+      - '.github/workflows/image-index.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: image-index
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0        # commit 날짜를 git log로 읽으므로 전체 이력이 필요하다
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Pillow
+        run: pip install --quiet 'pillow>=10'
+
+      - name: Build index and thumbnails
+        run: python3 tools/build_image_index.py
+
+      - name: Commit if anything changed
+        run: |
+          if git diff --quiet -- Images/index.json Images/.thumbs; then
+            echo "nothing to commit"
+            exit 0
+          fi
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add Images/index.json Images/.thumbs
+          git commit -m 'Rebuild the image index and thumbnails'
+          git push

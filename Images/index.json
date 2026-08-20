@@ -1,0 +1,779 @@
+{
+ "generated": "2026-08-20T17:37:50Z",
+ "folder": "Images",
+ "thumb_dir": ".thumbs",
+ "thumb_width": 480,
+ "count": 77,
+ "items": [
+  {
+   "n": "acacia-tree-dune-sunset.webp",
+   "s": 352962,
+   "h1": "5084404344f4a6201abb5fac04c85470ea10a29c",
+   "d": 1786507323,
+   "w": 1536,
+   "ht": 1024,
+   "t": ".thumbs/acacia-tree-dune-sunset.webp.webp",
+   "e": 0
+  },
+  {
+   "n": "anderson-mill-pool-lap-lanes.jpg",
+   "s": 440841,
+   "h1": "b9d3f2454883bf90e54dd4d9b8eb34675e7abfc6",
+   "d": 1787093774,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/anderson-mill-pool-lap-lanes.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "apex-center-entrance.jpg",
+   "s": 424491,
+   "h1": "5ded62fc9f154bca9649f8ad19bb22604177281f",
+   "d": 1786486892,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/apex-center-entrance.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "apex-ice-arena-exterior.jpg",
+   "s": 497091,
+   "h1": "5e445075c03804c80ca7491f65ea9d89c16a63e1",
+   "d": 1786486892,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/apex-ice-arena-exterior.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "apex-ice-arena-rink.jpg",
+   "s": 384705,
+   "h1": "9bae8bcc2eda2ff44b50f363caf52852dd2e0b02",
+   "d": 1786498727,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/apex-ice-arena-rink.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "apex-park-lawn-trees.jpg",
+   "s": 476824,
+   "h1": "cad3481e41ab2da6c3b63885957eb65801a6ffb1",
+   "d": 1786498849,
+   "w": 1500,
+   "ht": 1125,
+   "t": ".thumbs/apex-park-lawn-trees.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "apex-park-skatepark-deep-bowl.jpg",
+   "s": 443143,
+   "h1": "93a2c07af494390b0ff4effe02f2ea716f611057",
+   "d": 1786498849,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/apex-park-skatepark-deep-bowl.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "apex-park-skatepark-flow-course.jpg",
+   "s": 424026,
+   "h1": "d23b517c16bf2cca8622f35f9875d0a4637d9201",
+   "d": 1786498849,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/apex-park-skatepark-flow-course.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "automatic-rule-loading-600x400.png",
+   "s": 104754,
+   "h1": "c854c7ae77e90f39834897114738625f94bdc760",
+   "d": 1785874729,
+   "w": 600,
+   "ht": 400,
+   "t": ".thumbs/automatic-rule-loading-600x400.png.webp",
+   "e": 0
+  },
+  {
+   "n": "barn-marquee-letters.jpg",
+   "s": 379504,
+   "h1": "0ddf83530fd1a1a0a47903895a371908318f9851",
+   "d": 1787081638,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/barn-marquee-letters.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "bull-skull-wall-mount.jpg",
+   "s": 442126,
+   "h1": "7ea0483f649bdf5b1b10a1d7a1c6938c49d99492",
+   "d": 1787084182,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/bull-skull-wall-mount.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "clover-field-park-pavilion.jpg",
+   "s": 452345,
+   "h1": "5699c536bfacf9e5ca05c5720c39a3b6dadad1ab",
+   "d": 1787083799,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/clover-field-park-pavilion.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "crowded-beach-umbrellas.webp",
+   "s": 109828,
+   "h1": "7fa5848848d106fefb20a89a2730efc3d0cd04fc",
+   "d": 1786507200,
+   "w": 1024,
+   "ht": 1024,
+   "t": ".thumbs/crowded-beach-umbrellas.webp.webp",
+   "e": 0
+  },
+  {
+   "n": "dandelion-seeds-backlit.jpg",
+   "s": 215926,
+   "h1": "5eced63d040c3548d09617de5cb9570ccb801687",
+   "d": 1786507200,
+   "w": 1024,
+   "ht": 1024,
+   "t": ".thumbs/dandelion-seeds-backlit.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "dog-sled-team-blizzard.webp",
+   "s": 83496,
+   "h1": "eccdf32681150bc2b4dff05b484f47a177f95bfa",
+   "d": 1786507200,
+   "w": 1024,
+   "ht": 1024,
+   "t": ".thumbs/dog-sled-team-blizzard.webp.webp",
+   "e": 0
+  },
+  {
+   "n": "fieldhouse-ice-rink-public-skate.jpg",
+   "s": 368617,
+   "h1": "dd833a834fe031b6a4556f344b97befa30b00d5f",
+   "d": 1787081638,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/fieldhouse-ice-rink-public-skate.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "four-seasons-tree.webp",
+   "s": 379314,
+   "h1": "95e474ef33243695541190abd4336958819c13a6",
+   "d": 1786507419,
+   "w": 1024,
+   "ht": 1024,
+   "t": ".thumbs/four-seasons-tree.webp.webp",
+   "e": 0
+  },
+  {
+   "n": "freedom-school-building.jpg",
+   "s": 422081,
+   "h1": "901a98ad3088c1cd507eb2b4d038089e9b6d2023",
+   "d": 1786153778,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/freedom-school-building.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "georgetown-neighborhood-trail-prairie-edge.jpg",
+   "s": 346641,
+   "h1": "7f22faeb2f01ee82e7f6a4e50a3e15cc770defd6",
+   "d": 1786798546,
+   "w": 2000,
+   "ht": 1125,
+   "t": ".thumbs/georgetown-neighborhood-trail-prairie-edge.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "georgetown-resort-pool-ledge-loungers.jpg",
+   "s": 426349,
+   "h1": "854cd79b6a180be8a8081d7c241e24d9e0ad4f81",
+   "d": 1786798546,
+   "w": 2000,
+   "ht": 1125,
+   "t": ".thumbs/georgetown-resort-pool-ledge-loungers.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "georgetown-resort-pool-umbrella-patio.jpg",
+   "s": 411023,
+   "h1": "59cdf8e096c64d54a78ffa5f7a4863641ed496e5",
+   "d": 1786798546,
+   "w": 2000,
+   "ht": 900,
+   "t": ".thumbs/georgetown-resort-pool-umbrella-patio.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "git-fork-600x400.png",
+   "s": 26622,
+   "h1": "ae4d43ab3e914538717f3db84e431953fe083ca5",
+   "d": 1785973927,
+   "w": 600,
+   "ht": 400,
+   "t": ".thumbs/git-fork-600x400.png.webp",
+   "e": 0
+  },
+  {
+   "n": "grand-piano-salt-flat-sunset.webp",
+   "s": 86212,
+   "h1": "42a97702f3b6a7acdf6cfed410c26cd838cda8b7",
+   "d": 1786507200,
+   "w": 1376,
+   "ht": 768,
+   "t": ".thumbs/grand-piano-salt-flat-sunset.webp.webp",
+   "e": 0
+  },
+  {
+   "n": "gravel-road-utility-poles.jpg",
+   "s": 430969,
+   "h1": "982debcf89cf660ab8886eefd90a4f7687d4135c",
+   "d": 1786486972,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/gravel-road-utility-poles.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "great-blue-hole-aerial.jpg",
+   "s": 428205,
+   "h1": "0efd5ba8645c19a026384f3607af70d3fa5dde62",
+   "d": 1786507200,
+   "w": 1536,
+   "ht": 1024,
+   "t": ".thumbs/great-blue-hole-aerial.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "guitar-wall-music-store.jpg",
+   "s": 456202,
+   "h1": "4a7c85eef674dd16196de9e5c43877bdcf733c58",
+   "d": 1787083799,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/guitar-wall-music-store.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "hammerhead-shark-sunrays-painting.webp",
+   "s": 479862,
+   "h1": "c9113c3522998e0e62eeebe1e2c4c01460cbc516",
+   "d": 1786507364,
+   "w": 1536,
+   "ht": 1024,
+   "t": ".thumbs/hammerhead-shark-sunrays-painting.webp.webp",
+   "e": 0
+  },
+  {
+   "n": "harper-park-crape-myrtle-street-corner.jpg",
+   "s": 442523,
+   "h1": "bed7312a7f22f79ca0b0fbe90d7809744bb7d82b",
+   "d": 1787084623,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/harper-park-crape-myrtle-street-corner.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "harper-park-entrance-sign.jpg",
+   "s": 343983,
+   "h1": "d816b20452dfc8ad85ce6ebeb43c9a08bef79c5a",
+   "d": 1787084182,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/harper-park-entrance-sign.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "harper-park-sidewalk-live-oak-shade.jpg",
+   "s": 454317,
+   "h1": "327b696251568b8b72043d42bd312d343bbd0202",
+   "d": 1787084623,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/harper-park-sidewalk-live-oak-shade.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "harper-park-sign-field-view.jpg",
+   "s": 372304,
+   "h1": "368537db692d9cdc0d80566f7063c2089522768a",
+   "d": 1787084182,
+   "w": 1500,
+   "ht": 1125,
+   "t": ".thumbs/harper-park-sign-field-view.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "harper-park-stone-sign.jpg",
+   "s": 413967,
+   "h1": "5b1278f197fa46ba6260d152333668eb3070d05c",
+   "d": 1787084182,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/harper-park-stone-sign.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "harper-park-swing-bench.jpg",
+   "s": 416953,
+   "h1": "0b13ca394e696f57286d997f011f95731c87daca",
+   "d": 1787084182,
+   "w": 1500,
+   "ht": 1125,
+   "t": ".thumbs/harper-park-swing-bench.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "heb-plus-storefront-dusk.jpg",
+   "s": 490374,
+   "h1": "2a88fc99dbe5af9b8496280614692b97e353e222",
+   "d": 1787083799,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/heb-plus-storefront-dusk.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "heb-texan-truffles-tin.jpg",
+   "s": 177209,
+   "h1": "3e278263d5041d069034ef9cd83b5b9951db76e1",
+   "d": 1786507467,
+   "w": 900,
+   "ht": 600,
+   "t": ".thumbs/heb-texan-truffles-tin.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "hillside-plaza-stone-columns.jpg",
+   "s": 433360,
+   "h1": "a8bae20dd0deb560e21ec816f5531f7f56ee6698",
+   "d": 1787081638,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/hillside-plaza-stone-columns.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "hockey-rink-empty-ice.jpg",
+   "s": 444905,
+   "h1": "a4785940b4764ada3c57dd56d814bd8ae1ad2eb5",
+   "d": 1787083799,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/hockey-rink-empty-ice.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "in-n-out-storefront-clouds.jpg",
+   "s": 488584,
+   "h1": "138841d592166003a894a922e249d842dc5eb5cc",
+   "d": 1787081638,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/in-n-out-storefront-clouds.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "incheon-bridge-sunset.jpg",
+   "s": 399351,
+   "h1": "9acdcdf495d7203588699e8d1a6da12878968461",
+   "d": 1785929553,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/incheon-bridge-sunset.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "lawn-worms-eye-live-oak-sky.jpg",
+   "s": 468246,
+   "h1": "5f1884f5924f24340ad2c12792bd099c2fcbf67d",
+   "d": 1786507656,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/lawn-worms-eye-live-oak-sky.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "lawn-worms-eye-shaded-street.jpg",
+   "s": 408382,
+   "h1": "90be081c4e8827f564442975cc86373ceb6ff1fb",
+   "d": 1786507656,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/lawn-worms-eye-shaded-street.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "lawn-worms-eye-street-corner.jpg",
+   "s": 448058,
+   "h1": "ab528f25d871e084275e0558927b18675b443ad1",
+   "d": 1786507656,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/lawn-worms-eye-street-corner.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "live-oak-street-water-tower.jpg",
+   "s": 455101,
+   "h1": "aa03b16b133e3105e3fa1c16ef38cef59809fecd",
+   "d": 1787083799,
+   "w": 1500,
+   "ht": 1125,
+   "t": ".thumbs/live-oak-street-water-tower.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "lowes-do-it-right-buckets.jpg",
+   "s": 181058,
+   "h1": "65d0f808bbc58efb1e2b14a295a76d582acfd441",
+   "d": 1786507467,
+   "w": 1000,
+   "ht": 750,
+   "t": ".thumbs/lowes-do-it-right-buckets.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "margaret-hunt-hill-bridge-dallas.jpg",
+   "s": 73322,
+   "h1": "ffe1767e71d57d2455540725433c0b5896b8bd56",
+   "d": 1786798737,
+   "w": 800,
+   "ht": 600,
+   "t": ".thumbs/margaret-hunt-hill-bridge-dallas.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "margaret-hunt-hill-bridge-dallas.webp",
+   "s": 49828,
+   "h1": "14e9fb938e41b0f7bb858ade77ea8ea5454b2e4f",
+   "d": 1786798356,
+   "w": 800,
+   "ht": 600,
+   "t": ".thumbs/margaret-hunt-hill-bridge-dallas.webp.webp",
+   "e": 0
+  },
+  {
+   "n": "mean-variance-and-agreement-metrics-for-regression.png",
+   "s": 63033,
+   "h1": "93bdad734de44db503169b0dca755bdf0f486011",
+   "d": 1787242533,
+   "w": 600,
+   "ht": 400,
+   "t": ".thumbs/mean-variance-and-agreement-metrics-for-regression.png.webp",
+   "e": 0
+  },
+  {
+   "n": "open-prairie-fenceline-clouds.jpg",
+   "s": 350712,
+   "h1": "2d68c353aba694fc994d18b85c5979f8f6c66780",
+   "d": 1786486972,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/open-prairie-fenceline-clouds.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "pappadeaux-seafood-kitchen-exterior.jpg",
+   "s": 392469,
+   "h1": "c6ce9baef2ba290433103f6ce0ce39c83cf6555e",
+   "d": 1787083799,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/pappadeaux-seafood-kitchen-exterior.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "plains-highway-wind-farm.jpg",
+   "s": 465931,
+   "h1": "e5348afa29c8f9bb0a2c6b9aad7adc5f2dcdce4e",
+   "d": 1786248365,
+   "w": 2000,
+   "ht": 1333,
+   "t": ".thumbs/plains-highway-wind-farm.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "prairie-crossroads-stop-sign.jpg",
+   "s": 377139,
+   "h1": "52e280e0bf8cc6fd626f3d8805972f03e47c55b7",
+   "d": 1786218042,
+   "w": 2000,
+   "ht": 1420,
+   "t": ".thumbs/prairie-crossroads-stop-sign.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "prairie-dirt-road-power-line.jpg",
+   "s": 420648,
+   "h1": "1ad1edaa847c12d62ab8db1f2c0c4d6257fb50e8",
+   "d": 1786486892,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/prairie-dirt-road-power-line.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "prairie-road-cirrus-sky.jpg",
+   "s": 456594,
+   "h1": "9110c6eb4c1d1de7c55ad91f29721f403db0216a",
+   "d": 1786486892,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/prairie-road-cirrus-sky.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "prairie-road-farmstead-clouds.jpg",
+   "s": 355298,
+   "h1": "2adc1818ba722874d40084212948cc066d684327",
+   "d": 1786486892,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/prairie-road-farmstead-clouds.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "pumpjacks-and-wind-turbines.jpg",
+   "s": 416225,
+   "h1": "9efa7e506ad5fe79f5c14a9d890dcf2c0f0c526a",
+   "d": 1786248365,
+   "w": 1500,
+   "ht": 1000,
+   "t": ".thumbs/pumpjacks-and-wind-turbines.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "pumpjacks-green-pasture-wind-farm.jpg",
+   "s": 553234,
+   "h1": "6ee79ca72f6c4811f409d001f1b6f4b79c2c2cec",
+   "d": 1786485894,
+   "w": 2000,
+   "ht": 1333,
+   "t": ".thumbs/pumpjacks-green-pasture-wind-farm.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "raising-canes-night-exterior.jpg",
+   "s": 403333,
+   "h1": "3806cf07637e2ac62d594f001c1201d51c102a44",
+   "d": 1787081638,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/raising-canes-night-exterior.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "red-chair-long-shadow.webp",
+   "s": 123250,
+   "h1": "43f97cdc687826031cde4f698315b499d32814f6",
+   "d": 1786507200,
+   "w": 2000,
+   "ht": 2000,
+   "t": ".thumbs/red-chair-long-shadow.webp.webp",
+   "e": 0
+  },
+  {
+   "n": "red-chairs-grid-white.webp",
+   "s": 122176,
+   "h1": "c7e7e7da72942c833879cd406573b424373d1799",
+   "d": 1786507200,
+   "w": 2000,
+   "ht": 1116,
+   "t": ".thumbs/red-chairs-grid-white.webp.webp",
+   "e": 0
+  },
+  {
+   "n": "regal-cinema-entrance-dusk.jpg",
+   "s": 385846,
+   "h1": "450c1adb363d0ccc51f5d7fc2351a7849d5359da",
+   "d": 1786798356,
+   "w": 2000,
+   "ht": 1125,
+   "t": ".thumbs/regal-cinema-entrance-dusk.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "residence-inn-room-phone.jpg",
+   "s": 434086,
+   "h1": "fb652f4d3c2d37ffeda8fede1af46764d4605b12",
+   "d": 1786487115,
+   "w": 1500,
+   "ht": 2000,
+   "t": ".thumbs/residence-inn-room-phone.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "reusable-markdown-ai-prompt-300x200.png",
+   "s": 49194,
+   "h1": "5f0823833f1fdc31198aeccfa2439cd04c179874",
+   "d": 1786481788,
+   "w": 300,
+   "ht": 200,
+   "t": ".thumbs/reusable-markdown-ai-prompt-300x200.png.webp",
+   "e": 0
+  },
+  {
+   "n": "rmai-prompt-400x300.png",
+   "s": 58930,
+   "h1": "295265270e6b964582c466d245aefa7160fd3b5f",
+   "d": 1786481788,
+   "w": 400,
+   "ht": 300,
+   "t": ".thumbs/rmai-prompt-400x300.png.webp",
+   "e": 0
+  },
+  {
+   "n": "santorini-domes-infinity-pool-sunset.webp",
+   "s": 147200,
+   "h1": "aaa4782b43bab4004bd04531196886955d1bdc79",
+   "d": 1786507323,
+   "w": 2000,
+   "ht": 1125,
+   "t": ".thumbs/santorini-domes-infinity-pool-sunset.webp.webp",
+   "e": 0
+  },
+  {
+   "n": "snow-bench-footprints.webp",
+   "s": 159322,
+   "h1": "f0f064a44dd229a163564759c398d9a5eaa47192",
+   "d": 1786507200,
+   "w": 1536,
+   "ht": 1024,
+   "t": ".thumbs/snow-bench-footprints.webp.webp",
+   "e": 0
+  },
+  {
+   "n": "spiral-staircase-two-figures.webp",
+   "s": 136278,
+   "h1": "fbc4661df047f65701130849077951baf30a0967",
+   "d": 1786507200,
+   "w": 1024,
+   "ht": 1024,
+   "t": ".thumbs/spiral-staircase-two-figures.webp.webp",
+   "e": 0
+  },
+  {
+   "n": "strawberry-matcha-bingsu.jpg",
+   "s": 397696,
+   "h1": "83a4561a9198199fd2dd6fb3bb98bebde5aee6e2",
+   "d": 1786097592,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/strawberry-matcha-bingsu.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "surfer-inside-wave-barrel.webp",
+   "s": 331596,
+   "h1": "5724713301f5687d5b1874d24f023271c60b6706",
+   "d": 1786507419,
+   "w": 1024,
+   "ht": 1024,
+   "t": ".thumbs/surfer-inside-wave-barrel.webp.webp",
+   "e": 0
+  },
+  {
+   "n": "t-bone-steak-illustration.png",
+   "s": 498686,
+   "h1": "7e4aa74b8db50aadf7b03952afc728e07fa67d09",
+   "d": 1786507200,
+   "w": 800,
+   "ht": 450,
+   "t": ".thumbs/t-bone-steak-illustration.png.webp",
+   "e": 0
+  },
+  {
+   "n": "the-pond-hockey-club-sign.jpg",
+   "s": 455270,
+   "h1": "9a2f405eb2e3f29db2bb6628f7cf889e41e139c8",
+   "d": 1787083799,
+   "w": 1500,
+   "ht": 1125,
+   "t": ".thumbs/the-pond-hockey-club-sign.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "variance-components-coefficient-of-determination-r2.png",
+   "s": 8416,
+   "h1": "7c5eb5bbcca2878e322376844b4f25bce34c39a8",
+   "d": 1787237768,
+   "w": 300,
+   "ht": 200,
+   "t": ".thumbs/variance-components-coefficient-of-determination-r2.png.webp",
+   "e": 0
+  },
+  {
+   "n": "welcome-to-colorful-colorado.jpg",
+   "s": 411680,
+   "h1": "efa5dff7158cfe834ca673a64dfc3528dea8432b",
+   "d": 1786153826,
+   "w": 2000,
+   "ht": 1500,
+   "t": ".thumbs/welcome-to-colorful-colorado.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "whataburger-storefront.jpg",
+   "s": 155339,
+   "h1": "7b2d3bc251894b6275230fbe9c25de7cb5f2f906",
+   "d": 1786507561,
+   "w": 800,
+   "ht": 600,
+   "t": ".thumbs/whataburger-storefront.jpg.webp",
+   "e": 0
+  },
+  {
+   "n": "white-doorways-receding.png",
+   "s": 481317,
+   "h1": "66c36be51742d63af288fff6f2dff02a46c68b72",
+   "d": 1786507200,
+   "w": 576,
+   "ht": 1024,
+   "t": ".thumbs/white-doorways-receding.png.webp",
+   "e": 0
+  },
+  {
+   "n": "white-feather-underwater.webp",
+   "s": 57636,
+   "h1": "2e5a7a1084de0827a24e1cea21b6805f101e5dd4",
+   "d": 1786507323,
+   "w": 1536,
+   "ht": 1024,
+   "t": ".thumbs/white-feather-underwater.webp.webp",
+   "e": 0
+  },
+  {
+   "n": "zernike-pyramid-noll-1200x800.png",
+   "s": 453020,
+   "h1": "8d84723f4bc406cbe3adb95c5dd99ab4259bb9d8",
+   "d": 1786507258,
+   "w": 1200,
+   "ht": 800,
+   "t": ".thumbs/zernike-pyramid-noll-1200x800.png.webp",
+   "e": 0
+  },
+  {
+   "n": "zernike-pyramid-noll-800x800.png",
+   "s": 435628,
+   "h1": "11f5e5aac58ec04bcfdd811a1d89f1f681f16ca8",
+   "d": 1786507258,
+   "w": 800,
+   "ht": 800,
+   "t": ".thumbs/zernike-pyramid-noll-800x800.png.webp",
+   "e": 0
+  }
+ ]
+}
