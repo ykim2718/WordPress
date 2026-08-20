@@ -1,0 +1,54 @@
+name: Build gallery artifacts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Images/**'
+      - '!Images/index.json'
+      - '!Images/.thumbs/**'
+      - 'plugins/github-image-gallery/**'
+      - 'tools/build_image_index.py'
+      - 'tools/build_plugin_dist.sh'
+      - '.github/workflows/image-index.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gallery-artifacts
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Pillow
+        run: pip install --quiet 'pillow>=10'
+
+      - name: Build the image index and thumbnails
+        run: python3 tools/build_image_index.py
+
+      - name: Build the plugin zip when the version changed
+        run: bash tools/build_plugin_dist.sh
+
+      - name: Commit whatever changed
+        run: |
+          if git diff --quiet -- Images/index.json Images/.thumbs plugins/dist; then
+            echo "nothing to commit"
+            exit 0
+          fi
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add Images/index.json Images/.thumbs plugins/dist
+          git commit -m 'Rebuild gallery artifacts'
+          git push
