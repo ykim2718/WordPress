@@ -1,9 +1,12 @@
 name: Package plugin
 
-# plugin-v1.0.1 처럼 tag를 밀면 plugins/github-image-gallery/ 만 담은 zip을 만들어
-# release에 붙인다. 워드프레스의 업데이트 화면은 이 asset을 내려받는다.
+# plugins/github-image-gallery/ 만 담은 zip을 만들어 release에 붙인다.
+# 워드프레스의 업데이트 화면은 이 asset을 내려받는다.
 #
 #   git tag plugin-v1.0.1 && git push origin plugin-v1.0.1
+#
+# 이미 밀어 둔 tag로 뒤늦게 돌리려면 Actions 화면에서 Run workflow를 눌러
+# tag 이름을 입력하면 된다.
 
 on:
   push:
@@ -11,7 +14,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'plugin-v로 시작하는 tag 이름'
+        description: 'plugin-v로 시작하는 tag 이름 (예: plugin-v1.0.0)'
         required: true
 
 permissions:
@@ -21,16 +24,29 @@ jobs:
   package:
     runs-on: ubuntu-latest
     steps:
+      - name: Resolve the tag
+        id: t
+        run: |
+          TAG="${{ github.event.inputs.tag }}"
+          [ -n "$TAG" ] || TAG="${GITHUB_REF_NAME}"
+          case "$TAG" in
+            plugin-v*) ;;
+            *) echo "::error::tag must start with plugin-v (got '$TAG')"; exit 1 ;;
+          esac
+          echo "tag=$TAG"            >> "$GITHUB_OUTPUT"
+          echo "version=${TAG#plugin-v}" >> "$GITHUB_OUTPUT"
+
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.t.outputs.tag }}
 
       - name: Check that the tag matches the plugin header
         run: |
-          TAG="${GITHUB_REF_NAME#plugin-v}"
           HDR=$(grep -m1 '^ \* Version:' plugins/github-image-gallery/github-image-gallery.php \
                 | sed 's/.*Version: *//' | tr -d '[:space:]')
-          echo "tag=$TAG header=$HDR"
-          if [ "$TAG" != "$HDR" ]; then
-            echo "::error::tag ($TAG) and the plugin header ($HDR) disagree"
+          echo "tag=${{ steps.t.outputs.version }} header=$HDR"
+          if [ "${{ steps.t.outputs.version }}" != "$HDR" ]; then
+            echo "::error::tag and the plugin header disagree"
             exit 1
           fi
 
@@ -44,5 +60,6 @@ jobs:
       - name: Publish the release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.t.outputs.tag }}
           files: build/github-image-gallery.zip
           generate_release_notes: true
