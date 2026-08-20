@@ -3,7 +3,7 @@
  * Plugin Name:       GitHub Image Gallery
  * Plugin URI:        https://github.com/ykim2718/WordPress
  * Description:       Shows a folder of images from a public GitHub repository as a filterable thumbnail gallery. Groups are derived from the file names and offered as a multi-select dropdown.
- * Version:           1.0.0
+ * Version:           1.0.1
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Author:            yRocket
@@ -22,7 +22,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('GIG_VERSION', '1.0.0');
+define('GIG_VERSION', '1.0.1');
 define('GIG_FILE', __FILE__);
 define('GIG_DIR', plugin_dir_path(__FILE__));
 define('GIG_URL', plugin_dir_url(__FILE__));
@@ -38,16 +38,16 @@ function gig_enqueue_assets() {
     wp_enqueue_style('gig-gallery', GIG_URL . 'assets/gallery.css', array(), GIG_VERSION);
     wp_enqueue_script('gig-gallery', GIG_URL . 'assets/gallery.js', array(), GIG_VERSION, true);
     wp_localize_script('gig-gallery', 'GIG_I18N', array(
-        'all'      => __('모든 group', 'github-image-gallery'),
-        /* translators: %d: 선택한 group 수 */
-        'selected' => __('%d개 group 선택', 'github-image-gallery'),
+        'all'      => __('All groups', 'github-image-gallery'),
+        /* translators: %d: number of selected groups */
+        'selected' => __('%d selected', 'github-image-gallery'),
     ));
 }
 
 /** 설정 -> 플러그인 목록에서 캐시를 비울 수 있게 한다 */
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), function ($links) {
     $url = wp_nonce_url(admin_url('plugins.php?gig_flush=1'), 'gig_flush');
-    array_unshift($links, '<a href="' . esc_url($url) . '">' . esc_html__('캐시 비우기', 'github-image-gallery') . '</a>');
+    array_unshift($links, '<a href="' . esc_url($url) . '">' . esc_html__('Flush cache', 'github-image-gallery') . '</a>');
     return $links;
 });
 

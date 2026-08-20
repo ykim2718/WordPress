@@ -10,12 +10,12 @@ if (!defined('ABSPATH')) exit;
  * ------------------------------------------------------------------ */
 function gig_parse_source($url) {
     $url = trim((string) $url);
-    if ($url === '') return new WP_Error('gig_empty', __('github_url 속성이 비어 있습니다.', 'github-image-gallery'));
+    if ($url === '') return new WP_Error('gig_empty', __('The github_url attribute is empty.', 'github-image-gallery'));
 
     // "owner/repo/path" 축약형
     if (strpos($url, '://') === false) {
         $seg = array_values(array_filter(explode('/', trim($url, '/'))));
-        if (count($seg) < 2) return new WP_Error('gig_short', __('owner/repo 형식이 아닙니다.', 'github-image-gallery'));
+        if (count($seg) < 2) return new WP_Error('gig_short', __('Not in owner/repo form.', 'github-image-gallery'));
         return array(
             'owner'  => $seg[0],
             'repo'   => $seg[1],
@@ -26,10 +26,10 @@ function gig_parse_source($url) {
 
     $p = wp_parse_url($url);
     if (empty($p['host']) || !in_array(strtolower($p['host']), array('github.com', 'www.github.com'), true)) {
-        return new WP_Error('gig_host', __('github.com 주소만 사용할 수 있습니다.', 'github-image-gallery'));
+        return new WP_Error('gig_host', __('Only github.com URLs are accepted.', 'github-image-gallery'));
     }
     $seg = array_values(array_filter(explode('/', trim($p['path'], '/'))));
-    if (count($seg) < 2) return new WP_Error('gig_path', __('owner/repo를 찾을 수 없습니다.', 'github-image-gallery'));
+    if (count($seg) < 2) return new WP_Error('gig_path', __('Could not find owner/repo in the URL.', 'github-image-gallery'));
 
     $branch = 'main';
     $path   = '';
@@ -67,9 +67,9 @@ function gig_http($url, $accept_json = true) {
     $body = wp_remote_retrieve_body($res);
 
     if ($code === 403 && (int) wp_remote_retrieve_header($res, 'x-ratelimit-remaining') === 0) {
-        return new WP_Error('gig_rate', __('GitHub API 호출 한도를 넘었습니다. index.json을 쓰면 이 한도를 쓰지 않습니다.', 'github-image-gallery'));
+        return new WP_Error('gig_rate', __('GitHub API rate limit reached. Using index.json avoids this limit.', 'github-image-gallery'));
     }
-    if ($code !== 200) return new WP_Error('gig_http', sprintf(__('GitHub 응답 %d', 'github-image-gallery'), $code));
+    if ($code !== 200) return new WP_Error('gig_http', sprintf(__('GitHub returned %d', 'github-image-gallery'), $code));
     return $body;
 }
 
@@ -102,7 +102,7 @@ function gig_fetch_index($src) {
 
     $data = json_decode($body, true);
     if (!is_array($data) || empty($data['items']) || !is_array($data['items'])) {
-        return new WP_Error('gig_index', __('index.json 형식이 아닙니다.', 'github-image-gallery'));
+        return new WP_Error('gig_index', __('index.json is not in the expected shape.', 'github-image-gallery'));
     }
 
     $base  = gig_raw_base($src);
@@ -138,7 +138,7 @@ function gig_fetch_api($src) {
     if (is_wp_error($body)) return $body;
 
     $rows = json_decode($body, true);
-    if (!is_array($rows)) return new WP_Error('gig_shape', __('폴더 목록을 읽지 못했습니다.', 'github-image-gallery'));
+    if (!is_array($rows)) return new WP_Error('gig_shape', __('Could not read the folder listing.', 'github-image-gallery'));
 
     $ok    = array('jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'svg', 'bmp');
     $items = array();
@@ -255,7 +255,7 @@ function gig_render($atts) {
     if (is_wp_error($data)) return gig_notice($data->get_error_message());
 
     $files = $data['items'];
-    if (empty($files)) return gig_notice(__('이 폴더에서 이미지를 찾지 못했습니다.', 'github-image-gallery'));
+    if (empty($files)) return gig_notice(__('No images found in this folder.', 'github-image-gallery'));
 
     $sort = in_array($a['sort'], array('name_asc', 'name_desc', 'date_desc', 'date_asc'), true)
           ? $a['sort'] : 'name_asc';
@@ -307,13 +307,13 @@ function gig_render($atts) {
   <div class="gig-bar">
     <div class="gig-field gig-groups">
       <button type="button" class="gig-drop-btn" aria-expanded="false" aria-haspopup="true">
-        <span class="gig-drop-label"><?php esc_html_e('모든 group', 'github-image-gallery'); ?></span>
+        <span class="gig-drop-label"><?php esc_html_e('All groups', 'github-image-gallery'); ?></span>
         <span class="gig-caret" aria-hidden="true">&#9662;</span>
       </button>
-      <div class="gig-drop" role="group" aria-label="<?php esc_attr_e('Group 선택', 'github-image-gallery'); ?>" hidden>
+      <div class="gig-drop" role="group" aria-label="<?php esc_attr_e('Select groups', 'github-image-gallery'); ?>" hidden>
         <div class="gig-drop-head">
-          <button type="button" class="gig-mini" data-all="1"><?php esc_html_e('전체 선택', 'github-image-gallery'); ?></button>
-          <button type="button" class="gig-mini" data-all="0"><?php esc_html_e('전체 해제', 'github-image-gallery'); ?></button>
+          <button type="button" class="gig-mini" data-all="1"><?php esc_html_e('Select all', 'github-image-gallery'); ?></button>
+          <button type="button" class="gig-mini" data-all="0"><?php esc_html_e('Clear', 'github-image-gallery'); ?></button>
         </div>
         <ul class="gig-drop-list">
           <?php foreach ($gcount as $slug => $n) : ?>
@@ -328,22 +328,22 @@ function gig_render($atts) {
     </div>
 
     <div class="gig-field">
-      <label class="gig-lab" for="<?php echo esc_attr($uid); ?>-sort"><?php esc_html_e('정렬', 'github-image-gallery'); ?></label>
+      <label class="gig-lab" for="<?php echo esc_attr($uid); ?>-sort"><?php esc_html_e('Sort', 'github-image-gallery'); ?></label>
       <select id="<?php echo esc_attr($uid); ?>-sort" class="gig-sort">
-        <option value="name_asc"  <?php selected($sort, 'name_asc');  ?>><?php esc_html_e('이름 A → Z', 'github-image-gallery'); ?></option>
-        <option value="name_desc" <?php selected($sort, 'name_desc'); ?>><?php esc_html_e('이름 Z → A', 'github-image-gallery'); ?></option>
+        <option value="name_asc"  <?php selected($sort, 'name_asc');  ?>><?php esc_html_e('Name A → Z', 'github-image-gallery'); ?></option>
+        <option value="name_desc" <?php selected($sort, 'name_desc'); ?>><?php esc_html_e('Name Z → A', 'github-image-gallery'); ?></option>
         <?php if ($has_dates) : ?>
-        <option value="date_desc" <?php selected($sort, 'date_desc'); ?>><?php esc_html_e('날짜 최신순', 'github-image-gallery'); ?></option>
-        <option value="date_asc"  <?php selected($sort, 'date_asc');  ?>><?php esc_html_e('날짜 오래된순', 'github-image-gallery'); ?></option>
+        <option value="date_desc" <?php selected($sort, 'date_desc'); ?>><?php esc_html_e('Newest first', 'github-image-gallery'); ?></option>
+        <option value="date_asc"  <?php selected($sort, 'date_asc');  ?>><?php esc_html_e('Oldest first', 'github-image-gallery'); ?></option>
         <?php endif; ?>
       </select>
     </div>
 
     <?php if ((int) $a['show_search'] === 1) : ?>
     <div class="gig-field gig-grow">
-      <label class="gig-lab" for="<?php echo esc_attr($uid); ?>-q"><?php esc_html_e('검색', 'github-image-gallery'); ?></label>
+      <label class="gig-lab" for="<?php echo esc_attr($uid); ?>-q"><?php esc_html_e('Search', 'github-image-gallery'); ?></label>
       <input id="<?php echo esc_attr($uid); ?>-q" class="gig-q" type="search"
-             placeholder="<?php esc_attr_e('파일명 일부', 'github-image-gallery'); ?>" autocomplete="off">
+             placeholder="<?php esc_attr_e('Filter by name', 'github-image-gallery'); ?>" autocomplete="off">
     </div>
     <?php endif; ?>
 
@@ -381,10 +381,10 @@ function gig_render($atts) {
     <?php endforeach; ?>
   </div>
 
-  <p class="gig-empty" hidden><?php esc_html_e('조건에 맞는 이미지가 없습니다.', 'github-image-gallery'); ?></p>
+  <p class="gig-empty" hidden><?php esc_html_e('No images match the current filter.', 'github-image-gallery'); ?></p>
 
   <?php if ($data['via'] === 'api' && current_user_can('manage_options')) : ?>
-  <p class="gig-hint"><?php esc_html_e('index.json이 없어 GitHub API로 읽었습니다. 날짜 정렬과 썸네일 축소가 꺼집니다. (관리자에게만 보이는 안내)', 'github-image-gallery'); ?></p>
+  <p class="gig-hint"><?php esc_html_e('index.json이 없어 GitHub API로 읽었습니다. 날짜 Sort과 썸네일 축소가 꺼집니다. (관리자에게만 보이는 안내)', 'github-image-gallery'); ?></p>
   <?php endif; ?>
 </div>
     <?php

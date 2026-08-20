@@ -95,7 +95,7 @@ add_filter('plugins_api', function ($result, $action, $args) {
         'download_link' => !empty($rel['package']) ? $rel['package'] : '',
         'last_updated'  => !empty($rel['date']) ? $rel['date'] : '',
         'sections'      => array(
-            'description' => esc_html__('GitHub 저장소의 이미지 폴더를 thumbnail gallery로 보여 준다.', 'github-image-gallery'),
+            'description' => esc_html__('Shows a folder of images from a GitHub repository as a thumbnail gallery.', 'github-image-gallery'),
             'changelog'   => !empty($rel['notes']) ? wp_kses_post(nl2br($rel['notes'])) : '',
         ),
     );
