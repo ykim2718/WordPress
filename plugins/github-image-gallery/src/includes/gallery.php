@@ -309,7 +309,7 @@ function gig_render($atts) {
      style="--gig-col:<?php echo (int) $col; ?>;--gig-gap:<?php echo (int) $gap; ?>px;--gig-ratio:<?php echo esc_attr($ratio); ?>">
 
   <?php if ((int) $a['show_version'] === 1) : ?>
-  <div class="gig-ver">v<?php echo esc_html(GIG_VERSION); ?></div>
+  <div class="gig-ver">version <?php echo esc_html(GIG_VERSION); ?></div>
   <?php endif; ?>
 
   <div class="gig-bar">

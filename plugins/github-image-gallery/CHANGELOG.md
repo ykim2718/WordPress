@@ -1,3 +1,7 @@
+## 1.0.7
+
+- Spell the version label out as *version 1.0.7* rather than *v1.0.7*.
+
 ## 1.0.6
 
 - Print the running version in small grey type at the top left of the gallery,
