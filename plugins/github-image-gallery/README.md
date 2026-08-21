@@ -79,7 +79,7 @@ CI가 `plugins/dist/`의 zip과 `version.json`을 다시 만들고, 워드프레
 손으로 만들려면:
 
 ```bash
-bash tools/build_plugin_dist.sh
+python3 tools/build_plugin_dist.py
 ```
 
 ## 썸네일 다시 만들기
@@ -92,6 +92,16 @@ python3 tools/build_image_index.py            # --dir, --width, --quality
 ```
 
 바뀌지 않은 그림의 썸네일은 sha1로 걸러 다시 만들지 않는다.
+
+## View details 창
+
+워드프레스 플러그인 목록의 "자세히 보기"에 나오는 두 문서는 저장소에서 온다.
+
+- `DESCRIPTION.md` -- 설명. `![](이름.jpg)` 는 `plugins/screenshots/` 를 가리킨다.
+- `CHANGELOG.md` -- 버전 이력.
+
+`tools/build_plugin_dist.py` 가 둘을 HTML로 바꿔 `plugins/dist/version.json` 에 넣고,
+플러그인이 그것을 그대로 보여 준다. 두 파일은 zip에 들어가지 않는다.
 
 ## 워크플로
 

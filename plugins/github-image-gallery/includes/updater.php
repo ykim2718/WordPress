@@ -41,7 +41,8 @@ function gig_remote_version() {
                 'version' => (string) $data['version'],
                 'package' => gig_dist_url('github-image-gallery.zip'),
                 'date'    => (string) ($data['updated'] ?? ''),
-                'notes'   => (string) ($data['notes'] ?? ''),
+                'desc'    => (string) ($data['description'] ?? ''),
+                'log'     => (string) ($data['changelog'] ?? ''),
             );
         }
     }
@@ -95,8 +96,10 @@ add_filter('plugins_api', function ($result, $action, $args) {
         'download_link' => !empty($rel['package']) ? $rel['package'] : '',
         'last_updated'  => !empty($rel['date']) ? $rel['date'] : '',
         'sections'      => array(
-            'description' => esc_html__('Shows a folder of images from a GitHub repository as a thumbnail gallery.', 'github-image-gallery'),
-            'changelog'   => !empty($rel['notes']) ? wp_kses_post(nl2br($rel['notes'])) : '',
+            'description' => !empty($rel['desc'])
+                ? wp_kses_post($rel['desc'])
+                : esc_html__('Shows a folder of images from a GitHub repository as a thumbnail gallery.', 'github-image-gallery'),
+            'changelog'   => !empty($rel['log']) ? wp_kses_post($rel['log']) : '',
         ),
     );
 }, 10, 3);

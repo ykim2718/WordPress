@@ -15,6 +15,7 @@ on:
       - 'plugins/github-image-gallery/**'
       - 'tools/build_image_index.py'
       - 'tools/build_plugin_dist.sh'
+      - 'tools/build_plugin_dist.py'
       - '.github/workflows/image-index.yml'
   workflow_dispatch:
 
