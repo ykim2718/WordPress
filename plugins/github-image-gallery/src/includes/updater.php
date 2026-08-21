@@ -2,7 +2,7 @@
 /**
  * 업데이트를 저장소에서 바로 받는다. tag도 release도 쓰지 않는다.
  *
- * CI가 plugins/dist/ 에 두 파일을 만들어 둔다.
+ * CI가 plugins/github-image-gallery/dist/ 에 두 파일을 만들어 둔다.
  *   version.json                 {"version":"1.0.1","updated":"..."}
  *   github-image-gallery.zip     플러그인 폴더만 담은 압축
  *
@@ -19,7 +19,8 @@ define('GIG_BRANCH', 'main');
 define('GIG_SLUG', 'github-image-gallery');
 
 function gig_dist_url($file) {
-    return 'https://raw.githubusercontent.com/' . GIG_REPO . '/' . GIG_BRANCH . '/plugins/dist/' . $file;
+    return 'https://raw.githubusercontent.com/' . GIG_REPO . '/' . GIG_BRANCH
+         . '/plugins/' . GIG_SLUG . '/dist/' . $file;
 }
 
 /** 저장소에 올라와 있는 최신 버전. 캐시 6시간. */

@@ -27,7 +27,8 @@ from pathlib import Path
 SLUG = "github-image-gallery"
 REPO = "ykim2718/WordPress"
 BRANCH = "main"
-SHOTS = f"https://raw.githubusercontent.com/{REPO}/{BRANCH}/plugins/screenshots/"
+PLUGIN = f"plugins/{SLUG}"
+SHOTS = f"https://raw.githubusercontent.com/{REPO}/{BRANCH}/{PLUGIN}/screenshots/"
 
 
 def repo_root() -> Path:
@@ -124,9 +125,10 @@ def md_to_html(md: str) -> str:
 # -------------------------------------------------------------------- build --
 
 def build(root: Path, force: bool) -> int:
-    src = root / "plugins" / SLUG
-    dist = root / "plugins" / "dist"
-    ver = header_version(src / f"{SLUG}.php")
+    home = root / PLUGIN
+    src  = home / "src"          # zip에 들어가는 것만 여기 둔다
+    dist = home / "dist"
+    ver  = header_version(src / f"{SLUG}.php")
 
     current = ""
     vj = dist / "version.json"
@@ -143,21 +145,20 @@ def build(root: Path, force: bool) -> int:
 
     dist.mkdir(parents=True, exist_ok=True)
 
-    # 문서는 zip에 넣지 않는다: 화면에 쓰는 것은 version.json 쪽이다
-    skip = {"DESCRIPTION.md", "CHANGELOG.md"}
+    # src/ 아래만 압축한다. 문서와 스크린샷, dist는 자연히 빠진다.
     if zip_path.exists():
         zip_path.unlink()
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
         for p in sorted(src.rglob("*")):
-            if p.is_dir() or p.name in skip:
+            if p.is_dir():
                 continue
             z.write(p, f"{SLUG}/{p.relative_to(src).as_posix()}")
 
     payload = {
         "version": ver,
         "updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "description": md_to_html((src / "DESCRIPTION.md").read_text(encoding="utf-8")),
-        "changelog": md_to_html((src / "CHANGELOG.md").read_text(encoding="utf-8")),
+        "description": md_to_html((home / "DESCRIPTION.md").read_text(encoding="utf-8")),
+        "changelog": md_to_html((home / "CHANGELOG.md").read_text(encoding="utf-8")),
     }
     vj.write_text(json.dumps(payload, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
 

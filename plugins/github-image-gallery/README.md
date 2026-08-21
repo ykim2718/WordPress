@@ -2,19 +2,45 @@
 
 GitHub 공개 저장소의 이미지 폴더를 워드프레스 글에 thumbnail gallery로 넣는 플러그인.
 
+![워드프레스 플러그인 목록의 자세히 보기 화면](screenshots/view-details.jpg)
+
+설치하면 위와 같이 보인다. 설명과 스크린샷, 변경 이력이 모두 저장소에서 온다.
+
 ```
-[github_image_gallery github_url="https://github.com/ykim2718/WordPress/tree/main/Images"]
+[github_image_gallery github_url=https://github.com/ykim2718/WordPress/tree/main/Images]
 ```
+
+## 폴더 구조
+
+플러그인 하나가 폴더 하나를 쓴다. 새 플러그인을 만들면 `plugins/` 아래에 같은 모양으로
+폴더를 하나 더 두면 된다.
+
+```
+plugins/github-image-gallery/
+├── src/                     ← 이 폴더만 zip으로 묶인다
+│   ├── github-image-gallery.php
+│   ├── includes/
+│   └── assets/
+├── dist/                    ← 빌드 결과. 워드프레스가 여기서 받는다
+│   ├── github-image-gallery.zip
+│   └── version.json
+├── screenshots/             ← View details 창과 이 문서에 쓰는 그림
+├── DESCRIPTION.md           ← View details 의 Description 탭
+├── CHANGELOG.md             ← View details 의 Changelog 탭
+└── README.md
+```
+
+`src/` 밖의 것은 zip에 들어가지 않으므로, 문서와 그림이 늘어나도 플러그인 용량은 그대로다.
 
 ## 어떻게 도는가
 
 | 층 | 언어 | 하는 일 |
 |---|---|---|
-| 빌드 | Python (GitHub Actions) | `Images/`를 훑어 `index.json`과 480px 썸네일 생성 |
-| 서버 | PHP | `index.json` 한 번 받아 캐시, group 계산, HTML 출력 |
-| 화면 | JavaScript | group 다중 선택, 정렬, 검색, 라이트박스 |
+| 빌드 | Python (GitHub Actions) | `Images/`를 훑어 `index.json`과 썸네일, 플러그인 zip 생성 |
+| 서버 | PHP | 정적 파일을 한 번 받아 캐시, group 계산, HTML 출력 |
+| 화면 | JavaScript | group 다중 선택, 정렬, 검색, 라이트박스, 오른쪽 클릭 메뉴 |
 
-목록은 두 경로로 읽는다.
+이미지 목록은 두 경로로 읽는다.
 
 1. **`index.json`** — `tools/build_image_index.py`가 CI에서 만들어 둔 것. `raw.githubusercontent.com`에서
    파일 하나만 받으면 되므로 **API 한도를 쓰지 않고**, commit 날짜·가로세로·썸네일 경로가 이미 들어 있다.
@@ -55,13 +81,14 @@ Lawn Worms Eye 3   Margaret Hunt Hill Bridge 2      Other 43
 | `show_name` | 1 | caption에 파일명 표시 |
 | `show_search` | 1 | 검색 입력칸 표시 |
 | `lightbox` | 1 | 클릭 시 overlay. 0이면 새 탭 |
+| `context_menu` | 1 | 0이면 브라우저 기본 오른쪽 메뉴로 되돌린다 |
 | `limit` | 0 | 0이면 전부 |
 | `cache` | 60 | 목록 캐시 분 |
 
 ## 설치
 
-1. 플러그인 화면 → 새로 추가 → 플러그인 업로드에 `github-image-gallery.zip`.
-2. 이후 업데이트는 플러그인 화면에 알림으로 뜬다. 아래 릴리스 절차를 따르면 된다.
+1. 플러그인 화면 → 새로 추가 → 플러그인 업로드에 `dist/github-image-gallery.zip`.
+2. 이후 업데이트는 플러그인 화면에 알림으로 뜬다.
 
 비공개 저장소를 읽거나 API 한도를 5000회로 올리려면 `wp-config.php`에 토큰을 둔다.
 `index.json` 경로만 쓴다면 없어도 된다.
@@ -72,9 +99,9 @@ define('GITHUB_GALLERY_TOKEN', 'ghp_...');
 
 ## 새 버전 내보내기
 
-`github-image-gallery.php`의 `Version:`과 `GIG_VERSION`을 올려서 push하면 끝이다.
-CI가 `plugins/dist/`의 zip과 `version.json`을 다시 만들고, 워드프레스 플러그인 화면에
-업데이트가 뜬다. tag도 release도 쓰지 않는다.
+`src/github-image-gallery.php`의 `Version:`과 `GIG_VERSION`을 올리고, `CHANGELOG.md` 맨 위에
+항목을 적어서 push하면 끝이다. CI가 `dist/`를 다시 만들고 워드프레스에 업데이트가 뜬다.
+tag도 release도 쓰지 않는다.
 
 손으로 만들려면:
 
@@ -93,17 +120,7 @@ python3 tools/build_image_index.py            # --dir, --width, --quality
 
 바뀌지 않은 그림의 썸네일은 sha1로 걸러 다시 만들지 않는다.
 
-## View details 창
-
-워드프레스 플러그인 목록의 "자세히 보기"에 나오는 두 문서는 저장소에서 온다.
-
-- `DESCRIPTION.md` -- 설명. `![](이름.jpg)` 는 `plugins/screenshots/` 를 가리킨다.
-- `CHANGELOG.md` -- 버전 이력.
-
-`tools/build_plugin_dist.py` 가 둘을 HTML로 바꿔 `plugins/dist/version.json` 에 넣고,
-플러그인이 그것을 그대로 보여 준다. 두 파일은 zip에 들어가지 않는다.
-
 ## 워크플로
 
-`tools/workflows/image-index.yml`을 `.github/workflows/`에 넣으면 위 두 가지가 자동으로 돈다.
+`tools/workflows/image-index.yml`을 `.github/workflows/`에 넣으면 위의 두 가지가 자동으로 돈다.
 이 세션의 토큰에 workflow 권한이 없어 대신 넣어 두지 못했다.

@@ -1,3 +1,12 @@
+## 1.0.5
+
+- Give the plugin one folder of its own. `src/`, `dist/` and `screenshots/`
+  now sit under `plugins/github-image-gallery/` instead of being spread across
+  three folders in `plugins/`, so a second plugin can be added beside it
+  without the two getting tangled.
+- Only `src/` goes into the zip, which drops the documents and screenshots
+  from the download.
+
 ## 1.0.4
 
 - Fill in this **View details** window: the description now carries screen
