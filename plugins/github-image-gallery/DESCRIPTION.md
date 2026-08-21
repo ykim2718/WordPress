@@ -44,4 +44,5 @@ spends the 60-per-hour anonymous rate limit and offers no date sorting.
 - `lightbox` — `0` opens the image in a new tab instead of an overlay.
 - `context_menu` — `0` restores the browser's own right-click menu.
 - `ratio` — tile shape, `4/3` by default. `auto` uses each picture's own.
+- `show_version` — `0` hides the small version label above the gallery.
 - `limit`, `cache` — cap the number of tiles, and the listing cache in minutes.

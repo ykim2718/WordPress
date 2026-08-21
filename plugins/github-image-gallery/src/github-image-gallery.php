@@ -3,7 +3,7 @@
  * Plugin Name:       GitHub Image Gallery
  * Plugin URI:        https://github.com/ykim2718/WordPress
  * Description:       Shows a folder of images from a public GitHub repository as a filterable thumbnail gallery. Groups are derived from the file names and offered as a multi-select dropdown.
- * Version:           1.0.5
+ * Version:           1.0.6
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Author:            yRocket
@@ -22,7 +22,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('GIG_VERSION', '1.0.5');
+define('GIG_VERSION', '1.0.6');
 define('GIG_FILE', __FILE__);
 define('GIG_DIR', plugin_dir_path(__FILE__));
 define('GIG_URL', plugin_dir_url(__FILE__));

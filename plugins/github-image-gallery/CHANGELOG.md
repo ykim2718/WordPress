@@ -1,3 +1,9 @@
+## 1.0.6
+
+- Print the running version in small grey type at the top left of the gallery,
+  so it is obvious from the page itself whether an update took effect.
+  `show_version=0` hides it.
+
 ## 1.0.5
 
 - Give the plugin one folder of its own. `src/`, `dist/` and `screenshots/`

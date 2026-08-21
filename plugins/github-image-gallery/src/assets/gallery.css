@@ -2,6 +2,11 @@
 
 .gig { --gig-col: 4; --gig-gap: 14px; --gig-ratio: 4/3; }
 
+.gig-ver {
+  font-size: .68rem; line-height: 1; opacity: .45; margin: 0 0 5px 2px;
+  font-variant-numeric: tabular-nums; letter-spacing: .02em;
+}
+
 .gig-bar {
   display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px;
   margin: 0 0 16px; padding: 12px 14px;

@@ -245,6 +245,7 @@ function gig_render($atts) {
         'show_search'  => 1,
         'lightbox'     => 1,
         'context_menu' => 1,
+        'show_version'  => 1,
         'limit'        => 0,
         'cache'        => 60,
     ), $atts, 'github_image_gallery');
@@ -306,6 +307,10 @@ function gig_render($atts) {
      data-menu="<?php echo ((int) $a['context_menu'] === 1) ? '1' : '0'; ?>"
      data-blob="<?php echo esc_attr('https://github.com/' . $src['owner'] . '/' . $src['repo'] . '/blob/' . $src['branch'] . ($src['path'] !== '' ? '/' . $src['path'] : '')); ?>"
      style="--gig-col:<?php echo (int) $col; ?>;--gig-gap:<?php echo (int) $gap; ?>px;--gig-ratio:<?php echo esc_attr($ratio); ?>">
+
+  <?php if ((int) $a['show_version'] === 1) : ?>
+  <div class="gig-ver">v<?php echo esc_html(GIG_VERSION); ?></div>
+  <?php endif; ?>
 
   <div class="gig-bar">
     <div class="gig-field gig-groups">
