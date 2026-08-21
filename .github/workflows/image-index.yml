@@ -43,12 +43,12 @@ jobs:
 
       - name: Commit whatever changed
         run: |
-          if git diff --quiet -- Images/index.json Images/.thumbs plugins/dist; then
+          git add -A
+          if git diff --cached --quiet; then
             echo "nothing to commit"
             exit 0
           fi
           git config user.name  'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add Images/index.json Images/.thumbs plugins/dist
           git commit -m 'Rebuild gallery artifacts'
           git push
