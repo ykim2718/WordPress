@@ -1,3 +1,11 @@
+## 1.0.8
+
+- Actually hold the padding in the group dropdown. The reset added in 1.0.3
+  was written as `.gig-drop-list li`, which loses to a theme rule like
+  `.entry-content ul li` on specificity, so the checkboxes stayed indented on
+  themes that style lists that way. The reset is now scoped under `.gig` and
+  marked important.
+
 ## 1.0.7
 
 - Spell the version label out as *version 1.0.7* rather than *v1.0.7*.

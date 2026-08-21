@@ -39,16 +39,31 @@
   font: inherit; font-size: .75rem; padding: 3px 8px; cursor: pointer; color: inherit;
   border: 1px solid rgba(128, 128, 128, .45); border-radius: 999px; background: transparent;
 }
-.gig-drop-list { list-style: none; margin: 0; padding: 0; }
-/* 테마가 li에 들여쓰기를 주는 경우가 있어 여기서 눌러 둔다 */
-.gig-drop-list li { margin: 0; padding: 0; list-style: none; }
-.gig-drop-list label {
+/* 테마가 .entry-content ul li 같은 선택자로 목록에 들여쓰기를 주는 일이 흔하다.
+   그쪽 선택자가 더 강하면 조용히 밀리므로, 여기서는 확실히 눌러 둔다. */
+.gig .gig-drop-list,
+.gig .gig-drop-list li {
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+  text-indent: 0 !important;
+  background: none !important;
+  border: 0 !important;
+}
+.gig .gig-drop-list li::before,
+.gig .gig-drop-list li::after { content: none !important; }
+.gig .gig-drop-list li::marker { content: '' !important; }
+
+.gig .gig-drop-list label {
   display: flex; align-items: center; gap: 10px;
-  padding: 6px 2ch;                    /* 좌우 모두 글자 두 개 폭 */
+  padding: 6px 2ch !important;         /* 좌우 모두 글자 두 개 폭 */
+  margin: 0 !important;
   font-size: .88rem; cursor: pointer;
 }
-.gig-drop-list input[type=checkbox] { margin: 0; flex: none; }
-.gig-drop-list label:hover { background: rgba(128, 128, 128, .14); }
+.gig .gig-drop-list input[type=checkbox] {
+  margin: 0 !important; flex: none; vertical-align: middle;
+}
+.gig .gig-drop-list label:hover { background: rgba(128, 128, 128, .14); }
 .gig-gname { flex: 1; white-space: nowrap; }   /* 라벨이 줄바꿈되지 않게 */
 .gig-gnum  { font-size: .75rem; opacity: .6; }
 
