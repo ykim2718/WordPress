@@ -92,8 +92,21 @@
   .gig-link:hover img { transform: none; }
 }
 
-.gig figcaption {
-  display: flex; gap: 8px; align-items: baseline; margin-top: 6px;
+/* 테마가 figure / figcaption 에 주는 여백이 타일 사이로 들어오면 세로 간격이
+   가로 간격보다 벌어진다. 위젯 안에서는 그 여백을 쓰지 않는다. */
+.gig .gig-grid,
+.gig .gig-item,
+.gig .gig-item .gig-link,
+.gig .gig-item figcaption,
+.gig .gig-item .gig-fn,
+.gig .gig-item .gig-dt {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.gig .gig-item figcaption {
+  display: flex; gap: 8px; align-items: baseline;
+  margin-top: 6px !important;
   font-size: .74rem; line-height: 1.35; opacity: .8;
   /* 두 줄 높이로 고정한다. 캡션 길이가 제각각이면 행 높이가 들쭉날쭉해져서
      파일명과 아래 그림 사이 간격이 좌우 간격과 달라 보인다. */
@@ -104,7 +117,7 @@
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.gig-dt { margin-left: auto; white-space: nowrap; opacity: .75; }
+.gig .gig-dt { margin-left: auto !important; white-space: nowrap; opacity: .75; }
 .gig-empty { padding: 28px 0; text-align: center; opacity: .7; }
 
 /* 라이트박스 */

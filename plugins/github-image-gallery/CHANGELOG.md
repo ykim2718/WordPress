@@ -1,3 +1,10 @@
+## 1.0.9
+
+- Keep the vertical gap between tiles equal to the horizontal one. Themes
+  that give `figure` and `figcaption` their own margins were adding that space
+  under every caption, pushing the rows apart while the columns stayed at
+  14px. Those margins are now held at zero inside the gallery.
+
 ## 1.0.8
 
 - Actually hold the padding in the group dropdown. The reset added in 1.0.3
