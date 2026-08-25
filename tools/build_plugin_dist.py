@@ -9,26 +9,37 @@ images load inside that window.
 
 Nothing is rebuilt unless the version in the plugin header actually changed.
 
-    python3 tools/build_plugin_dist.py [--force]
+    python3 tools/build_plugin_dist.py [--slug SLUG] [--force]
+
+One plugin lives in one folder under plugins/, so --slug picks which one to
+build. It defaults to github-image-gallery, the first plugin in the repository.
+
+Changelog
+    0.1.0  --slug, so a second plugin can be built with the same script.
 """
 
 from __future__ import annotations
 
+__author__ = 'yRocket'
+__version__ = "0.1.0.2026.8.25"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
+
 import argparse
 import json
 import re
-import shutil
 import subprocess
 import sys
 import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-SLUG = "github-image-gallery"
+DEFAULT_SLUG = "github-image-gallery"
 REPO = "ykim2718/WordPress"
 BRANCH = "main"
-PLUGIN = f"plugins/{SLUG}"
-SHOTS = f"https://raw.githubusercontent.com/{REPO}/{BRANCH}/{PLUGIN}/screenshots/"
+
+
+def shots_url(slug: str) -> str:
+    """Where DESCRIPTION.md image names resolve to inside the View details window."""
+    return f"https://raw.githubusercontent.com/{REPO}/{BRANCH}/plugins/{slug}/screenshots/"
 
 
 def repo_root() -> Path:
@@ -47,12 +58,12 @@ def header_version(php: Path) -> str:
 # ---------------------------------------------------------------- markdown --
 # 이 저장소가 쓰는 문법만 다룬다: 제목, 목록, 문단, 굵게, 코드, 링크, 그림.
 
-def inline(text: str) -> str:
+def inline(text: str, shots: str) -> str:
     text = (text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
     text = re.sub(r"!\[([^\]]*)\]\(([^)]+)\)",
                   lambda m: '<img src="%s" alt="%s" style="max-width:100%%;height:auto;'
                             'border:1px solid #ddd;border-radius:6px" />'
-                            % (m.group(2) if "://" in m.group(2) else SHOTS + m.group(2),
+                            % (m.group(2) if "://" in m.group(2) else shots + m.group(2),
                                m.group(1)),
                   text)
     text = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r'<a href="\2">\1</a>', text)
@@ -62,7 +73,7 @@ def inline(text: str) -> str:
     return text
 
 
-def md_to_html(md: str) -> str:
+def md_to_html(md: str, shots: str) -> str:
     out, block, mode = [], [], None
 
     def flush():
@@ -70,13 +81,13 @@ def md_to_html(md: str) -> str:
         if not block:
             return
         if mode == "ul":
-            out.append("<ul>" + "".join("<li>%s</li>" % inline(b) for b in block) + "</ul>")
+            out.append("<ul>" + "".join("<li>%s</li>" % inline(b, shots) for b in block) + "</ul>")
         elif mode == "pre":
             body = "\n".join(block)
             out.append("<pre><code>%s</code></pre>"
                        % body.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
         else:
-            out.append("<p>%s</p>" % inline(" ".join(block)))
+            out.append("<p>%s</p>" % inline(" ".join(block), shots))
         block, mode = [], None
 
     fenced = False
@@ -101,7 +112,7 @@ def md_to_html(md: str) -> str:
         if line.startswith("#"):
             flush()
             level = len(line) - len(line.lstrip("#"))
-            out.append("<h%d>%s</h%d>" % (min(level + 1, 6), inline(line.lstrip("# ")),
+            out.append("<h%d>%s</h%d>" % (min(level + 1, 6), inline(line.lstrip("# "), shots),
                                           min(level + 1, 6)))
             continue
         if line.lstrip().startswith("- "):
@@ -124,11 +135,13 @@ def md_to_html(md: str) -> str:
 
 # -------------------------------------------------------------------- build --
 
-def build(root: Path, force: bool) -> int:
-    home = root / PLUGIN
+def build(root: Path, slug: str, force: bool) -> int:
+    home = root / "plugins" / slug
     src  = home / "src"          # zip에 들어가는 것만 여기 둔다
     dist = home / "dist"
-    ver  = header_version(src / f"{SLUG}.php")
+    if not src.is_dir():
+        sys.exit(f"no such plugin: {home.relative_to(root).as_posix()}/src")
+    ver  = header_version(src / f"{slug}.php")
 
     current = ""
     vj = dist / "version.json"
@@ -138,7 +151,7 @@ def build(root: Path, force: bool) -> int:
         except Exception:
             current = ""
 
-    zip_path = dist / f"{SLUG}.zip"
+    zip_path = dist / f"{slug}.zip"
     if not force and ver == current and zip_path.exists():
         print(f"version {ver} unchanged, nothing to build")
         return 0
@@ -152,13 +165,14 @@ def build(root: Path, force: bool) -> int:
         for p in sorted(src.rglob("*")):
             if p.is_dir():
                 continue
-            z.write(p, f"{SLUG}/{p.relative_to(src).as_posix()}")
+            z.write(p, f"{slug}/{p.relative_to(src).as_posix()}")
 
+    shots = shots_url(slug)
     payload = {
         "version": ver,
         "updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "description": md_to_html((home / "DESCRIPTION.md").read_text(encoding="utf-8")),
-        "changelog": md_to_html((home / "CHANGELOG.md").read_text(encoding="utf-8")),
+        "description": md_to_html((home / "DESCRIPTION.md").read_text(encoding="utf-8"), shots),
+        "changelog": md_to_html((home / "CHANGELOG.md").read_text(encoding="utf-8"), shots),
     }
     vj.write_text(json.dumps(payload, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
 
@@ -170,9 +184,11 @@ def build(root: Path, force: bool) -> int:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--slug", default=DEFAULT_SLUG,
+                    help=f"plugin folder under plugins/ (default: {DEFAULT_SLUG})")
     ap.add_argument("--force", action="store_true", help="rebuild even if the version is unchanged")
     args = ap.parse_args()
-    return build(repo_root(), args.force)
+    return build(repo_root(), args.slug, args.force)
 
 
 if __name__ == "__main__":

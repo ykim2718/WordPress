@@ -1,0 +1,45 @@
+/* Key Word Cloud 0.0.0.2026.8.25 */
+
+.kwc-cloud {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	justify-content: center;
+	gap: 0.35em 0.75em;
+	margin: 1em 0;
+	padding: 0;
+	line-height: 1.35;
+}
+
+/* 모든 단어는 가로로만 놓는다. 테마가 회전/세로쓰기를 걸어도 무시한다. */
+.kwc-cloud .kwc-word {
+	display: inline-block;
+	white-space: nowrap;
+	writing-mode: horizontal-tb !important;
+	text-orientation: mixed !important;
+	transform: none !important;
+	rotate: none !important;
+	text-decoration: none;
+	border: 0;
+	box-shadow: none;
+	transition: opacity 0.15s ease;
+}
+
+.kwc-cloud a.kwc-word:hover,
+.kwc-cloud a.kwc-word:focus {
+	text-decoration: underline;
+	opacity: 0.75;
+}
+
+.kwc-cloud .kwc-word--static {
+	cursor: default;
+}
+
+.kwc-error {
+	margin: 1em 0;
+	padding: 0.6em 0.9em;
+	border-left: 4px solid #b3202e;
+	background: #fff4f4;
+	color: #7a1620;
+	font-size: 0.95em;
+}
