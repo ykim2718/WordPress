@@ -1,0 +1,10 @@
+{
+  "extraKnownMarketplaces": {
+    "claude-configuration": {
+      "source": { "source": "github", "repo": "ykim2718/Claude-Configuration" }
+    }
+  },
+  "enabledPlugins": {
+    "yrocket-rules@claude-configuration": true
+  }
+}
