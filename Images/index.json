@@ -1,9 +1,9 @@
 {
- "generated": "2026-08-21T17:24:06Z",
+ "generated": "2026-08-25T22:36:22Z",
  "folder": "Images",
  "thumb_dir": ".thumbs",
  "thumb_width": 480,
- "count": 77,
+ "count": 82,
  "items": [
   {
    "n": "acacia-tree-dune-sunset.webp",
@@ -106,6 +106,16 @@
    "e": 0
   },
   {
+   "n": "box-truck-liftgate-open.jpg",
+   "s": 375781,
+   "h1": "2172a6a7a7458a120cffd83736669375faf44d1b",
+   "d": 1787697368,
+   "w": 2000,
+   "ht": 1500,
+   "e": 0,
+   "t": ".thumbs/box-truck-liftgate-open.jpg.webp"
+  },
+  {
    "n": "bull-skull-wall-mount.jpg",
    "s": 442126,
    "h1": "7ea0483f649bdf5b1b10a1d7a1c6938c49d99492",
@@ -144,6 +154,26 @@
    "ht": 1024,
    "t": ".thumbs/dandelion-seeds-backlit.jpg.webp",
    "e": 0
+  },
+  {
+   "n": "diet-dr-pepper-3-liter-shelf.jpg",
+   "s": 392423,
+   "h1": "9c27474b7c4996f0fadba7ea2054e67e8f0a5f74",
+   "d": 1787697368,
+   "w": 2000,
+   "ht": 1500,
+   "e": 0,
+   "t": ".thumbs/diet-dr-pepper-3-liter-shelf.jpg.webp"
+  },
+  {
+   "n": "diet-dr-pepper-bottles-shelf.jpg",
+   "s": 382535,
+   "h1": "d4102efc33b99a5646f93ff88112babc749c7213",
+   "d": 1787697368,
+   "w": 2000,
+   "ht": 1500,
+   "e": 0,
+   "t": ".thumbs/diet-dr-pepper-bottles-shelf.jpg.webp"
   },
   {
    "n": "dog-sled-team-blizzard.webp",
@@ -506,6 +536,16 @@
    "e": 0
   },
   {
+   "n": "plywood-shipping-crate-hinged.jpg",
+   "s": 349326,
+   "h1": "fce7b752752e0e1a02d46ac52e78277b45d78f78",
+   "d": 1787697368,
+   "w": 2000,
+   "ht": 1500,
+   "e": 0,
+   "t": ".thumbs/plywood-shipping-crate-hinged.jpg.webp"
+  },
+  {
    "n": "prairie-crossroads-stop-sign.jpg",
    "s": 377139,
    "h1": "52e280e0bf8cc6fd626f3d8805972f03e47c55b7",
@@ -704,6 +744,16 @@
    "ht": 1125,
    "t": ".thumbs/the-pond-hockey-club-sign.jpg.webp",
    "e": 0
+  },
+  {
+   "n": "vanilla-cashmere-body-mist-backyard.jpg",
+   "s": 447417,
+   "h1": "79c53bfc0c2ef7486c3410d80d86de88360f8688",
+   "d": 1787697368,
+   "w": 2000,
+   "ht": 1500,
+   "e": 0,
+   "t": ".thumbs/vanilla-cashmere-body-mist-backyard.jpg.webp"
   },
   {
    "n": "variance-components-coefficient-of-determination-r2.png",
