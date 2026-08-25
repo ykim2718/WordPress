@@ -12,7 +12,35 @@ defined( 'ABSPATH' ) || exit;
 
 final class KWC_Block {
 
-	const NAME = 'key-word-cloud/word-cloud';
+	const NAME     = 'key-word-cloud/word-cloud';
+	const CATEGORY = 'yrocket';
+
+	/**
+	 * 인서터의 yRocket 묶음. block.json 의 category 가 이 slug 를 가리킨다.
+	 *
+	 * 등록되지 않은 category 를 가리키면 block 이 인서터에서 사라지므로,
+	 * 이 filter 가 없으면 block 도 없는 셈이다.
+	 *
+	 * @param array $categories 기존 category 목록.
+	 * @return array
+	 */
+	public static function add_category( $categories ) {
+		if ( ! is_array( $categories ) ) {
+			error_log( '[key-word-cloud] block categories filter received a non-array' );
+			return $categories;
+		}
+		foreach ( $categories as $category ) {
+			if ( isset( $category['slug'] ) && self::CATEGORY === $category['slug'] ) {
+				return $categories;   // 이미 누가 만들어 두었다
+			}
+		}
+		$categories[] = array(
+			'slug'  => self::CATEGORY,
+			'title' => 'yRocket',
+			'icon'  => null,
+		);
+		return $categories;
+	}
 
 	/**
 	 * block 등록. init 에서 부른다.
@@ -68,3 +96,6 @@ final class KWC_Block {
 		return '<div ' . $wrapper . '>' . $html . '</div>';
 	}
 }
+
+// category 는 편집 화면이 열릴 때 필요하므로 block 등록과 무관하게 건다.
+add_filter( 'block_categories_all', array( 'KWC_Block', 'add_category' ) );

@@ -1,3 +1,9 @@
+## 1.1.1
+
+- File the block under a **yRocket** group in the inserter. It was asking for
+  the built-in `widgets` category, so it sat among the widget blocks. The
+  plugin now registers the group and points the block at it.
+
 ## 1.1.0
 
 - Add a **Key Word Cloud** block, so the cloud can be dropped in from the

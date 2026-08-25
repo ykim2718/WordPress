@@ -3,7 +3,7 @@
  * Plugin Name:       Key Word Cloud
  * Plugin URI:        https://github.com/ykim2718/WordPress
  * Description:       Builds a word cloud from the content or the excerpt of your posts. Stopwords and Korean particle stripping are configurable, and clicking a word opens the post list for it.
- * Version:           1.1.0
+ * Version:           1.1.1
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Author:            yRocket
@@ -22,7 +22,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('KWC_VERSION', '1.1.0');
+define('KWC_VERSION', '1.1.1');
 define('KWC_FILE', __FILE__);
 define('KWC_DIR', plugin_dir_path(__FILE__));
 define('KWC_URL', plugin_dir_url(__FILE__));

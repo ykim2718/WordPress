@@ -3,7 +3,7 @@
 	"apiVersion": 2,
 	"name": "key-word-cloud/word-cloud",
 	"title": "Key Word Cloud",
-	"category": "widgets",
+	"category": "yrocket",
 	"icon": "cloud",
 	"description": "Counts the words in your posts and draws them as a cloud. Leave a field empty to use the saved setting.",
 	"keywords": ["word", "cloud", "tag", "keyword", "단어"],
