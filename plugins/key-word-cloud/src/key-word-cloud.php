@@ -3,7 +3,7 @@
  * Plugin Name:       Key Word Cloud
  * Plugin URI:        https://github.com/ykim2718/WordPress
  * Description:       Builds a word cloud from the content or the excerpt of your posts. Stopwords and Korean particle stripping are configurable, and clicking a word opens the post list for it.
- * Version:           1.0.0
+ * Version:           1.1.0
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Author:            yRocket
@@ -22,7 +22,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('KWC_VERSION', '1.0.0');
+define('KWC_VERSION', '1.1.0');
 define('KWC_FILE', __FILE__);
 define('KWC_DIR', plugin_dir_path(__FILE__));
 define('KWC_URL', plugin_dir_url(__FILE__));
@@ -32,6 +32,7 @@ require_once KWC_DIR . 'includes/defaults.php';
 require_once KWC_DIR . 'includes/tokenizer.php';
 require_once KWC_DIR . 'includes/cloud.php';
 require_once KWC_DIR . 'includes/shortcode.php';
+require_once KWC_DIR . 'includes/block.php';
 require_once KWC_DIR . 'includes/settings.php';
 require_once KWC_DIR . 'includes/updater.php';
 
@@ -54,6 +55,7 @@ if (!kwc_requirements_met()) {
 
 add_action('init', array('KWC_Shortcode', 'register'));
 add_action('init', array('KWC_Cloud', 'register_assets'));
+add_action('init', array('KWC_Block', 'register'));
 
 if (is_admin()) {
     KWC_Settings::init();

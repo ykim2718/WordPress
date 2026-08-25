@@ -1,3 +1,12 @@
+## 1.1.0
+
+- Add a **Key Word Cloud** block, so the cloud can be dropped in from the
+  block inserter instead of typing the shortcode. Every setting is in the
+  block sidebar, and a field left empty falls back to the saved setting rather
+  than to a second copy of the defaults.
+- Render the block on the server through the same code the shortcode uses, and
+  preview it in the editor the same way, so the rules stay in one place.
+
 ## 1.0.0
 
 - First release. A `[wpwordcloud]` shortcode that counts the words in the

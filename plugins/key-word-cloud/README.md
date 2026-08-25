@@ -3,6 +3,8 @@
 글의 본문 또는 요약문을 읽어 단어 구름을 그리는 워드프레스 플러그인. 단어를 누르면 그
 단어로 검색한 글 목록이 열린다.
 
+넣는 방법은 두 가지다. 블록 삽입기에서 **Key Word Cloud** 블록을 고르거나, 숏코드를 쓴다.
+
 ```
 [wpwordcloud]
 [wpwordcloud source="excerpt" category="ai" max="40" min_count="2" color_end="#b3202e"]
@@ -17,6 +19,7 @@ plugins/key-word-cloud/
 ├── src/                     ← 이 폴더만 zip으로 묶인다
 │   ├── key-word-cloud.php
 │   ├── includes/
+│   ├── blocks/word-cloud/   ← block.json, editor.js
 │   └── assets/
 ├── dist/                    ← 빌드 결과. 워드프레스가 여기서 받는다
 │   ├── key-word-cloud.zip
@@ -39,9 +42,20 @@ plugins/key-word-cloud/
 | `includes/tokenizer.php` | 텍스트를 단어로 자르고 조사를 떼어낸다 |
 | `includes/cloud.php` | 글을 읽어 빈도를 세고 HTML을 만든다 |
 | `includes/shortcode.php` | `[wpwordcloud]` 와 속성 검증 |
+| `includes/block.php` | block 등록과 서버 렌더링 |
 | `includes/settings.php` | 사이드바 메뉴와 설정 화면 |
 | `includes/updater.php` | 저장소에서 갱신, View details 창 |
+| `blocks/word-cloud/` | `block.json`, `editor.js`, `editor.asset.php` |
 | `assets/kwc.css` | 가로 배치와 오류 문구 서식 |
+
+## Block
+
+블록의 사이드바 항목은 아래 숏코드 속성과 이름도 뜻도 같다. 칸을 비워 두면 설정 화면의
+값을 쓴다. 편집 화면의 미리보기는 브라우저가 아니라 서버가 그린 것을 받아 온다. 규칙을
+PHP 한 곳에만 두려는 것이고, 그래서 미리보기와 실제 화면이 갈라지지 않는다.
+
+`editor.js` 는 JSX 없이 `wp` 전역만 쓰는 평범한 JavaScript다. 이 저장소에는 build 단계가
+없으므로, 의존 script 목록은 `editor.asset.php` 에 손으로 적어 둔다.
 
 ## 단어를 세는 순서
 

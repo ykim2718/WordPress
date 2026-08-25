@@ -1,9 +1,14 @@
 Reads your published posts, counts the words in them, and prints the result as
-a word cloud. One shortcode in a post is all it takes.
+a word cloud. Insert the **Key Word Cloud** block, or type the shortcode.
 
 ```
 [wpwordcloud]
 ```
+
+The block carries the same settings in its sidebar. A field left empty there
+means "use the value from the settings screen", so nothing has to be repeated.
+The editor previews the block by asking the server to draw it, which is the
+same code the front end runs.
 
 **Content or excerpt, your choice.** The plugin can read the post body or the
 post excerpt. When it reads excerpts and a post has none, that post is skipped

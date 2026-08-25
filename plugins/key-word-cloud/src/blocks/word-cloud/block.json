@@ -1,0 +1,32 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "key-word-cloud/word-cloud",
+	"title": "Key Word Cloud",
+	"category": "widgets",
+	"icon": "cloud",
+	"description": "Counts the words in your posts and draws them as a cloud. Leave a field empty to use the saved setting.",
+	"keywords": ["word", "cloud", "tag", "keyword", "단어"],
+	"textdomain": "key-word-cloud",
+	"supports": {
+		"html": false,
+		"align": ["wide", "full"]
+	},
+	"attributes": {
+		"source": { "type": "string", "default": "" },
+		"post_type": { "type": "string", "default": "" },
+		"category": { "type": "string", "default": "" },
+		"tag": { "type": "string", "default": "" },
+		"limit": { "type": "string", "default": "" },
+		"max": { "type": "string", "default": "" },
+		"min_count": { "type": "string", "default": "" },
+		"min_len": { "type": "string", "default": "" },
+		"min_size": { "type": "string", "default": "" },
+		"max_size": { "type": "string", "default": "" },
+		"color_start": { "type": "string", "default": "" },
+		"color_end": { "type": "string", "default": "" },
+		"link": { "type": "string", "default": "" },
+		"cache": { "type": "string", "default": "" }
+	},
+	"editorScript": "file:./editor.js"
+}
