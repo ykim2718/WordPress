@@ -1,9 +1,9 @@
 {
- "generated": "2026-08-25T22:36:22Z",
+ "generated": "2026-08-27T22:49:56Z",
  "folder": "Images",
  "thumb_dir": ".thumbs",
  "thumb_width": 480,
- "count": 82,
+ "count": 83,
  "items": [
   {
    "n": "acacia-tree-dune-sunset.webp",
@@ -112,8 +112,8 @@
    "d": 1787697368,
    "w": 2000,
    "ht": 1500,
-   "e": 0,
-   "t": ".thumbs/box-truck-liftgate-open.jpg.webp"
+   "t": ".thumbs/box-truck-liftgate-open.jpg.webp",
+   "e": 0
   },
   {
    "n": "bull-skull-wall-mount.jpg",
@@ -162,8 +162,8 @@
    "d": 1787697368,
    "w": 2000,
    "ht": 1500,
-   "e": 0,
-   "t": ".thumbs/diet-dr-pepper-3-liter-shelf.jpg.webp"
+   "t": ".thumbs/diet-dr-pepper-3-liter-shelf.jpg.webp",
+   "e": 0
   },
   {
    "n": "diet-dr-pepper-bottles-shelf.jpg",
@@ -172,8 +172,8 @@
    "d": 1787697368,
    "w": 2000,
    "ht": 1500,
-   "e": 0,
-   "t": ".thumbs/diet-dr-pepper-bottles-shelf.jpg.webp"
+   "t": ".thumbs/diet-dr-pepper-bottles-shelf.jpg.webp",
+   "e": 0
   },
   {
    "n": "dog-sled-team-blizzard.webp",
@@ -542,8 +542,8 @@
    "d": 1787697368,
    "w": 2000,
    "ht": 1500,
-   "e": 0,
-   "t": ".thumbs/plywood-shipping-crate-hinged.jpg.webp"
+   "t": ".thumbs/plywood-shipping-crate-hinged.jpg.webp",
+   "e": 0
   },
   {
    "n": "prairie-crossroads-stop-sign.jpg",
@@ -752,8 +752,8 @@
    "d": 1787697368,
    "w": 2000,
    "ht": 1500,
-   "e": 0,
-   "t": ".thumbs/vanilla-cashmere-body-mist-backyard.jpg.webp"
+   "t": ".thumbs/vanilla-cashmere-body-mist-backyard.jpg.webp",
+   "e": 0
   },
   {
    "n": "variance-components-coefficient-of-determination-r2.png",
@@ -804,6 +804,16 @@
    "ht": 1024,
    "t": ".thumbs/white-feather-underwater.webp.webp",
    "e": 0
+  },
+  {
+   "n": "wide-narrow-doe-400x300.png",
+   "s": 21479,
+   "h1": "bba93558fb64745ce60889f6e29a51e5b71cb169",
+   "d": 1787870976,
+   "w": 400,
+   "ht": 300,
+   "e": 0,
+   "t": ".thumbs/wide-narrow-doe-400x300.png.webp"
   },
   {
    "n": "zernike-pyramid-noll-1200x800.png",
