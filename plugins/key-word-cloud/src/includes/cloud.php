@@ -70,10 +70,14 @@ final class KWC_Cloud {
 	}
 
 	/**
-	 * 대상 글을 읽어 단어 빈도를 센다.
+	 * 대상 글을 읽어 단어 빈도와 문서 빈도를 센다.
+	 *
+	 * counts 는 전체 등장 횟수, doc_freq 는 그 단어가 나온 글의 수다.
+	 * 둘이 있어야 TF-IDF 를 계산할 수 있다.
 	 *
 	 * @param array $args 정규화된 인자.
-	 * @return array counts(word => count, 빈도 내림차순), scanned, empty_source.
+	 * @return array counts(word => count, 빈도 내림차순), doc_freq(word => 글 수),
+	 *               docs(단어를 하나라도 담은 글 수), scanned, empty_source.
 	 */
 	public static function count_words( array $args ) {
 		$query_args = array(
@@ -102,6 +106,8 @@ final class KWC_Cloud {
 		}
 
 		$counts       = array();
+		$doc_freq     = array();
+		$docs         = 0;
 		$empty_source = 0;
 
 		foreach ( $posts as $post ) {
@@ -123,12 +129,22 @@ final class KWC_Cloud {
 				}
 			}
 
+			$seen = array();
 			foreach ( KWC_Tokenizer::tokenize( $text ) as $token ) {
 				$word = KWC_Tokenizer::normalize( $token, $stopwords, $args );
 				if ( '' === $word ) {
 					continue;
 				}
 				$counts[ $word ] = isset( $counts[ $word ] ) ? $counts[ $word ] + 1 : 1;
+				$seen[ $word ]   = true;
+			}
+
+			if ( empty( $seen ) ) {
+				continue;
+			}
+			$docs++;
+			foreach ( array_keys( $seen ) as $word ) {
+				$doc_freq[ $word ] = isset( $doc_freq[ $word ] ) ? $doc_freq[ $word ] + 1 : 1;
 			}
 		}
 
@@ -136,9 +152,55 @@ final class KWC_Cloud {
 
 		return array(
 			'counts'       => $counts,
+			'doc_freq'     => $doc_freq,
+			'docs'         => $docs,
 			'scanned'      => count( $posts ),
 			'empty_source' => $empty_source,
 		);
+	}
+
+	/**
+	 * 단어마다 순위 점수를 매긴다.
+	 *
+	 * tfidf: (1 + log TF) x log(1 + N / DF).
+	 *   모든 글에 두루 나오는 단어는 DF 가 커져 점수가 내려가고,
+	 *   몇 글에 몰려 나오는 단어가 올라온다. 그것이 key word 다.
+	 *   log(1 + N/DF) 를 쓰므로 DF = N 이어도 0 이 되어 사라지지는 않는다.
+	 * count: 등장 횟수 그대로. 예전 동작이다.
+	 *
+	 * @param array  $counts   word => 전체 등장 횟수.
+	 * @param array  $doc_freq word => 그 단어가 나온 글 수.
+	 * @param int    $docs     단어를 담은 글 수.
+	 * @param string $ranking  tfidf | count.
+	 * @return array word => 점수 (내림차순).
+	 */
+	public static function score_words( array $counts, array $doc_freq, $docs, $ranking ) {
+		if ( 'count' === $ranking ) {
+			return $counts;
+		}
+		if ( 'tfidf' !== $ranking ) {
+			// 여기까지 온 값은 검증을 거쳤어야 한다. 조용히 한쪽을 고르지 않는다.
+			error_log( '[key-word-cloud] unknown ranking: ' . $ranking );
+			return $counts;
+		}
+		if ( $docs < 1 ) {
+			error_log( '[key-word-cloud] tfidf needs at least one document; got ' . $docs );
+			return $counts;
+		}
+
+		$scores = array();
+		foreach ( $counts as $word => $tf ) {
+			$df = isset( $doc_freq[ $word ] ) ? (int) $doc_freq[ $word ] : 0;
+			if ( $df < 1 ) {
+				// counts 에 있으면 반드시 어느 글에선가 나왔다. 어긋나면 버그다.
+				error_log( '[key-word-cloud] doc_freq missing for ' . $word );
+				continue;
+			}
+			$scores[ $word ] = ( 1 + log( $tf ) ) * log( 1 + $docs / $df );
+		}
+
+		arsort( $scores );
+		return $scores;
 	}
 
 	/**
@@ -193,20 +255,44 @@ final class KWC_Cloud {
 			return '<p class="kwc-error">Key Word Cloud: 표시할 단어가 없다. ' . esc_html( $why ) . '</p>';
 		}
 
-		$counts = array_slice( $counts, 0, (int) $args['max_words'], true );
+		// TF-IDF 는 희귀할수록 점수를 올리므로, 글 하나에만 있는 오탈자나 코드 조각이
+		// 맨 위로 올라온다. 여러 글에 걸쳐 나온 단어만 후보로 남긴다.
+		// 하한을 글 개수로 두면 사이트 규모가 달라질 때 깨지므로 비율로 잡는다.
+		$min_docs = (int) ceil( $result['docs'] * (int) $args['min_docs_pct'] / 100 );
+		if ( $min_docs > 1 ) {
+			$doc_freq = $result['doc_freq'];
+			$kept     = array();
+			foreach ( $counts as $word => $count ) {
+				if ( isset( $doc_freq[ $word ] ) && $doc_freq[ $word ] >= $min_docs ) {
+					$kept[ $word ] = $count;
+				}
+			}
+			if ( empty( $kept ) ) {
+				error_log( '[key-word-cloud] min_docs=' . $min_docs . ' removed every word of ' . count( $counts ) );
+				return '<p class="kwc-error">Key Word Cloud: 표시할 단어가 없다. ' . esc_html( '글 ' . $min_docs . '개 이상에 나온 단어가 없다.' ) . '</p>';
+			}
+			$counts = $kept;
+		}
 
-		$max = max( $counts );
-		$min = min( $counts );
-		// sqrt 스케일이 선형보다 빈도 차이를 덜 과장한다.
+		// 크기 순서는 점수가 정하고, 화면에 적는 숫자는 실제 등장 횟수 그대로 둔다.
+		$scores = self::score_words( $counts, $result['doc_freq'], $result['docs'], $args['ranking'] );
+		$scores = array_slice( $scores, 0, (int) $args['max_words'], true );
+
+		$max = max( $scores );
+		$min = min( $scores );
+		// sqrt 스케일이 선형보다 점수 차이를 덜 과장한다.
 		$span = sqrt( $max ) - sqrt( $min );
 
 		$items = array();
-		foreach ( $counts as $word => $count ) {
-			$weight = ( $span > 0 ) ? ( ( sqrt( $count ) - sqrt( $min ) ) / $span ) : 1.0;
+		foreach ( $scores as $word => $score ) {
+			$count  = isset( $counts[ $word ] ) ? (int) $counts[ $word ] : 0;
+			$weight = ( $span > 0 ) ? ( ( sqrt( $score ) - sqrt( $min ) ) / $span ) : 1.0;
 			$size   = $args['min_size'] + ( $args['max_size'] - $args['min_size'] ) * $weight;
 			$color  = self::mix_color( $args['color_start'], $args['color_end'], $weight );
 			$style  = sprintf( 'font-size:%.1fpx;color:%s;', $size, $color );
-			$title  = sprintf( '%s (%d)', $word, $count );
+			$title  = ( 'tfidf' === $args['ranking'] )
+				? sprintf( '%s — %d회, 글 %d개', $word, $count, isset( $result['doc_freq'][ $word ] ) ? (int) $result['doc_freq'][ $word ] : 0 )
+				: sprintf( '%s (%d)', $word, $count );
 
 			if ( 'search' === $args['link_mode'] ) {
 				$link_args = array( 's' => $word );

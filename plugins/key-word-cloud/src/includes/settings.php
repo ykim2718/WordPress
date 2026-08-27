@@ -82,6 +82,7 @@ final class KWC_Settings {
 		}
 
 		$fields = array(
+			array( 'ranking', '단어 고르는 기준', 'kwc_source', 'field_ranking' ),
 			array( 'source', '텍스트 소스', 'kwc_source', 'field_source' ),
 			array( 'excerpt_fallback', '요약문이 비면 본문 사용', 'kwc_source', 'field_excerpt_fallback' ),
 			array( 'post_types', '대상 post type', 'kwc_source', 'field_post_types' ),
@@ -92,6 +93,7 @@ final class KWC_Settings {
 			array( 'kr_particles', '조사 목록', 'kwc_filter', 'field_kr_particles' ),
 			array( 'min_len', '최소 단어 길이', 'kwc_filter', 'field_min_len' ),
 			array( 'min_count', '최소 등장 횟수', 'kwc_filter', 'field_min_count' ),
+			array( 'min_docs_pct', 'TF-IDF 최소 문서 비율 (%)', 'kwc_filter', 'field_min_docs_pct' ),
 			array( 'max_words', '최대 단어 수', 'kwc_filter', 'field_max_words' ),
 			array( 'size', '글자 크기 (px)', 'kwc_style', 'field_size' ),
 			array( 'color', '색상 (적음 → 많음)', 'kwc_style', 'field_color' ),
@@ -120,6 +122,13 @@ final class KWC_Settings {
 
 		$out    = $current;
 		$errors = array();
+
+		$ranking = isset( $input['ranking'] ) ? (string) $input['ranking'] : '';
+		if ( in_array( $ranking, array( 'tfidf', 'count' ), true ) ) {
+			$out['ranking'] = $ranking;
+		} else {
+			$errors[] = '단어 고르는 기준 값이 잘못됐다: ' . $ranking;
+		}
 
 		$source = isset( $input['source'] ) ? (string) $input['source'] : '';
 		if ( in_array( $source, array( 'content', 'excerpt' ), true ) ) {
@@ -157,7 +166,8 @@ final class KWC_Settings {
 		$ints = array(
 			'scan_limit'  => array( 1, 5000 ),
 			'max_words'   => array( 1, 500 ),
-			'min_count'   => array( 1, 1000 ),
+			'min_count'    => array( 1, 1000 ),
+			'min_docs_pct' => array( 0, 100 ),
 			'min_len'     => array( 1, 20 ),
 			'min_size'    => array( 6, 200 ),
 			'max_size'    => array( 6, 200 ),
@@ -267,6 +277,24 @@ final class KWC_Settings {
 
 	// --- 필드 렌더러 ---------------------------------------------------------
 
+	public static function field_ranking() {
+		$current = self::value( 'ranking' );
+		$labels  = array(
+			'tfidf' => 'TF-IDF — 그 글들을 특징짓는 단어',
+			'count' => '등장 횟수 — 많이 나온 단어',
+		);
+		foreach ( $labels as $key => $label ) {
+			printf(
+				'<label style="margin-right:16px"><input type="radio" name="%s" value="%s" %s> %s</label>',
+				esc_attr( self::name( 'ranking' ) ),
+				esc_attr( $key ),
+				checked( $current, $key, false ),
+				esc_html( $label )
+			);
+		}
+		echo '<p class="description">TF-IDF 는 모든 글에 두루 나오는 흔한 말의 점수를 낮추고, 몇몇 글에 몰려 나오는 단어를 올린다. 글자 크기는 이 점수를 따르고, 마우스를 올리면 실제 등장 횟수가 보인다.</p>';
+	}
+
 	public static function field_source() {
 		$current = self::value( 'source' );
 		foreach ( array( 'content' => '본문 (Content)', 'excerpt' => '요약문 (Excerpt)' ) as $key => $label ) {
@@ -343,6 +371,10 @@ final class KWC_Settings {
 
 	public static function field_min_count() {
 		self::number_field( 'min_count', 1, 1000, '이보다 적게 나온 단어는 버린다.' );
+	}
+
+	public static function field_min_docs_pct() {
+		self::number_field( 'min_docs_pct', 0, 100, '읽은 글의 이 비율 이상에 나온 단어만 TF-IDF 후보가 된다. 0 이면 제한 없음. 낮추면 한 글에만 있는 오탈자가 올라오고, 높이면 흔한 말만 남는다.' );
 	}
 
 	public static function field_max_words() {

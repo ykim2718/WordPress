@@ -10,6 +10,13 @@ means "use the value from the settings screen", so nothing has to be repeated.
 The editor previews the block by asking the server to draw it, which is the
 same code the front end runs.
 
+**Keywords, not just frequent words.** Words are ranked by TF-IDF: a word that
+appears in every post is pushed down, a word that clusters in a few is pushed
+up. Counting occurrences alone tends to surface whatever the site says most
+often, which describes nothing. A floor on how many posts a word must appear
+in — 10% of the posts scanned by default — keeps a typo from a single post
+from winning on rarity alone. Set `ranking` to `count` for plain frequency.
+
 **Content or excerpt, your choice.** The plugin can read the post body or the
 post excerpt. When it reads excerpts and a post has none, that post is skipped
 rather than quietly swapped for its body; turn the fallback on in the settings
@@ -52,6 +59,9 @@ word, so the reader lands on the ordinary post list of your theme.
 Attributes override the saved settings for that one cloud. A bad value is
 reported on the page instead of being silently replaced by a default.
 
+- `ranking` — `tfidf` or `count`.
+- `min_docs_pct` — TF-IDF floor: least share of scanned posts a word must appear
+  in, `0` to remove it.
 - `source` — `content` or `excerpt`.
 - `post_type` — comma separated. Public post types only.
 - `category`, `tag` — slugs, to narrow the posts that are read.

@@ -64,7 +64,28 @@ PHP 한 곳에만 두려는 것이고, 그래서 미리보기와 실제 화면�
 3. 소문자로 바꾸고 불용어를 버린다.
 4. 한글 단어면 끝의 조사를 뗀다. 뗀 뒤에 다시 한 번 불용어를 대조한다.
 5. 길이가 `min_len` 미만이거나 숫자로만 된 토큰을 버린다.
-6. 빈도순으로 정렬해 `min_count` 미만을 버리고 위에서 `max` 개만 남긴다.
+6. `min_count` 미만을 버린다.
+7. `ranking=tfidf` 면 글 수 기준 `min_docs_pct` 미만인 단어를 버리고 TF-IDF 점수를 매긴다.
+8. 점수순으로 위에서 `max` 개만 남긴다.
+
+## TF-IDF
+
+점수는 `(1 + log TF) × log(1 + N / DF)` 다. TF 는 전체 등장 횟수, DF 는 그 단어가 나온 글
+수, N 은 읽은 글 수다. 모든 글에 두루 나오는 단어는 DF 가 커져 점수가 내려가고, 몇 글에
+몰려 나오는 단어가 올라온다. 글자 크기는 이 점수를 따르고, 마우스를 올리면 실제 등장
+횟수와 글 수가 보인다.
+
+TF-IDF 는 희귀할수록 점수를 올리므로 하한이 없으면 한 글에만 있는 오탈자가 1위가 된다.
+`min_docs_pct` 가 그 하한이다. 글 300개를 읽은 저장소에서 잰 결과는 이렇다.
+
+| min_docs_pct | 상위 단어 |
+|---|---|
+| 0 | slug, df, vectorization, groq, katex, ucxxxxxxxxx |
+| 2 | katex, ccc, cai, mathbf, city, embedding |
+| 10 | id, team, wafer, variance, report, yield, manufacturing |
+| 20 | feature, learning, product, model, user, method |
+
+낮추면 잡음이 올라오고, 높이면 흔한 말만 남는다. 기본값 10 은 그 사이다.
 
 조사 분리는 형태소 분석기가 아니라 규칙이다. 긴 조사부터 맞춰 보고, 떼고 남는 어간이
 `kr_min_stem` 음절보다 짧아지면 떼지 않는다. 최대 두 번까지 반복해서 `학교에서는` 이
@@ -75,6 +96,8 @@ PHP 한 곳에만 두려는 것이고, 그래서 미리보기와 실제 화면�
 
 | Attribute | Default | 설명 |
 |---|---|---|
+| `ranking` | `tfidf` | `tfidf` 또는 `count` |
+| `min_docs_pct` | 10 | TF-IDF 후보가 되기 위한 최소 문서 비율(%). 0 이면 제한 없음 |
 | `source` | `content` | `content` 또는 `excerpt` |
 | `post_type` | `post` | 쉼표 구분. 공개 post type만 |
 | `category` | `''` | 카테고리 slug |

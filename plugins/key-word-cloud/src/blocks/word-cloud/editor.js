@@ -25,6 +25,12 @@
 	var InspectorControls = wp.blockEditor.InspectorControls;
 	var ServerSideRender = wp.serverSideRender;
 
+	var RANKINGS = [
+		{ label: __( 'Saved setting', 'key-word-cloud' ), value: '' },
+		{ label: __( 'TF-IDF (distinctive words)', 'key-word-cloud' ), value: 'tfidf' },
+		{ label: __( 'Occurrences (frequent words)', 'key-word-cloud' ), value: 'count' }
+	];
+
 	var SOURCES = [
 		{ label: __( 'Saved setting', 'key-word-cloud' ), value: '' },
 		{ label: __( 'Content', 'key-word-cloud' ), value: 'content' },
@@ -74,6 +80,7 @@
 	function inspector( props ) {
 		return el( InspectorControls, { key: 'inspector' }, [
 			panel( __( 'Source', 'key-word-cloud' ), true, [
+				select( props, 'ranking', __( 'How words are chosen', 'key-word-cloud' ), RANKINGS ),
 				select( props, 'source', __( 'Text source', 'key-word-cloud' ), SOURCES ),
 				text( props, 'post_type', __( 'Post types', 'key-word-cloud' ), __( 'Comma separated. Public post types only.', 'key-word-cloud' ) ),
 				text( props, 'category', __( 'Category slug', 'key-word-cloud' ) ),
@@ -83,6 +90,7 @@
 			panel( __( 'Words', 'key-word-cloud' ), false, [
 				text( props, 'max', __( 'Words to draw', 'key-word-cloud' ) ),
 				text( props, 'min_count', __( 'Least occurrences', 'key-word-cloud' ) ),
+				text( props, 'min_docs_pct', __( 'TF-IDF: least posts (%)', 'key-word-cloud' ), __( 'A word must appear in this share of the scanned posts. 0 removes the floor.', 'key-word-cloud' ) ),
 				text( props, 'min_len', __( 'Least characters', 'key-word-cloud' ) )
 			] ),
 			panel( __( 'Size and colour', 'key-word-cloud' ), false, [

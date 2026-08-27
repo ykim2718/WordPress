@@ -13,6 +13,7 @@
 		"align": ["wide", "full"]
 	},
 	"attributes": {
+		"ranking": { "type": "string", "default": "" },
 		"source": { "type": "string", "default": "" },
 		"post_type": { "type": "string", "default": "" },
 		"category": { "type": "string", "default": "" },
@@ -20,6 +21,7 @@
 		"limit": { "type": "string", "default": "" },
 		"max": { "type": "string", "default": "" },
 		"min_count": { "type": "string", "default": "" },
+		"min_docs_pct": { "type": "string", "default": "" },
 		"min_len": { "type": "string", "default": "" },
 		"min_size": { "type": "string", "default": "" },
 		"max_size": { "type": "string", "default": "" },

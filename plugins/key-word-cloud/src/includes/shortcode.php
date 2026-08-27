@@ -27,6 +27,8 @@ final class KWC_Shortcode {
 
 		$atts = shortcode_atts(
 			array(
+				'ranking'     => $options['ranking'],
+				'min_docs_pct' => $options['min_docs_pct'],
 				'source'      => $options['source'],
 				'post_type'   => implode( ',', (array) $options['post_types'] ),
 				'category'    => '',
@@ -69,6 +71,11 @@ final class KWC_Shortcode {
 			return new WP_Error( 'kwc_bad_source', 'source 는 content 또는 excerpt 여야 한다. 받은 값: ' . $atts['source'] );
 		}
 
+		$ranking = strtolower( trim( (string) $atts['ranking'] ) );
+		if ( ! in_array( $ranking, array( 'tfidf', 'count' ), true ) ) {
+			return new WP_Error( 'kwc_bad_ranking', 'ranking 은 tfidf 또는 count 여야 한다. 받은 값: ' . $atts['ranking'] );
+		}
+
 		$link = strtolower( trim( (string) $atts['link'] ) );
 		if ( ! in_array( $link, array( 'search', 'none' ), true ) ) {
 			return new WP_Error( 'kwc_bad_link', 'link 는 search 또는 none 이어야 한다. 받은 값: ' . $atts['link'] );
@@ -90,6 +97,7 @@ final class KWC_Shortcode {
 			'limit'     => array( 1, 5000 ),
 			'max'       => array( 1, 500 ),
 			'min_count' => array( 1, 1000 ),
+			'min_docs_pct' => array( 0, 100 ),
 			'min_len'   => array( 1, 20 ),
 			'min_size'  => array( 6, 200 ),
 			'max_size'  => array( 6, 200 ),
@@ -118,6 +126,8 @@ final class KWC_Shortcode {
 		}
 
 		return array(
+			'ranking'          => $ranking,
+			'min_docs_pct'     => $values['min_docs_pct'],
 			'source'           => $source,
 			'excerpt_fallback' => (int) $options['excerpt_fallback'],
 			'post_types'       => $post_types,

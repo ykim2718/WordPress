@@ -1,3 +1,18 @@
+## 1.2.0
+
+- Rank words by TF-IDF instead of raw frequency, and make that the default.
+  Counting occurrences alone surfaced whatever the site says most often —
+  *data*, *model*, *time*, *use* — which describes nothing. TF-IDF lowers a
+  word that appears across every post and raises one that clusters in a few,
+  which is what a keyword is. `ranking=count` restores the old behaviour.
+- Add a floor on how many posts a word must appear in, as a share of the posts
+  scanned, 10% by default. Without it TF-IDF rewards rarity so hard that a
+  typo or a stray code fragment from a single post wins. On a corpus of 300
+  posts the difference is *slug, katex, ucxxxxxxxxx* at 0% versus *wafer,
+  yield, variance, manufacturing* at 10%.
+- Show the number of posts a word came from, next to its occurrence count, in
+  the tooltip.
+
 ## 1.1.1
 
 - File the block under a **yRocket** group in the inserter. It was asking for
