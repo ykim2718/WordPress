@@ -124,7 +124,7 @@ final class KWC_Settings {
 		$errors = array();
 
 		$ranking = isset( $input['ranking'] ) ? (string) $input['ranking'] : '';
-		if ( in_array( $ranking, array( 'tfidf', 'count' ), true ) ) {
+		if ( in_array( $ranking, array( 'tfidf', 'count', 'topics' ), true ) ) {
 			$out['ranking'] = $ranking;
 		} else {
 			$errors[] = '단어 고르는 기준 값이 잘못됐다: ' . $ranking;
@@ -282,6 +282,7 @@ final class KWC_Settings {
 		$labels  = array(
 			'tfidf' => 'TF-IDF — 그 글들을 특징짓는 단어',
 			'count' => '등장 횟수 — 많이 나온 단어',
+			'topics' => 'Topic — 밖에서 올린 주제 묶음',
 		);
 		foreach ( $labels as $key => $label ) {
 			printf(

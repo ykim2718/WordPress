@@ -16,7 +16,7 @@ final class KWC_Defaults {
 	 */
 	public static function options() {
 		return array(
-			'ranking'          => 'tfidf',     // tfidf | count
+			'ranking'          => 'tfidf',     // tfidf | count | topics
 			'min_docs_pct'     => 10,           // TF-IDF 후보가 되려면 읽은 글의 이 비율(%) 이상에 나와야 한다
 			'source'           => 'content',   // content | excerpt
 			'excerpt_fallback' => 0,           // excerpt 가 비었을 때 본문으로 대체할지 (기본 off: 조용한 대체 금지)

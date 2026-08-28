@@ -44,6 +44,7 @@ plugins/key-word-cloud/
 | `includes/shortcode.php` | `[wpwordcloud]` 와 속성 검증 |
 | `includes/block.php` | block 등록과 서버 렌더링 |
 | `includes/settings.php` | 사이드바 메뉴와 설정 화면 |
+| `includes/topics.php` | 밖에서 올린 topic 을 REST 로 받아 저장 |
 | `includes/updater.php` | 저장소에서 갱신, View details 창 |
 | `blocks/word-cloud/` | `block.json`, `editor.js`, `editor.asset.php` |
 | `assets/kwc.css` | 가로 배치와 오류 문구 서식 |
@@ -92,11 +93,46 @@ TF-IDF 는 희귀할수록 점수를 올리므로 하한이 없으면 한 글에
 `학교` 에 닿는다. `고양이` 가 `고양` 이 되는 식의 오분리가 보이면 `kr_min_stem` 을 올리거나
 그 조사를 목록에서 뺀다.
 
+## Topic
+
+`ranking=topics` 는 본문을 세지 않는다. 밖에서 만들어 올린 topic 을 읽어 그린다. TF-IDF 가
+낱말만 다루는 반면 topic 은 `within-wafer variation` 같은 구절이 될 수 있고, 그건 세는
+것으로는 나오지 않는다.
+
+받는 자리는 아래 하나다. WordPress application password 로 인증하며, 글을 고칠 수 있는
+사용자만 쓴다.
+
+```bash
+POST /wp-json/key-word-cloud/v1/topics
+Authorization: Basic <base64 of user:application-password>
+Content-Type: application/json
+```
+
+```json
+{
+  "generator": "어떤 방법으로 만들었는지 적어 두는 자리",
+  "topics": [
+    {
+      "label": "ai assisted development",
+      "posts": 6,
+      "phrases": ["agentic automation", "ai agent worker", "ai assistant"]
+    }
+  ]
+}
+```
+
+`posts` 가 글자 크기를 정하고, `phrases` 는 마우스를 올렸을 때 보인다. `label` 이 비었거나
+`posts` 가 1 미만인 항목은 버리고 무엇을 왜 버렸는지 응답과 error log 에 적는다. 쓸 수 있는
+항목이 하나도 없으면 저장하지 않고 400 을 돌려준다. 저장에 성공하면 캐시를 비운다.
+
+topic 을 만드는 파이프라인은 이 저장소에 없다. LLM 과 embedding 모델이 필요하므로 GPU 가
+있는 기계에서 돌리고, 결과만 위 주소로 보낸다.
+
 ## 속성
 
 | Attribute | Default | 설명 |
 |---|---|---|
-| `ranking` | `tfidf` | `tfidf` 또는 `count` |
+| `ranking` | `tfidf` | `tfidf`, `count`, `topics` |
 | `min_docs_pct` | 10 | TF-IDF 후보가 되기 위한 최소 문서 비율(%). 0 이면 제한 없음 |
 | `source` | `content` | `content` 또는 `excerpt` |
 | `post_type` | `post` | 쉼표 구분. 공개 post type만 |

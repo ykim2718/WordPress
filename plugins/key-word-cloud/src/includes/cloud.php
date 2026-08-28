@@ -223,6 +223,15 @@ final class KWC_Cloud {
 			return $html;
 		}
 
+		if ( 'topics' === $args['ranking'] ) {
+			$html = self::render_topics( $args );
+			if ( $ttl > 0 && '' !== $html ) {
+				set_transient( $key, $html, $ttl );
+			}
+			wp_enqueue_style( 'key-word-cloud' );
+			return $html;
+		}
+
 		$result = self::count_words( $args );
 		$counts = $result['counts'];
 
@@ -278,47 +287,22 @@ final class KWC_Cloud {
 		$scores = self::score_words( $counts, $result['doc_freq'], $result['docs'], $args['ranking'] );
 		$scores = array_slice( $scores, 0, (int) $args['max_words'], true );
 
-		$max = max( $scores );
-		$min = min( $scores );
-		// sqrt 스케일이 선형보다 점수 차이를 덜 과장한다.
-		$span = sqrt( $max ) - sqrt( $min );
-
-		$items = array();
+		$entries = array();
 		foreach ( $scores as $word => $score ) {
-			$count  = isset( $counts[ $word ] ) ? (int) $counts[ $word ] : 0;
-			$weight = ( $span > 0 ) ? ( ( sqrt( $score ) - sqrt( $min ) ) / $span ) : 1.0;
-			$size   = $args['min_size'] + ( $args['max_size'] - $args['min_size'] ) * $weight;
-			$color  = self::mix_color( $args['color_start'], $args['color_end'], $weight );
-			$style  = sprintf( 'font-size:%.1fpx;color:%s;', $size, $color );
-			$title  = ( 'tfidf' === $args['ranking'] )
-				? sprintf( '%s — %d회, 글 %d개', $word, $count, isset( $result['doc_freq'][ $word ] ) ? (int) $result['doc_freq'][ $word ] : 0 )
-				: sprintf( '%s (%d)', $word, $count );
-
-			if ( 'search' === $args['link_mode'] ) {
-				$link_args = array( 's' => $word );
-				if ( 1 === count( $args['post_types'] ) ) {
-					$link_args['post_type'] = $args['post_types'][0];
-				}
-				$items[] = sprintf(
-					'<a class="kwc-word" href="%s" style="%s" title="%s" data-count="%d">%s</a>',
-					esc_url( add_query_arg( $link_args, home_url( '/' ) ) ),
-					esc_attr( $style ),
-					esc_attr( $title ),
-					$count,
-					esc_html( $word )
-				);
-			} else {
-				$items[] = sprintf(
-					'<span class="kwc-word kwc-word--static" style="%s" title="%s" data-count="%d">%s</span>',
-					esc_attr( $style ),
-					esc_attr( $title ),
-					$count,
-					esc_html( $word )
-				);
-			}
+			$count     = isset( $counts[ $word ] ) ? (int) $counts[ $word ] : 0;
+			$doc_count = isset( $result['doc_freq'][ $word ] ) ? (int) $result['doc_freq'][ $word ] : 0;
+			$entries[] = array(
+				'text'   => (string) $word,
+				'score'  => (float) $score,
+				'count'  => $count,
+				'search' => (string) $word,
+				'title'  => ( 'tfidf' === $args['ranking'] )
+					? sprintf( '%s — %d회, 글 %d개', $word, $count, $doc_count )
+					: sprintf( '%s (%d)', $word, $count ),
+			);
 		}
 
-		$html = '<div class="kwc-cloud">' . implode( "\n", $items ) . '</div>';
+		$html = self::draw( $entries, $args );
 
 		if ( $ttl > 0 ) {
 			set_transient( $key, $html, $ttl );
@@ -326,6 +310,106 @@ final class KWC_Cloud {
 
 		wp_enqueue_style( 'key-word-cloud' );
 		return $html;
+	}
+
+	/**
+	 * 미리 계산된 topic 으로 구름을 그린다.
+	 *
+	 * 본문을 세지 않는다. GPU 가 있는 기계의 Python 파이프라인이 만들어 REST 로
+	 * 올려 둔 것을 읽기만 한다.
+	 *
+	 * @param array $args 정규화된 인자.
+	 * @return string
+	 */
+	private static function render_topics( array $args ) {
+		$topics = KWC_Topics::stored();
+		if ( empty( $topics ) ) {
+			// 아직 아무것도 안 올라왔다는 것과 구름이 비었다는 것은 다른 일이다.
+			error_log( '[key-word-cloud] ranking=topics but no topics have been uploaded yet' );
+			return '<p class="kwc-error">Key Word Cloud: 올라온 topic 이 없다. '
+				. esc_html( 'tools/push_topics.py 로 먼저 올려라.' ) . '</p>';
+		}
+
+		$min_posts = (int) $args['min_count'];
+		$entries   = array();
+		foreach ( $topics as $topic ) {
+			$posts = (int) $topic['posts'];
+			if ( $posts < $min_posts ) {
+				continue;
+			}
+			$phrases   = isset( $topic['phrases'] ) ? (array) $topic['phrases'] : array();
+			$entries[] = array(
+				'text'   => (string) $topic['label'],
+				'score'  => (float) $posts,
+				'count'  => $posts,
+				'search' => (string) $topic['label'],
+				'title'  => sprintf(
+					'%s — 글 %d개%s',
+					$topic['label'],
+					$posts,
+					empty( $phrases ) ? '' : ' · ' . implode( ', ', array_slice( $phrases, 0, 6 ) )
+				),
+			);
+			if ( count( $entries ) >= (int) $args['max_words'] ) {
+				break;
+			}
+		}
+
+		if ( empty( $entries ) ) {
+			error_log( '[key-word-cloud] every one of ' . count( $topics ) . ' topics is below min_count=' . $min_posts );
+			return '<p class="kwc-error">Key Word Cloud: 표시할 topic 이 없다. '
+				. esc_html( 'topic ' . count( $topics ) . '개가 모두 글 ' . $min_posts . '개 미만이다.' ) . '</p>';
+		}
+
+		return self::draw( $entries, $args );
+	}
+
+	/**
+	 * 항목 목록을 구름 HTML 로 바꾼다.
+	 *
+	 * @param array $entries text, score, count, search, title 을 가진 항목들.
+	 * @param array $args    정규화된 인자.
+	 * @return string
+	 */
+	private static function draw( array $entries, array $args ) {
+		$scores = array_column( $entries, 'score' );
+		$max    = max( $scores );
+		$min    = min( $scores );
+		// sqrt 스케일이 선형보다 점수 차이를 덜 과장한다.
+		$span = sqrt( $max ) - sqrt( $min );
+
+		$items = array();
+		foreach ( $entries as $entry ) {
+			$weight = ( $span > 0 ) ? ( ( sqrt( $entry['score'] ) - sqrt( $min ) ) / $span ) : 1.0;
+			$size   = $args['min_size'] + ( $args['max_size'] - $args['min_size'] ) * $weight;
+			$color  = self::mix_color( $args['color_start'], $args['color_end'], $weight );
+			$style  = sprintf( 'font-size:%.1fpx;color:%s;', $size, $color );
+
+			if ( 'search' === $args['link_mode'] ) {
+				$link_args = array( 's' => $entry['search'] );
+				if ( 1 === count( $args['post_types'] ) ) {
+					$link_args['post_type'] = $args['post_types'][0];
+				}
+				$items[] = sprintf(
+					'<a class="kwc-word" href="%s" style="%s" title="%s" data-count="%d">%s</a>',
+					esc_url( add_query_arg( $link_args, home_url( '/' ) ) ),
+					esc_attr( $style ),
+					esc_attr( $entry['title'] ),
+					(int) $entry['count'],
+					esc_html( $entry['text'] )
+				);
+			} else {
+				$items[] = sprintf(
+					'<span class="kwc-word kwc-word--static" style="%s" title="%s" data-count="%d">%s</span>',
+					esc_attr( $style ),
+					esc_attr( $entry['title'] ),
+					(int) $entry['count'],
+					esc_html( $entry['text'] )
+				);
+			}
+		}
+
+		return '<div class="kwc-cloud">' . implode( "\n", $items ) . '</div>';
 	}
 
 	/**

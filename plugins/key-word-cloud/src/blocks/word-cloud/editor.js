@@ -28,7 +28,8 @@
 	var RANKINGS = [
 		{ label: __( 'Saved setting', 'key-word-cloud' ), value: '' },
 		{ label: __( 'TF-IDF (distinctive words)', 'key-word-cloud' ), value: 'tfidf' },
-		{ label: __( 'Occurrences (frequent words)', 'key-word-cloud' ), value: 'count' }
+		{ label: __( 'Occurrences (frequent words)', 'key-word-cloud' ), value: 'count' },
+		{ label: __( 'Uploaded topics', 'key-word-cloud' ), value: 'topics' }
 	];
 
 	var SOURCES = [

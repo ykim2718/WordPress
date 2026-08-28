@@ -1,3 +1,16 @@
+## 1.3.0
+
+- Add `ranking=topics`, which draws topics prepared elsewhere instead of
+  counting words here. TF-IDF ranks single words; a keyword is usually a
+  phrase, and no amount of counting turns `wafer` and `variation` into
+  `within-wafer variation`.
+- Accept those topics at `POST /wp-json/key-word-cloud/v1/topics`, guarded by
+  the `edit_posts` capability and stored in one option. A topic carries a
+  label, the number of posts it covers, and the phrases it was folded from,
+  which the tooltip shows. Uploading clears the cloud cache.
+- Reject an upload that carries no usable topic rather than storing an empty
+  set, and log which entries were dropped and why.
+
 ## 1.2.0
 
 - Rank words by TF-IDF instead of raw frequency, and make that the default.

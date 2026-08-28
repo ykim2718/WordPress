@@ -17,6 +17,14 @@ often, which describes nothing. A floor on how many posts a word must appear
 in — 10% of the posts scanned by default — keeps a typo from a single post
 from winning on rarity alone. Set `ranking` to `count` for plain frequency.
 
+**Topics from outside, when counting is not enough.** Set `ranking` to `topics`
+and the cloud draws topics uploaded to `/wp-json/key-word-cloud/v1/topics`
+instead of counting words itself. Counting can only rank the words that are
+already there; a pipeline running elsewhere can read the posts with a language
+model, group the phrases it finds, and send back topics such as *within-wafer
+variation* that no word count would produce. Each topic is sized by the number
+of posts it covers, and its tooltip lists the phrases behind it.
+
 **Content or excerpt, your choice.** The plugin can read the post body or the
 post excerpt. When it reads excerpts and a post has none, that post is skipped
 rather than quietly swapped for its body; turn the fallback on in the settings
@@ -59,7 +67,7 @@ word, so the reader lands on the ordinary post list of your theme.
 Attributes override the saved settings for that one cloud. A bad value is
 reported on the page instead of being silently replaced by a default.
 
-- `ranking` — `tfidf` or `count`.
+- `ranking` — `tfidf`, `count`, or `topics`.
 - `min_docs_pct` — TF-IDF floor: least share of scanned posts a word must appear
   in, `0` to remove it.
 - `source` — `content` or `excerpt`.

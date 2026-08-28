@@ -72,8 +72,8 @@ final class KWC_Shortcode {
 		}
 
 		$ranking = strtolower( trim( (string) $atts['ranking'] ) );
-		if ( ! in_array( $ranking, array( 'tfidf', 'count' ), true ) ) {
-			return new WP_Error( 'kwc_bad_ranking', 'ranking 은 tfidf 또는 count 여야 한다. 받은 값: ' . $atts['ranking'] );
+		if ( ! in_array( $ranking, array( 'tfidf', 'count', 'topics' ), true ) ) {
+			return new WP_Error( 'kwc_bad_ranking', 'ranking 은 tfidf, count, topics 중 하나여야 한다. 받은 값: ' . $atts['ranking'] );
 		}
 
 		$link = strtolower( trim( (string) $atts['link'] ) );
