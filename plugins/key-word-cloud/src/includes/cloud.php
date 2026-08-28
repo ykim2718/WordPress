@@ -179,10 +179,11 @@ final class KWC_Cloud {
 				'text'  => (string) $topic['label'],
 				'posts' => $posts,
 				'tip'   => sprintf(
-					/* translators: 1: number of posts, 2: the phrases the topic was folded from */
+					/* translators: 1: number of posts, 2: a colon and the phrases the topic was folded from */
 					_n( '%1$d post%2$s', '%1$d posts%2$s', $posts, 'key-word-cloud' ),
 					$posts,
-					empty( $phrases ) ? '' : "\n" . implode( ' · ', array_slice( $phrases, 0, 8 ) )
+					// 구절이 없으면 콜론도 없다. 뒤에 아무것도 없는 콜론은 문장이 잘린 것처럼 보인다.
+					empty( $phrases ) ? '' : ":\n" . implode( ' · ', array_slice( $phrases, 0, 8 ) )
 				),
 			);
 			if ( count( $entries ) >= (int) $args['max_words'] ) {

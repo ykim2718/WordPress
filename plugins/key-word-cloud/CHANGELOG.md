@@ -1,3 +1,9 @@
+## 2.4.1
+
+- Separate the post count from the phrases with a colon in the tooltip: "3
+  posts: reference display · reference number". A topic with no phrases behind
+  it gets no colon, so the line never ends on one.
+
 ## 2.4.0
 
 - Write everything a reader sees in English. The tooltip said 글 3개; it now
