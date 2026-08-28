@@ -127,6 +127,17 @@ python3 tools/push_topics.py --write plugins/key-word-cloud/dist/topics.json --d
 `assets/kwc.js` 가 직접 줄을 나눈다. 한 줄에 적어도 하나는 담으므로 허용 폭보다 긴
 구절도 버려지지 않는다. JavaScript 가 없으면 예전처럼 네모로 흐른다.
 
+줄은 가운데부터 바깥으로 채우고, 줄 안에서도 큰 것이 가운데 오도록 놓는다. 그래서
+크기가 아래로만이 아니라 사방으로 줄어든다. 데모 구름에서 재면 가운데 35.4px, 그 바깥
+23.4px, 가장자리 18.5px 였다.
+
+글꼴은 여섯 가지에서 고른다: 둥근, 고딕, 명조, 고정폭, 테마 글꼴, 직접 적기. 기본은
+둥근이다. 구름은 테마가 본문에 쓰는 딱딱한 글꼴보다 부드러운 글꼴에서 잘 읽힌다. 글꼴을
+내려받지는 않고 기기에 있는 것만 부르므로, 둥근 시스템 글꼴이 없는 Windows 에서는 부드러운
+고딕으로 내려간다. 직접 적은 값은 style 속성에 들어가므로 글자·숫자·공백과 쉼표, 따옴표,
+하이픈, 밑줄만 남기고 걸러 낸다. 걸러 낸 사실은 error log 에 남고, 남는 것이 없으면
+기본으로 되돌리지 않고 오류를 낸다.
+
 색은 다섯 가지를 돌려 쓴다. 이웃한 topic 을 갈라 보이게 할 뿐 **색 자체에는 뜻이 없다.**
 글 수는 글자 크기가 나타낸다. 다섯 색은 색맹 구분 기준과 배경 대비 4.5:1 을 검증해서
 고른 것이다. 여기서는 색이 곧 글자라 대비가 읽기에 직접 걸린다.
@@ -167,6 +178,8 @@ topic 에 마우스를 올리면 어떤 구절에서 온 것인지와 글 수가
 | `color_start` | `#8aa4c8` | 적은 글에서 온 topic 의 색 |
 | `color_end` | `#12355b` | 많은 글에서 온 topic 의 색 |
 | `shape` | `ellipse` | `ellipse` 또는 `block` |
+| `font` | `rounded` | `rounded`, `sans`, `serif`, `mono`, `theme`, `custom` |
+| `font_custom` | `''` | `font=custom` 일 때 쓸 CSS font-family |
 | `color_mode` | `palette` | `palette` 또는 `gradient` |
 | `link` | `search` | `search` 또는 `none` |
 | `cache` | 3600 | 캐시 초. 0이면 캐시하지 않는다 |

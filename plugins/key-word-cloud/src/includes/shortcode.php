@@ -29,6 +29,8 @@ final class KWC_Shortcode {
 			array(
 				'language'    => $options['language'],
 				'shape'       => $options['shape'],
+				'font'        => $options['font'],
+				'font_custom' => $options['font_custom'],
 				'color_mode'  => $options['color_mode'],
 				'max'         => $options['max_words'],
 				'min_posts'   => $options['min_posts'],
@@ -76,6 +78,17 @@ final class KWC_Shortcode {
 			return new WP_Error( 'kwc_bad_color_mode', 'color_mode 는 palette 또는 gradient 여야 한다. 받은 값: ' . $atts['color_mode'] );
 		}
 
+		$font = strtolower( trim( (string) $atts['font'] ) );
+		if ( ! in_array( $font, array( 'rounded', 'sans', 'serif', 'mono', 'theme', 'custom' ), true ) ) {
+			return new WP_Error( 'kwc_bad_font', 'font 는 rounded, sans, serif, mono, theme, custom 중 하나여야 한다. 받은 값: ' . $atts['font'] );
+		}
+
+		$font_custom = KWC_Cloud::sanitize_font_family( $atts['font_custom'] );
+		if ( 'custom' === $font && '' === $font_custom ) {
+			// 고른 글꼴이 비어 있으면 조용히 기본으로 되돌리지 않고 알린다.
+			return new WP_Error( 'kwc_no_font_custom', 'font=custom 인데 font_custom 이 비었거나 쓸 수 없는 값이다.' );
+		}
+
 		$link = strtolower( trim( (string) $atts['link'] ) );
 		if ( ! in_array( $link, array( 'search', 'none' ), true ) ) {
 			return new WP_Error( 'kwc_bad_link', 'link 는 search 또는 none 이어야 한다. 받은 값: ' . $atts['link'] );
@@ -113,6 +126,8 @@ final class KWC_Shortcode {
 		return array(
 			'language'    => $language,
 			'shape'       => $shape,
+			'font'        => $font,
+			'font_custom' => $font_custom,
 			'color_mode'  => $color_mode,
 			'max_words'   => $values['max'],
 			'min_posts'   => $values['min_posts'],

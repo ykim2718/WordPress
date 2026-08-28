@@ -89,6 +89,7 @@ final class KWC_Settings {
 			array( 'min_posts', '최소 글 수', 'kwc_pick', 'field_min_posts' ),
 			array( 'max_words', '최대 topic 수', 'kwc_pick', 'field_max_words' ),
 			array( 'shape', '모양', 'kwc_style', 'field_shape' ),
+			array( 'font', '글꼴', 'kwc_style', 'field_font' ),
 			array( 'color_mode', '색 쓰는 법', 'kwc_style', 'field_color_mode' ),
 			array( 'size', '글자 크기 (px)', 'kwc_style', 'field_size' ),
 			array( 'color', '색상 (적음 → 많음)', 'kwc_style', 'field_color' ),
@@ -134,6 +135,20 @@ final class KWC_Settings {
 			} else {
 				$errors[] = $name . ' 값이 잘못됐다: ' . $value;
 			}
+		}
+
+		$font = isset( $input['font'] ) ? (string) $input['font'] : '';
+		if ( in_array( $font, array( 'rounded', 'sans', 'serif', 'mono', 'theme', 'custom' ), true ) ) {
+			$out['font'] = $font;
+		} else {
+			$errors[] = '글꼴 값이 잘못됐다: ' . $font;
+		}
+
+		$out['font_custom'] = KWC_Cloud::sanitize_font_family(
+			isset( $input['font_custom'] ) ? $input['font_custom'] : ''
+		);
+		if ( 'custom' === $out['font'] && '' === $out['font_custom'] ) {
+			$errors[] = '글꼴을 직접 적기로 했는데 적은 것이 비었거나 쓸 수 없는 값이다.';
 		}
 
 		$link = isset( $input['link_mode'] ) ? (string) $input['link_mode'] : '';
@@ -323,6 +338,27 @@ final class KWC_Settings {
 			'shape',
 			array( 'ellipse' => '타원', 'block' => '네모' ),
 			'타원은 CSS shape-outside 로 깎는다. 지원하지 않는 브라우저에서는 네모로 보인다.'
+		);
+	}
+
+	public static function field_font() {
+		self::radio_field(
+			'font',
+			array(
+				'rounded' => '둥근 (기본)',
+				'sans'    => '고딕',
+				'serif'   => '명조',
+				'mono'    => '고정폭',
+				'theme'   => '테마 글꼴',
+				'custom'  => '직접 적기',
+			),
+			'글꼴을 내려받지 않고 기기에 있는 것만 쓴다. 둥근 글꼴은 Apple 기기에 있고, Windows 에는 없어 부드러운 고딕으로 내려간다.'
+		);
+		printf(
+			'<p><input type="text" name="%s" value="%s" class="regular-text code" placeholder="Nunito, sans-serif"> '
+				. '<span class="description">직접 적기를 골랐을 때만 쓰인다.</span></p>',
+			esc_attr( self::name( 'font_custom' ) ),
+			esc_attr( (string) self::value( 'font_custom' ) )
 		);
 	}
 

@@ -36,6 +36,32 @@
 	color: #bf3130;
 }
 
+/* 글꼴. 내려받지 않고 기기에 있는 것만 쓴다.
+   rounded 가 기본이다. Apple 기기에는 둥근 시스템 글꼴이 있어 그대로 잡히고,
+   Windows 에는 둥근 시스템 글꼴이 없어 부드러운 sans 로 내려간다. */
+.kwc-cloud--font-rounded {
+	font-family: ui-rounded, 'SF Pro Rounded', 'Varela Round', Nunito, Quicksand,
+		'Trebuchet MS', 'Segoe UI', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+	font-weight: 600;
+	letter-spacing: 0.01em;
+}
+
+.kwc-cloud--font-sans {
+	font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Malgun Gothic',
+		'Apple SD Gothic Neo', sans-serif;
+	font-weight: 600;
+}
+
+.kwc-cloud--font-serif {
+	font-family: Georgia, 'Times New Roman', 'Nanum Myeongjo', 'Apple SD Gothic Neo', serif;
+	font-weight: 600;
+}
+
+.kwc-cloud--font-mono {
+	font-family: ui-monospace, 'Cascadia Mono', Consolas, 'D2Coding', monospace;
+	font-weight: 600;
+}
+
 .kwc-cloud {
 	display: flex;
 	flex-wrap: wrap;

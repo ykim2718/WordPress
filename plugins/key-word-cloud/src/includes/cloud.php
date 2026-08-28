@@ -86,6 +86,33 @@ final class KWC_Cloud {
 	}
 
 	/**
+	 * 손으로 적은 font-family 를 CSS 에 넣어도 되는 형태로 줄인다.
+	 *
+	 * 이 값은 style 속성으로 들어가므로 글꼴 이름에 쓰이는 글자만 남긴다.
+	 * 중괄호나 세미콜론, 괄호가 들어오면 선언을 벗어날 수 있으므로 버린다.
+	 *
+	 * @param string $family 입력.
+	 * @return string 쓸 수 있는 형태. 남는 것이 없으면 빈 문자열.
+	 */
+	public static function sanitize_font_family( $family ) {
+		$family = trim( (string) $family );
+		if ( '' === $family ) {
+			return '';
+		}
+		// 글자, 숫자, 공백, 그리고 쉼표 하이픈 밑줄 따옴표만 남긴다.
+		$clean = preg_replace( '/[^\p{L}\p{N} ,\'"_-]/u', '', $family );
+		if ( null === $clean ) {
+			error_log( '[key-word-cloud] preg_replace failed while cleaning a font family' );
+			return '';
+		}
+		$clean = trim( preg_replace( '/\s+/u', ' ', $clean ) );
+		if ( $clean !== $family ) {
+			error_log( '[key-word-cloud] font family was trimmed to a safe form: ' . $family . ' -> ' . $clean );
+		}
+		return $clean;
+	}
+
+	/**
 	 * 두 색 사이를 선형 보간한다.
 	 *
 	 * @param string $from   시작 색 (#rrggbb).
@@ -194,11 +221,7 @@ final class KWC_Cloud {
 		// sqrt 스케일이 선형보다 차이를 덜 과장한다.
 		$span = sqrt( $max ) - sqrt( $min );
 
-		// 타원으로 깎을 때는 큰 글자가 가운데로 가야 모양이 산다.
-		if ( 'ellipse' === $args['shape'] ) {
-			$entries = self::centre_heaviest( $entries );
-		}
-
+		// 큰 것부터 넘긴다. 타원일 때는 kwc.js 가 이 차례를 보고 가운데부터 채운다.
 		$items = array();
 		$index = 0;
 		foreach ( $entries as $entry ) {
@@ -240,33 +263,21 @@ final class KWC_Cloud {
 			}
 		}
 
-		$cloud_class = ( 'ellipse' === $args['shape'] ) ? 'kwc-cloud kwc-cloud--ellipse' : 'kwc-cloud';
+		$cloud_class = 'kwc-cloud';
+		if ( 'ellipse' === $args['shape'] ) {
+			$cloud_class .= ' kwc-cloud--ellipse';
+		}
+
+		$cloud_style = '';
+		if ( 'custom' === $args['font'] ) {
+			$cloud_style = ' style="font-family:' . esc_attr( $args['font_custom'] ) . ';"';
+		} elseif ( 'theme' !== $args['font'] ) {
+			$cloud_class .= ' kwc-cloud--font-' . $args['font'];
+		}
 
 		return '<div class="kwc">' . self::refresh_button()
-			. '<div class="' . esc_attr( $cloud_class ) . '">' . implode( "\n", $items ) . '</div></div>';
-	}
-
-	/**
-	 * 큰 것을 가운데에, 작은 것을 양 끝에 오도록 다시 늘어놓는다.
-	 *
-	 * 타원은 가운데가 넓고 끝이 좁다. 빈도순 그대로 두면 큰 글자가 위쪽 좁은 곳에
-	 * 몰려 모양이 무너진다.
-	 *
-	 * @param array $entries 글 수 내림차순으로 정렬된 항목들.
-	 * @return array
-	 */
-	private static function centre_heaviest( array $entries ) {
-		$left  = array();
-		$right = array();
-		foreach ( $entries as $position => $entry ) {
-			if ( 0 === $position % 2 ) {
-				$left[] = $entry;   // 큰 것부터 번갈아 담아
-			} else {
-				$right[] = $entry;
-			}
-		}
-		// 한쪽을 뒤집어 이으면 작은 것 - 큰 것 - 작은 것 순서가 된다.
-		return array_merge( array_reverse( $left ), $right );
+			. '<div class="' . esc_attr( $cloud_class ) . '"' . $cloud_style . '>'
+			. implode( "\n", $items ) . '</div></div>';
 	}
 
 	/**

@@ -38,6 +38,16 @@
 		{ label: __( 'Block', 'key-word-cloud' ), value: 'block' }
 	];
 
+	var FONTS = [
+		{ label: __( 'Saved setting', 'key-word-cloud' ), value: '' },
+		{ label: __( 'Rounded', 'key-word-cloud' ), value: 'rounded' },
+		{ label: __( 'Sans', 'key-word-cloud' ), value: 'sans' },
+		{ label: __( 'Serif', 'key-word-cloud' ), value: 'serif' },
+		{ label: __( 'Monospace', 'key-word-cloud' ), value: 'mono' },
+		{ label: __( 'Theme font', 'key-word-cloud' ), value: 'theme' },
+		{ label: __( 'Written below', 'key-word-cloud' ), value: 'custom' }
+	];
+
 	var COLOR_MODES = [
 		{ label: __( 'Saved setting', 'key-word-cloud' ), value: '' },
 		{ label: __( 'Several colours', 'key-word-cloud' ), value: 'palette' },
@@ -93,6 +103,8 @@
 			] ),
 			panel( __( 'Size and colour', 'key-word-cloud' ), false, [
 				select( props, 'shape', __( 'Shape', 'key-word-cloud' ), SHAPES ),
+				select( props, 'font', __( 'Font', 'key-word-cloud' ), FONTS ),
+				text( props, 'font_custom', __( 'Font family', 'key-word-cloud' ), __( 'Used only when the font is set to Written below.', 'key-word-cloud' ) ),
 				select( props, 'color_mode', __( 'Colour', 'key-word-cloud' ), COLOR_MODES ),
 				text( props, 'min_size', __( 'Smallest size in px', 'key-word-cloud' ) ),
 				text( props, 'max_size', __( 'Largest size in px', 'key-word-cloud' ) ),

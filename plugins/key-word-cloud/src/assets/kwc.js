@@ -127,12 +127,71 @@
 	}
 
 	/**
-	 * 낱말을 rows 줄에 욕심껏 담는다. 다 담지 못하면 null.
+	 * 가운데부터 바깥으로 번갈아 가는 차례를 만든다. n=5 이면 [2, 1, 3, 0, 4].
+	 *
+	 * 큰 글자를 가운데 줄에 먼저 넣으려는 것이다.
+	 */
+	function centreOutward( n ) {
+		var order = [];
+		var mid = Math.floor( ( n - 1 ) / 2 );
+		for ( var step = 0; order.length < n; step++ ) {
+			var down = mid - step;
+			var up = mid + step + ( n % 2 ? 1 : 0 );
+			if ( 0 === step ) {
+				order.push( mid );
+				continue;
+			}
+			if ( down >= 0 ) {
+				order.push( down );
+			}
+			if ( up < n && up !== down ) {
+				order.push( up );
+			}
+			if ( down < 0 && up >= n ) {
+				break;
+			}
+		}
+		return order;
+	}
+
+	/**
+	 * 한 줄 안에서도 큰 것이 가운데 오도록 다시 늘어놓는다.
+	 *
+	 * 들어온 것은 큰 것부터다. 번갈아 두 무더기에 담고 한쪽을 뒤집어 이으면
+	 * 작은 것 - 큰 것 - 작은 것이 된다.
+	 *
+	 * @param {Array} line 큰 것부터 놓인 낱말들.
+	 * @return {Array}
+	 */
+	function centreHeaviest( line ) {
+		var left = [];
+		var right = [];
+		for ( var i = 0; i < line.length; i++ ) {
+			if ( 0 === i % 2 ) {
+				left.push( line[ i ] );
+			} else {
+				right.push( line[ i ] );
+			}
+		}
+		return left.reverse().concat( right );
+	}
+
+	/**
+	 * 낱말을 rows 줄에 담는다. 다 담지 못하면 null.
+	 *
+	 * words 는 글 수가 많은 것부터 와야 한다. 가운데 줄부터 채우므로 큰 글자가
+	 * 가운데로 모이고, 남는 작은 것이 위아래 바깥 줄로 간다.
 	 */
 	function place( words, widths, rows, full, gap ) {
-		var out = [];
+		var out = new Array( rows );
+		for ( var i = 0; i < rows; i++ ) {
+			out[ i ] = [];
+		}
+
 		var index = 0;
-		for ( var k = 0; k < rows; k++ ) {
+		var order = centreOutward( rows );
+		for ( var o = 0; o < order.length; o++ ) {
+			var k = order[ o ];
 			var t = 2 * ( k + 0.5 ) / rows - 1;              // -1 .. 1
 			var allowed = full * Math.sqrt( Math.max( 0, 1 - t * t ) );
 
@@ -148,7 +207,7 @@
 				used = next;
 				index++;
 			}
-			out.push( line );
+			out[ k ] = centreHeaviest( line );
 		}
 		return ( index >= words.length ) ? out : null;
 	}

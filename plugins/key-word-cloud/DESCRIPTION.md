@@ -26,6 +26,15 @@ flatten the rest. Its tooltip lists the phrases it was folded from.
 Hangul syllable. Pick one on the settings screen or per cloud; English is the
 default.
 
+**Big in the middle, small at the edge.** Rows fill from the centre outwards
+and each row centres its own largest phrase, so size falls away in every
+direction from the middle of the cloud rather than only down the page.
+
+**Pick the font.** Rounded, sans, serif, monospace, the theme's own, or one you
+write yourself. Rounded is the default: a cloud reads better in a soft face
+than in the stiff one a theme sets for body text. Nothing is downloaded — the
+stacks name faces already on the device.
+
 **Shaped as an ellipse, coloured to be read.** Rows narrow towards the top and
 bottom so the cloud reads as an oval rather than a paragraph. Topics take five
 hues so neighbours are told apart; the hue means nothing, size still means the

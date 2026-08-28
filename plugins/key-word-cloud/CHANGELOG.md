@@ -1,3 +1,21 @@
+## 2.3.0
+
+- Put the largest topics in the middle and let them shrink towards the edge.
+  Rows are now filled from the centre row outwards, and each row is arranged so
+  its biggest phrase sits in the middle of the row, which gives a size gradient
+  in both directions rather than only down the page. Measured on the demo
+  cloud: 35.4px average in the middle fifth, 23.4px in the ring around it,
+  18.5px at the edge.
+- Choose the font: rounded, sans, serif, monospace, the theme's own, or one
+  written by hand. Rounded is the default because a word cloud reads better in
+  a soft face than in the stiff one a theme usually sets for body text. Nothing
+  is downloaded; the stacks name faces that are already on the device, and on
+  Windows, which has no rounded system face, rounded falls back to a soft sans.
+- A hand-written font family is reduced to letters, digits, spaces, commas,
+  quotes, hyphens and underscores before it reaches the style attribute, and
+  what was removed is logged. `font=custom` with nothing usable left is refused
+  on the page rather than quietly falling back.
+
 ## 2.2.0
 
 - Lay the cloud out as an ellipse. Rows are built in JavaScript and each row is
