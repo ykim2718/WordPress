@@ -89,6 +89,7 @@ final class KWC_Settings {
 			array( 'min_posts', '최소 글 수', 'kwc_pick', 'field_min_posts' ),
 			array( 'max_words', '최대 topic 수', 'kwc_pick', 'field_max_words' ),
 			array( 'shape', '모양', 'kwc_style', 'field_shape' ),
+			array( 'ratio', '타원 가로:세로', 'kwc_style', 'field_ratio' ),
 			array( 'font', '글꼴', 'kwc_style', 'field_font' ),
 			array( 'color_mode', '색 쓰는 법', 'kwc_style', 'field_color_mode' ),
 			array( 'size', '글자 크기 (px)', 'kwc_style', 'field_size' ),
@@ -149,6 +150,13 @@ final class KWC_Settings {
 		);
 		if ( 'custom' === $out['font'] && '' === $out['font_custom'] ) {
 			$errors[] = '글꼴을 직접 적기로 했는데 적은 것이 비었거나 쓸 수 없는 값이다.';
+		}
+
+		$ratio = KWC_Cloud::sanitize_ratio( isset( $input['ratio'] ) ? $input['ratio'] : '' );
+		if ( null === $ratio ) {
+			$errors[] = '타원 가로:세로 는 0.5 에서 5 사이의 수여야 한다: ' . ( isset( $input['ratio'] ) ? $input['ratio'] : '' );
+		} else {
+			$out['ratio'] = (string) $ratio;
 		}
 
 		$link = isset( $input['link_mode'] ) ? (string) $input['link_mode'] : '';
@@ -360,6 +368,16 @@ final class KWC_Settings {
 			esc_attr( self::name( 'font_custom' ) ),
 			esc_attr( (string) self::value( 'font_custom' ) )
 		);
+	}
+
+	public static function field_ratio() {
+		printf(
+			'<input type="text" name="%s" value="%s" class="small-text" inputmode="decimal">',
+			esc_attr( self::name( 'ratio' ) ),
+			esc_attr( (string) self::value( 'ratio' ) )
+		);
+		echo ' <span class="description">0.5 ~ 5. 2 면 가로가 세로의 두 배다.</span>';
+		echo '<p class="description">칸이 좁아 이 비율이 안 나오면 글자를 줄여 맞춘다. 0.55 배까지만 줄이고, 그래도 모자라면 세로로 길어진다.</p>';
 	}
 
 	public static function field_color_mode() {

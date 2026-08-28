@@ -87,6 +87,24 @@ final class KWC_Cloud {
 	}
 
 	/**
+	 * 타원의 목표 가로세로 비를 읽는다.
+	 *
+	 * @param mixed $ratio 입력.
+	 * @return float|null 0.5..5 의 수. 벗어나거나 수가 아니면 null.
+	 */
+	public static function sanitize_ratio( $ratio ) {
+		$ratio = trim( (string) $ratio );
+		if ( 1 !== preg_match( '/^\d+(\.\d+)?$/', $ratio ) ) {
+			return null;
+		}
+		$value = (float) $ratio;
+		if ( $value < 0.5 || $value > 5.0 ) {
+			return null;
+		}
+		return $value;
+	}
+
+	/**
 	 * 손으로 적은 font-family 를 CSS 에 넣어도 되는 형태로 줄인다.
 	 *
 	 * 이 값은 style 속성으로 들어가므로 글꼴 이름에 쓰이는 글자만 남긴다.
@@ -233,13 +251,15 @@ final class KWC_Cloud {
 			$weight = ( $span > 0 ) ? ( ( sqrt( $entry['posts'] ) - sqrt( $min ) ) / $span ) : 1.0;
 			$size   = $args['min_size'] + ( $args['max_size'] - $args['min_size'] ) * $weight;
 
+			// 크기는 --kwc-scale 을 곱해서 낸다. 칸이 좁을 때 kwc.js 가 이 값을 낮춰
+			// 글자를 줄이고, 그래야 한 줄에 더 담겨 타원이 세로로 길어지지 않는다.
 			$class = 'kwc-word';
 			if ( 'palette' === $args['color_mode'] ) {
 				$class .= ' kwc-word--c' . ( $index % self::PALETTE_SIZE );
-				$style  = sprintf( 'font-size:%.1fpx;', $size );
+				$style  = sprintf( 'font-size:calc(%.1fpx * var(--kwc-scale, 1));', $size );
 			} else {
 				$style = sprintf(
-					'font-size:%.1fpx;color:%s;',
+					'font-size:calc(%.1fpx * var(--kwc-scale, 1));color:%s;',
 					$size,
 					self::mix_color( $args['color_start'], $args['color_end'], $weight )
 				);
@@ -280,8 +300,13 @@ final class KWC_Cloud {
 			$cloud_class .= ' kwc-cloud--font-' . $args['font'];
 		}
 
+		// 목표 비율은 script 가 읽는다. 칸이 좁으면 글자를 줄여 이 비율에 다가간다.
+		$ratio = ( 'ellipse' === $args['shape'] )
+			? sprintf( ' data-ratio="%.2f"', $args['ratio'] )
+			: '';
+
 		return '<div class="kwc">' . self::refresh_button()
-			. '<div class="' . esc_attr( $cloud_class ) . '"' . $cloud_style . '>'
+			. '<div class="' . esc_attr( $cloud_class ) . '"' . $ratio . $cloud_style . '>'
 			. implode( "\n", $items ) . '</div></div>';
 	}
 

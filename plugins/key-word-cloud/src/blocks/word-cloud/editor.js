@@ -103,6 +103,7 @@
 			] ),
 			panel( __( 'Size and colour', 'key-word-cloud' ), false, [
 				select( props, 'shape', __( 'Shape', 'key-word-cloud' ), SHAPES ),
+				text( props, 'ratio', __( 'Width : height', 'key-word-cloud' ), __( 'The ellipse aims for this. In a narrow column the text shrinks to keep it.', 'key-word-cloud' ) ),
 				select( props, 'font', __( 'Font', 'key-word-cloud' ), FONTS ),
 				text( props, 'font_custom', __( 'Font family', 'key-word-cloud' ), __( 'Used only when the font is set to Written below.', 'key-word-cloud' ) ),
 				select( props, 'color_mode', __( 'Colour', 'key-word-cloud' ), COLOR_MODES ),

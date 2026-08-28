@@ -15,6 +15,7 @@
 	"attributes": {
 		"language": { "type": "string", "default": "" },
 		"shape": { "type": "string", "default": "" },
+		"ratio": { "type": "string", "default": "" },
 		"font": { "type": "string", "default": "" },
 		"font_custom": { "type": "string", "default": "" },
 		"color_mode": { "type": "string", "default": "" },

@@ -101,30 +101,42 @@
 			cloud.appendChild( words[ i ] );
 		}
 
-		var widths = words.map( function ( word ) {
-			return word.getBoundingClientRect().width;
+		// 크기는 배율 1 에서 재고, 다른 배율의 폭은 비례로 계산한다. 글자 폭은 글자
+		// 크기에 비례하므로 배율마다 DOM 을 다시 쓸 필요가 없다.
+		cloud.style.setProperty( '--kwc-scale', 1 );
+		var base = words.map( function ( word ) {
+			var box = word.getBoundingClientRect();
+			return { w: box.width, h: parseFloat( window.getComputedStyle( word ).fontSize ) };
 		} );
-		var total = widths.reduce( function ( sum, w ) {
-			return sum + w;
-		}, 0 );
 		var gap = 12;
 
-		// 줄 수를 늘려 가며 전부 담기는 첫 값을 쓴다. 타원은 rectangle 보다 좁으므로
-		// rectangle 기준 줄 수에서 시작한다.
-		var rows = Math.max( 1, Math.ceil( ( total + gap * words.length ) / full ) );
-		var placed = null;
-		for ( var attempt = 0; attempt < 30 && ! placed; attempt++ ) {
-			placed = place( words, widths, rows, full, gap );
-			if ( ! placed ) {
-				rows++;
+		// 목표 비율. 칸이 좁아지면 글자를 줄여 가로로 긴 모양을 지킨다. 배율을 무한정
+		// 낮추면 글씨가 읽히지 않으므로 0.55 에서 멈춘다.
+		var target = parseFloat( cloud.getAttribute( 'data-ratio' ) );
+		if ( ! ( target > 0 ) ) {
+			target = 2;
+		}
+
+		var chosen = null;
+		var scales = [ 1, 0.92, 0.84, 0.76, 0.68, 0.62, 0.55 ];
+		for ( var s = 0; s < scales.length; s++ ) {
+			var trial = fitAtScale( words, base, scales[ s ], full, gap );
+			if ( ! trial ) {
+				continue;
+			}
+			chosen = trial;
+			if ( trial.ratio >= target ) {
+				break;   // 목표에 닿았다. 더 줄일 이유가 없다.
 			}
 		}
-		if ( ! placed ) {
-			// 담지 못했으면 손대지 않고 그대로 둔다. 낱말을 잃는 것보다 낫다.
+		if ( ! chosen ) {
 			cloud.classList.remove( 'kwc-cloud--rows' );
 			window.console && window.console.warn( '[key-word-cloud] could not lay out the ellipse; left as a block' );
 			return;
 		}
+
+		cloud.style.setProperty( '--kwc-scale', chosen.scale );
+		var placed = chosen.placed;
 		// 줄이 실제로 생긴 뒤에만 세로 쌓기를 켠다.
 		cloud.classList.add( 'kwc-cloud--rows' );
 
@@ -139,6 +151,58 @@
 			}
 			cloud.appendChild( row );
 		}
+	}
+
+	/**
+	 * 한 배율에서 줄을 나누고, 그때의 가로세로 비를 낸다.
+	 *
+	 * 높이는 줄마다 가장 큰 글자를 기준으로 어림한다. DOM 을 다시 쓰지 않고 배율을
+	 * 견주기 위한 것이고, 실제 배치는 고른 배율로 한 번만 한다.
+	 *
+	 * @param {Array}  words 낱말 요소들.
+	 * @param {Array}  base  배율 1 에서 잰 {w, h}.
+	 * @param {number} scale 시험할 배율.
+	 * @param {number} full  칸 너비.
+	 * @param {number} gap   낱말 사이 간격.
+	 * @return {Object|null} {scale, placed, ratio} 또는 담지 못하면 null.
+	 */
+	function fitAtScale( words, base, scale, full, gap ) {
+		var widths = base.map( function ( item ) {
+			return item.w * scale;
+		} );
+		var total = widths.reduce( function ( sum, w ) {
+			return sum + w;
+		}, 0 );
+
+		var rows = Math.max( 1, Math.ceil( ( total + gap * words.length ) / full ) );
+		var placed = null;
+		for ( var attempt = 0; attempt < 40 && ! placed; attempt++ ) {
+			placed = place( words, widths, rows, full, gap );
+			if ( ! placed ) {
+				rows++;
+			}
+		}
+		if ( ! placed ) {
+			return null;
+		}
+
+		var height = 0;
+		for ( var r = 0; r < placed.length; r++ ) {
+			if ( ! placed[ r ].length ) {
+				continue;
+			}
+			var tallest = 0;
+			for ( var j = 0; j < placed[ r ].length; j++ ) {
+				var at = words.indexOf( placed[ r ][ j ] );
+				tallest = Math.max( tallest, base[ at ].h * scale );
+			}
+			height += tallest * 1.35;
+		}
+		return {
+			scale: scale,
+			placed: placed,
+			ratio: height > 0 ? ( full / height ) : 0,
+		};
 	}
 
 	/**

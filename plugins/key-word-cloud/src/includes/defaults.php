@@ -24,6 +24,7 @@ final class KWC_Defaults {
 			'color_start' => '#8aa4c8',
 			'color_end'   => '#12355b',
 			'shape'       => 'ellipse',   // ellipse | block
+			'ratio'       => '2.0',       // 타원의 목표 가로:세로
 			'font'        => 'rounded',   // rounded | sans | serif | mono | theme | custom
 			'font_custom' => '',          // font=custom 일 때 쓸 CSS font-family
 			'color_mode'  => 'palette',   // palette | gradient

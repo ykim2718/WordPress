@@ -29,6 +29,7 @@ final class KWC_Shortcode {
 			array(
 				'language'    => $options['language'],
 				'shape'       => $options['shape'],
+				'ratio'       => $options['ratio'],
 				'font'        => $options['font'],
 				'font_custom' => $options['font_custom'],
 				'color_mode'  => $options['color_mode'],
@@ -89,6 +90,11 @@ final class KWC_Shortcode {
 			return new WP_Error( 'kwc_no_font_custom', 'font=custom 인데 font_custom 이 비었거나 쓸 수 없는 값이다.' );
 		}
 
+		$ratio = KWC_Cloud::sanitize_ratio( $atts['ratio'] );
+		if ( null === $ratio ) {
+			return new WP_Error( 'kwc_bad_ratio', 'ratio 는 0.5 에서 5 사이의 수여야 한다. 받은 값: ' . $atts['ratio'] );
+		}
+
 		$link = strtolower( trim( (string) $atts['link'] ) );
 		if ( ! in_array( $link, array( 'search', 'none' ), true ) ) {
 			return new WP_Error( 'kwc_bad_link', 'link 는 search 또는 none 이어야 한다. 받은 값: ' . $atts['link'] );
@@ -126,6 +132,7 @@ final class KWC_Shortcode {
 		return array(
 			'language'    => $language,
 			'shape'       => $shape,
+			'ratio'       => $ratio,
 			'font'        => $font,
 			'font_custom' => $font_custom,
 			'color_mode'  => $color_mode,

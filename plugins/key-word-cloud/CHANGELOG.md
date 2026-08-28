@@ -1,3 +1,17 @@
+## 2.6.0
+
+- Keep the ellipse wide when the column is narrow. The shape had no target: it
+  was whatever fell out of fitting the phrases into the available width, so
+  moving the block inside a section turned a wide oval into a tall one. The
+  layout now aims for a width-to-height ratio, 2:1 by default, and reaches it
+  by scaling the text down when the column cannot hold the phrases at full
+  size. Measured at a 700px window: 1.12:1 before, 1.95:1 after, at 0.76 scale.
+- Leave the text alone when there is room. At a 1400px window the same cloud
+  keeps its 44px maximum and comes out at 4.32:1 — the scale only ever drops,
+  never rises, and it stops at 0.55 so the smallest topics stay readable.
+- The ratio is a setting, on the settings screen, in the block sidebar, and as
+  the `ratio` shortcode attribute, between 0.5 and 5.
+
 ## 2.5.0
 
 - Draw the same ellipse in the editor as on the front end. The layout script
