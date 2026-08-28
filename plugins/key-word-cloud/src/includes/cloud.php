@@ -105,6 +105,31 @@ final class KWC_Cloud {
 	}
 
 	/**
+	 * 그릴 분야 목록을 읽는다.
+	 *
+	 * 빈 문자열과 `*` 는 둘 다 "모든 분야" 다. 값이 있으면 그 분야가 붙은 topic 만
+	 * 그린다. topic 하나가 여러 분야에 속할 수 있으므로 하나라도 겹치면 통과한다.
+	 *
+	 * @param mixed $value 쉼표로 이은 분야 이름.
+	 * @return array|null 정규화된 이름들. 모든 분야면 null.
+	 */
+	public static function parse_fields( $value ) {
+		$value = trim( (string) $value );
+		if ( '' === $value || '*' === $value ) {
+			return null;
+		}
+		$fields = array();
+		foreach ( explode( ',', $value ) as $field ) {
+			$field = KWC_Topics::normalize_field( $field );
+			if ( '' !== $field && ! in_array( $field, $fields, true ) ) {
+				$fields[] = $field;
+			}
+		}
+		// 쉼표만 적은 값을 "모든 분야" 로 읽으면 고른 것과 반대가 나온다.
+		return empty( $fields ) ? array() : $fields;
+	}
+
+	/**
 	 * 손으로 적은 font-family 를 CSS 에 넣어도 되는 형태로 줄인다.
 	 *
 	 * 이 값은 style 속성으로 들어가므로 글꼴 이름에 쓰이는 글자만 남긴다.
@@ -179,9 +204,11 @@ final class KWC_Cloud {
 		}
 
 		$min_posts = (int) $args['min_posts'];
+		$wanted    = self::parse_fields( $args['fields'] );
 		$entries   = array();
 		$too_few   = 0;
 		$other_language = 0;
+		$other_field    = 0;
 		foreach ( $topics as $topic ) {
 			$posts = (int) $topic['posts'];
 			if ( $posts < $min_posts ) {
@@ -190,6 +217,11 @@ final class KWC_Cloud {
 			}
 			if ( ! KWC_Language::matches( $topic['label'], $args['language'] ) ) {
 				$other_language++;
+				continue;
+			}
+			if ( null !== $wanted
+				&& empty( array_intersect( $wanted, (array) ( isset( $topic['fields'] ) ? $topic['fields'] : array() ) ) ) ) {
+				$other_field++;
 				continue;
 			}
 			$phrases   = isset( $topic['phrases'] ) ? (array) $topic['phrases'] : array();
@@ -215,6 +247,14 @@ final class KWC_Cloud {
 				__( 'of %1$d topics, %2$d come from fewer than %3$d posts and %4$d are not %5$s.', 'key-word-cloud' ),
 				count( $topics ), $too_few, $min_posts, $other_language, $args['language']
 			);
+			if ( null !== $wanted ) {
+				$why .= ' ' . sprintf(
+					/* translators: 1: how many are outside the chosen fields, 2: the chosen fields */
+					__( '%1$d are outside the chosen fields (%2$s).', 'key-word-cloud' ),
+					$other_field,
+					empty( $wanted ) ? '-' : implode( ', ', $wanted )
+				);
+			}
 			error_log( '[key-word-cloud] no topic survived: ' . $why );
 			return '<p class="kwc-error">Key Word Cloud: '
 				. esc_html__( 'nothing to draw — ', 'key-word-cloud' ) . esc_html( $why ) . '</p>';

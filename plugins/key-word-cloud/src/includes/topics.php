@@ -10,6 +10,7 @@
  *   POST /wp-json/key-word-cloud/v1/topics
  *   Authorization: Basic <application password>
  *   {"generator":"...","topics":[{"label":"ai assistant","posts":10,
+ *                                 "fields":["machine learning"],
  *                                 "phrases":["agentic automation", ...]}, ...]}
  *
  * @package KeyWordCloud
@@ -93,6 +94,41 @@ final class KWC_Topics {
 	}
 
 	/**
+	 * 분야 이름을 비교할 수 있는 꼴로 줄인다.
+	 *
+	 * 파이프라인이 적는 이름과 설정 화면에서 고른 이름이 대소문자나 공백만 다른 채로
+	 * 어긋나면 아무것도 안 그려진다. 양쪽 다 이 함수를 지난다.
+	 *
+	 * @param mixed $field 분야 이름.
+	 * @return string 소문자로 줄이고 공백을 하나로 만든 이름. 비면 빈 문자열.
+	 */
+	public static function normalize_field( $field ) {
+		$field = sanitize_text_field( (string) $field );
+		$field = trim( preg_replace( '/\s+/u', ' ', $field ) );
+		return function_exists( 'mb_strtolower' ) ? mb_strtolower( $field, 'UTF-8' ) : strtolower( $field );
+	}
+
+	/**
+	 * 올라온 topic 에 실제로 붙어 있는 분야와 그 개수.
+	 *
+	 * 목록을 플러그인이 정하지 않고 자료에서 읽는다. 파이프라인에 분야를 하나 더
+	 * 넣으면 설정 화면에도 저절로 나타난다.
+	 *
+	 * @return array 이름 => topic 수. 이름 순으로 정렬된다.
+	 */
+	public static function fields() {
+		$counts = array();
+		foreach ( self::stored() as $topic ) {
+			foreach ( (array) ( isset( $topic['fields'] ) ? $topic['fields'] : array() ) as $field ) {
+				$field = (string) $field;
+				$counts[ $field ] = isset( $counts[ $field ] ) ? $counts[ $field ] + 1 : 1;
+			}
+		}
+		ksort( $counts );
+		return $counts;
+	}
+
+	/**
 	 * 마지막으로 받은 때와 출처.
 	 *
 	 * @return array updated, generator, count.
@@ -160,9 +196,18 @@ final class KWC_Topics {
 				}
 			}
 
+			$fields = array();
+			foreach ( (array) ( isset( $topic['fields'] ) ? $topic['fields'] : array() ) as $field ) {
+				$field = self::normalize_field( $field );
+				if ( '' !== $field && ! in_array( $field, $fields, true ) ) {
+					$fields[] = $field;
+				}
+			}
+
 			$topics[] = array(
 				'label'   => sanitize_text_field( $label ),
 				'posts'   => $posts,
+				'fields'  => $fields,
 				'phrases' => $phrases,
 			);
 		}

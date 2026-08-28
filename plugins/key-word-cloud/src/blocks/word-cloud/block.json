@@ -14,6 +14,7 @@
 	},
 	"attributes": {
 		"language": { "type": "string", "default": "" },
+		"fields": { "type": "string", "default": "" },
 		"shape": { "type": "string", "default": "" },
 		"ratio": { "type": "string", "default": "" },
 		"width": { "type": "string", "default": "" },

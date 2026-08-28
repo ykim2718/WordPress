@@ -22,6 +22,13 @@ attempt, the next run, and a button that fetches now.
 posts it covers, spread on a square-root scale so one broad topic does not
 flatten the rest. Its tooltip lists the phrases it was folded from.
 
+**Draw one subject, or several.** Each topic carries the fields it belongs to,
+named by you and sorted by the model, so a blog that writes about several
+things can draw them apart: semiconductor and machine learning in one cloud,
+applied statistics in another, on the same page. Tick as many fields as a
+cloud should hold. The list comes from the topics that were uploaded, so it
+grows with the pipeline rather than with the plugin.
+
 **Korean, English, or both.** A topic counts as Korean when it holds a single
 Hangul syllable. Pick one on the settings screen or per cloud; English is the
 default.
@@ -55,6 +62,7 @@ so the reader lands on the ordinary post list of your theme.
 ### What you can set
 
 - Language: English, Korean, or both.
+- The fields to draw, as many as you like. None ticked draws every field.
 - The least number of posts a topic must cover, and how many topics to draw.
 - Smallest and largest font size in px.
 - The cloud's width and height in pixels. Leave them at 0 and the cloud takes
@@ -70,6 +78,8 @@ Attributes override the saved settings for that one cloud. A bad value is
 reported on the page instead of being silently replaced by a default.
 
 - `language` — `en`, `ko`, or `both`.
+- `fields` — the fields to draw, comma separated. Empty or `*` draws them all.
+  A name no uploaded topic carries is an error listing the ones that exist.
 - `min_posts` — a topic drawn from fewer posts than this is left out.
 - `max` — how many topics to draw, 60 by default.
 - `min_size`, `max_size` — font size range in px, 12 and 44 by default.
@@ -80,6 +90,12 @@ reported on the page instead of being silently replaced by a default.
   the page. A height replaces the ellipse ratio instead of arguing with it.
 - `link` — `search` or `none`.
 - `cache` — cache seconds, `0` to skip the cache.
+
+### Where the block's settings live
+
+The block's sidebar uses the editor's own tabs. Settings holds what is drawn --
+language, fields, how many topics, what a click does. Styles holds how it looks
+-- shape, size, font, colour. The cache sits under Advanced, being neither.
 
 ### Where the settings live
 

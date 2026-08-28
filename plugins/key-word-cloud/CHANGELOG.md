@@ -1,3 +1,19 @@
+## 2.8.0
+
+- Draw only the fields you pick. `tools/label_fields.py` asks the model which
+  of the fields you name each topic belongs to and writes the answer onto the
+  topic; the settings screen, the block sidebar, and the `fields` shortcode
+  attribute then tick the ones to draw. A topic may sit in several fields, so
+  semiconductor and machine learning can be one cloud and applied statistics
+  another on the same page.
+- The field list is read from the uploaded topics, not written into the
+  plugin. Add a field to the pipeline and it appears in both screens by
+  itself. A name that no topic carries is an error naming the ones that exist,
+  because a typo that quietly draws nothing is the harder bug.
+- The block's sidebar is grouped: Settings holds what is drawn, Styles holds
+  how it looks, and the cache sits under Advanced. These are the editor's own
+  tabs rather than tabs of our making.
+
 ## 2.7.0
 
 - Set the cloud's width and height in pixels, from the settings screen, the

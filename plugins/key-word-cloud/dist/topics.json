@@ -1,5 +1,5 @@
 {
- "generator": "qwen3:8b + bge-m3 @0.40",
+ "generator": "llm+bge-m3",
  "topics": [
   {
    "label": "stochastic optimization",
@@ -12,6 +12,9 @@
     "object-oriented programming",
     "stochastic optimization",
     "tree-based models"
+   ],
+   "fields": [
+    "machine learning"
    ]
   },
   {
@@ -25,6 +28,9 @@
     "ai-assisted coding",
     "ai-native environments",
     "ai-native startup"
+   ],
+   "fields": [
+    "machine learning"
    ]
   },
   {
@@ -39,7 +45,8 @@
     "server components",
     "server side rendering",
     "server-side execution"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "youtube video",
@@ -53,7 +60,8 @@
     "youtube url",
     "youtube video",
     "youtube watch"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "keyword optimization",
@@ -62,6 +70,9 @@
     "keyword matching",
     "keyword optimization",
     "top 5 keywords"
+   ],
+   "fields": [
+    "semiconductor"
    ]
   },
   {
@@ -72,7 +83,8 @@
     "human-centric",
     "one factor at a time",
     "results driven"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "residual bias",
@@ -83,6 +95,9 @@
     "observational bias",
     "residual bias",
     "residual variance"
+   ],
+   "fields": [
+    "applied statistics"
    ]
   },
   {
@@ -92,6 +107,9 @@
     "manufacturing execution system",
     "semiconductor manufacturing",
     "smart manufacturing"
+   ],
+   "fields": [
+    "semiconductor"
    ]
   },
   {
@@ -105,6 +123,9 @@
     "system prompt",
     "test-driven prompt",
     "user prompt"
+   ],
+   "fields": [
+    "machine learning"
    ]
   },
   {
@@ -115,7 +136,8 @@
     "rest api",
     "windows api",
     "wp rest api"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "세무서",
@@ -125,7 +147,8 @@
     "세무서",
     "세법상 미국인",
     "세액공제"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "agentic automation",
@@ -136,6 +159,9 @@
     "autonomous automation",
     "cognitive automation",
     "robotic process automation"
+   ],
+   "fields": [
+    "machine learning"
    ]
   },
   {
@@ -144,7 +170,8 @@
    "phrases": [
     "agile development",
     "agile manifesto"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "applicant tracking system",
@@ -152,7 +179,8 @@
    "phrases": [
     "applicant tracking system",
     "face recognition system"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "categorical variables",
@@ -161,6 +189,9 @@
     "categorical features",
     "categorical inference bias",
     "categorical variables"
+   ],
+   "fields": [
+    "applied statistics"
    ]
   },
   {
@@ -170,7 +201,8 @@
     "co-development",
     "cost sharing",
     "inclusion"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "continuous loop",
@@ -179,7 +211,8 @@
     "continuous deployment",
     "continuous loop",
     "iterative cycle"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "customer collaboration",
@@ -187,7 +220,8 @@
    "phrases": [
     "customer collaboration",
     "value customer"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "file type compatibility",
@@ -195,7 +229,8 @@
    "phrases": [
     "file type compatibility",
     "working software"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "flexibility real-time",
@@ -204,7 +239,8 @@
     "flexibility real-time",
     "real-time data processing",
     "time to interactive"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "high-stakes environments",
@@ -213,7 +249,8 @@
     "challenging project",
     "high-stakes environments",
     "strict rules"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "language server protocol",
@@ -221,7 +258,8 @@
    "phrases": [
     "language server protocol",
     "model context protocol"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "min-max scaling",
@@ -230,6 +268,9 @@
     "min-max scaling",
     "reusability scalability",
     "transistor scaling"
+   ],
+   "fields": [
+    "applied statistics"
    ]
   },
   {
@@ -239,7 +280,8 @@
     "job selection process",
     "recruiter efficiency",
     "recruitment management tool"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "reference number",
@@ -249,7 +291,8 @@
     "reference display",
     "reference indexing",
     "reference number"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "response noise",
@@ -258,7 +301,8 @@
     "noise features",
     "response noise",
     "responsiveness sensitivity"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "statistical model",
@@ -267,6 +311,9 @@
     "sample statistics",
     "statistical model",
     "systematic model error"
+   ],
+   "fields": [
+    "applied statistics"
    ]
   },
   {
@@ -276,7 +323,8 @@
     "version control a/b testing",
     "version control systems",
     "version-control prompts"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "종합소득세 신고",
@@ -285,7 +333,8 @@
     "부가세 연 1회 신고",
     "종합소득세 신고",
     "종합소득세 신고서"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "1 to 1 identity line",
@@ -293,7 +342,8 @@
    "phrases": [
     "1 to 1 identity line",
     "identity line"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "4-axis matrix",
@@ -301,7 +351,8 @@
    "phrases": [
     "4-axis matrix",
     "four pillars"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "ats score",
@@ -309,7 +360,8 @@
    "phrases": [
     "ats score",
     "ats-friendly resume"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "chain of verification",
@@ -318,7 +370,8 @@
     "chain of thought",
     "chain of verification",
     "source verification"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "clear headings",
@@ -326,7 +379,8 @@
    "phrases": [
     "clear headings",
     "headless cms"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "collective intelligence",
@@ -334,6 +388,9 @@
    "phrases": [
     "collective intelligence",
     "generalization performance"
+   ],
+   "fields": [
+    "machine learning"
    ]
   },
   {
@@ -343,6 +400,9 @@
     "central composite design",
     "composite chip",
     "independent chip designs"
+   ],
+   "fields": [
+    "semiconductor"
    ]
   },
   {
@@ -352,6 +412,9 @@
     "coefficient of determination",
     "concordance correlation coefficient",
     "pearson correlation coefficient"
+   ],
+   "fields": [
+    "applied statistics"
    ]
   },
   {
@@ -360,7 +423,8 @@
    "phrases": [
     "core definition",
     "core values"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "cross-functional team",
@@ -368,13 +432,17 @@
    "phrases": [
     "cross-functional team",
     "team differences"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "design of experiments",
    "posts": 2,
    "phrases": [
     "design of experiments"
+   ],
+   "fields": [
+    "applied statistics"
    ]
   },
   {
@@ -383,6 +451,9 @@
    "phrases": [
     "deterministic approach",
     "deterministic architecture"
+   ],
+   "fields": [
+    "machine learning"
    ]
   },
   {
@@ -391,7 +462,8 @@
    "phrases": [
     "direct quotes",
     "examples sentence"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "explained variation",
@@ -401,6 +473,9 @@
     "explained variation",
     "predictor variance",
     "unexplained variation"
+   ],
+   "fields": [
+    "applied statistics"
    ]
   },
   {
@@ -409,7 +484,8 @@
    "phrases": [
     "external data sources",
     "web based source"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "factors levels",
@@ -417,6 +493,9 @@
    "phrases": [
     "factors levels",
     "factors levels response"
+   ],
+   "fields": [
+    "applied statistics"
    ]
   },
   {
@@ -425,7 +504,8 @@
    "phrases": [
     "fault detection classification",
     "fault isolation"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "feature selection",
@@ -433,6 +513,9 @@
    "phrases": [
     "feature importance",
     "feature selection"
+   ],
+   "fields": [
+    "machine learning"
    ]
   },
   {
@@ -443,7 +526,8 @@
     "filesystem mcp server",
     "git mcp server",
     "mcp on wordpress.com"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "flip turn",
@@ -453,7 +537,8 @@
     "flip turn",
     "jump turn",
     "side turn"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "hello world",
@@ -461,7 +546,8 @@
    "phrases": [
     "hello world",
     "please provide"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "input feature engineering",
@@ -470,6 +556,9 @@
     "engineering data system",
     "input feature engineering",
     "output feature engineering"
+   ],
+   "fields": [
+    "applied statistics"
    ]
   },
   {
@@ -478,6 +567,9 @@
    "phrases": [
     "inverse transform",
     "inverted org chart"
+   ],
+   "fields": [
+    "applied statistics"
    ]
   },
   {
@@ -485,6 +577,9 @@
    "posts": 2,
    "phrases": [
     "loss function"
+   ],
+   "fields": [
+    "machine learning"
    ]
   },
   {
@@ -493,6 +588,9 @@
    "phrases": [
     "gradient vanishing",
     "missing values"
+   ],
+   "fields": [
+    "applied statistics"
    ]
   },
   {
@@ -501,6 +599,9 @@
    "phrases": [
     "one intel",
     "one-hot encoding"
+   ],
+   "fields": [
+    "machine learning"
    ]
   },
   {
@@ -509,7 +610,8 @@
    "phrases": [
     "positive spin",
     "small positive ranges"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "power consumption",
@@ -517,6 +619,9 @@
    "phrases": [
     "power consumption",
     "power performance area"
+   ],
+   "fields": [
+    "semiconductor"
    ]
   },
   {
@@ -525,7 +630,8 @@
    "phrases": [
     "pydantic-ai",
     "pythonic way"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "r squared",
@@ -535,6 +641,9 @@
     "explainability r squared",
     "r squared",
     "uncentered r squared"
+   ],
+   "fields": [
+    "applied statistics"
    ]
   },
   {
@@ -546,7 +655,8 @@
     "react framework",
     "risen framework",
     "rtf framework"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "resume formatting",
@@ -554,7 +664,8 @@
    "phrases": [
     "resume formatting",
     "resume screening"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "screening interview",
@@ -563,7 +674,8 @@
     "first interview",
     "screening interview",
     "technical interviews"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "self-awareness",
@@ -571,7 +683,8 @@
    "phrases": [
     "self-awareness",
     "self-interrogate"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "shadow space",
@@ -579,6 +692,9 @@
    "phrases": [
     "shadow engineering",
     "shadow space"
+   ],
+   "fields": [
+    "semiconductor"
    ]
   },
   {
@@ -588,7 +704,8 @@
     "smart method",
     "star method",
     "start method"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "standard test data format",
@@ -596,6 +713,9 @@
    "phrases": [
     "standard test data format",
     "task output format"
+   ],
+   "fields": [
+    "machine learning"
    ]
   },
   {
@@ -604,6 +724,9 @@
    "phrases": [
     "spatial structure",
     "structured record system"
+   ],
+   "fields": [
+    "applied statistics"
    ]
   },
   {
@@ -612,6 +735,9 @@
    "phrases": [
     "target non-stationarity",
     "target time"
+   ],
+   "fields": [
+    "machine learning"
    ]
   },
   {
@@ -620,6 +746,9 @@
    "phrases": [
     "test yield data",
     "yield analysis"
+   ],
+   "fields": [
+    "machine learning"
    ]
   },
   {
@@ -629,6 +758,10 @@
     "embedded content",
     "time series embedding",
     "time series vectorization"
+   ],
+   "fields": [
+    "machine learning",
+    "applied statistics"
    ]
   },
   {
@@ -637,7 +770,8 @@
    "phrases": [
     "universal adapter",
     "universal rendering"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "unknown categories",
@@ -645,7 +779,8 @@
    "phrases": [
     "i don't know",
     "unknown categories"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "vibe coding",
@@ -653,7 +788,8 @@
    "phrases": [
     "code block",
     "vibe coding"
-   ]
+   ],
+   "fields": []
   },
   {
    "label": "전략적 비교",
@@ -661,7 +797,8 @@
    "phrases": [
     "비판적 분석",
     "전략적 비교"
-   ]
+   ],
+   "fields": []
   }
  ]
 }

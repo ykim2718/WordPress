@@ -28,6 +28,7 @@ final class KWC_Shortcode {
 		$atts = shortcode_atts(
 			array(
 				'language'    => $options['language'],
+				'fields'      => $options['fields'],
 				'shape'       => $options['shape'],
 				'ratio'       => $options['ratio'],
 				'width'       => $options['width_px'],
@@ -69,6 +70,23 @@ final class KWC_Shortcode {
 		$language = strtolower( trim( (string) $atts['language'] ) );
 		if ( ! in_array( $language, array( 'en', 'ko', 'both' ), true ) ) {
 			return new WP_Error( 'kwc_bad_language', 'language 는 en, ko, both 중 하나여야 한다. 받은 값: ' . $atts['language'] );
+		}
+
+		$fields = KWC_Cloud::parse_fields( $atts['fields'] );
+		if ( is_array( $fields ) ) {
+			$known = array_keys( KWC_Topics::fields() );
+			if ( empty( $fields ) ) {
+				return new WP_Error( 'kwc_no_fields', 'fields 에 쓸 수 있는 이름이 하나도 없다. 받은 값: ' . $atts['fields'] );
+			}
+			// 오타를 "그 분야에 든 topic 이 없다" 로 흘리면 빈 구름의 이유를 알 수 없다.
+			$unknown = array_diff( $fields, $known );
+			if ( ! empty( $unknown ) ) {
+				return new WP_Error(
+					'kwc_bad_field',
+					'올라온 topic 에 없는 분야다: ' . implode( ', ', $unknown )
+						. '. 쓸 수 있는 분야: ' . ( empty( $known ) ? '없다 (파이프라인이 분야를 붙이지 않았다)' : implode( ', ', $known ) )
+				);
+			}
 		}
 
 		$shape = strtolower( trim( (string) $atts['shape'] ) );
@@ -135,6 +153,7 @@ final class KWC_Shortcode {
 
 		return array(
 			'language'    => $language,
+			'fields'      => ( null === $fields ) ? '' : implode( ',', $fields ),
 			'shape'       => $shape,
 			'ratio'       => $ratio,
 			'width_px'    => $values['width'],

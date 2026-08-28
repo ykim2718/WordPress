@@ -86,6 +86,7 @@ final class KWC_Settings {
 
 		$fields = array(
 			array( 'language', '언어', 'kwc_pick', 'field_language' ),
+			array( 'fields', '분야', 'kwc_pick', 'field_fields' ),
 			array( 'min_posts', '최소 글 수', 'kwc_pick', 'field_min_posts' ),
 			array( 'max_words', '최대 topic 수', 'kwc_pick', 'field_max_words' ),
 			array( 'shape', '모양', 'kwc_style', 'field_shape' ),
@@ -129,6 +130,22 @@ final class KWC_Settings {
 		} else {
 			$errors[] = '언어 값이 잘못됐다: ' . $language;
 		}
+
+		// 체크박스는 고른 것만 온다. 하나도 안 고르면 key 자체가 없고, 그것이 "모든 분야" 다.
+		$known  = array_keys( KWC_Topics::fields() );
+		$picked = array();
+		foreach ( (array) ( isset( $input['fields'] ) ? $input['fields'] : array() ) as $field ) {
+			$field = KWC_Topics::normalize_field( $field );
+			if ( '' === $field ) {
+				continue;
+			}
+			if ( ! in_array( $field, $known, true ) ) {
+				$errors[] = '올라온 topic 에 없는 분야다: ' . $field;
+				continue;
+			}
+			$picked[] = $field;
+		}
+		$out['fields'] = implode( ',', array_unique( $picked ) );
 
 		foreach ( array( 'shape' => array( 'ellipse', 'block' ), 'color_mode' => array( 'palette', 'gradient' ) ) as $name => $allowed ) {
 			$value = isset( $input[ $name ] ) ? (string) $input[ $name ] : '';
@@ -334,6 +351,29 @@ final class KWC_Settings {
 			array( 'en' => '영어', 'ko' => '한글', 'both' => '혼재' ),
 			'한글이 한 자라도 있으면 한글로 본다.'
 		);
+	}
+
+	public static function field_fields() {
+		$known = KWC_Topics::fields();
+		if ( empty( $known ) ) {
+			echo '<p class="description">올라온 topic 에 분야가 붙어 있지 않다. '
+				. '<code>tools/label_fields.py</code> 로 분야를 붙여 다시 올리면 여기에 목록이 생긴다.</p>';
+			return;
+		}
+		$chosen = KWC_Cloud::parse_fields( self::value( 'fields' ) );
+		foreach ( $known as $field => $count ) {
+			printf(
+				'<label style="display:inline-block;margin:0 16px 4px 0"><input type="checkbox" name="%s[]" value="%s" %s> %s '
+					. '<span class="description">(%d)</span></label>',
+				esc_attr( self::name( 'fields' ) ),
+				esc_attr( $field ),
+				checked( is_array( $chosen ) && in_array( $field, $chosen, true ), true, false ),
+				esc_html( $field ),
+				(int) $count
+			);
+		}
+		echo '<p class="description">고른 분야의 topic 만 그린다. 여럿 골라도 되고, '
+			. '하나도 안 고르면 분야를 가리지 않는다. 괄호 안은 그 분야에 든 topic 수다.</p>';
 	}
 
 	public static function field_min_posts() {

@@ -17,6 +17,7 @@ final class KWC_Defaults {
 	public static function options() {
 		return array(
 			'language'    => 'en',        // en | ko | both
+			'fields'      => '',          // 그릴 분야를 쉼표로. 비면 모든 분야
 			'max_words'   => 60,
 			'min_posts'   => 2,           // 이보다 적은 글에서 온 topic 은 그리지 않는다
 			'min_size'    => 12,

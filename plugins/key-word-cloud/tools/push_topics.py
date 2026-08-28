@@ -16,6 +16,7 @@ repository, it is what the plugin's once-a-day pull reads, which needs no
 password and no port open on the site.
 
 Changelog
+    0.2.0  Carry the field labels that label_fields.py writes.
     0.1.0  Add --write for the once-a-day pull.
     0.0.0  First version.
 """
@@ -23,7 +24,7 @@ Changelog
 from __future__ import annotations
 
 __author__ = 'yRocket'
-__version__ = "0.1.0.2026.8.28"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
+__version__ = "0.2.0.2026.8.28"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
 
 import argparse
 import base64
@@ -42,7 +43,9 @@ REQUIRED_ENVIRONMENT = ('WP_URL', 'WP_USERNAME', 'WP_APP_PASSWORD')
 def load_clusters(*, path: pathlib.Path, min_posts: int, limit: int) -> list[dict]:
     """Read the clusters and keep the ones worth drawing.
 
-    Returns [{'label': str, 'posts': int, 'phrases': [str, ...]}, ...].
+    Returns [{'label': str, 'posts': int, 'fields': [str, ...], 'phrases': [str, ...]}, ...].
+    The fields are there only if label_fields.py has run; without them the plugin
+    draws every topic, which is what it did before fields existed.
     """
     if not path.is_file():
         raise SystemExit(f"no such file: {path}. Run cluster_keywords.py first.")
@@ -51,9 +54,16 @@ def load_clusters(*, path: pathlib.Path, min_posts: int, limit: int) -> list[dic
         raise SystemExit(f"{path} has no 'clusters' key; it was not written by cluster_keywords.py")
 
     kept = [
-        {'label': c['label'], 'posts': int(c['posts']), 'phrases': list(c['phrases'])}
+        {'label': c['label'], 'posts': int(c['posts']), 'phrases': list(c['phrases']),
+         'fields': list(c.get('fields', []))}
         for c in saved['clusters'] if int(c['posts']) >= min_posts
     ]
+    labelled = sum(1 for c in kept if c['fields'])
+    if labelled:
+        print(f"{labelled}/{len(kept)} topics carry field labels")
+    else:
+        # Silence here would read as "the fields did not survive", which is a different bug.
+        print("no topic carries a field label; run label_fields.py to add them")
     if not kept:
         raise SystemExit(
             f"none of the {len(saved['clusters'])} clusters reach --min-posts {min_posts}; "

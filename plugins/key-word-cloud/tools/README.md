@@ -1,9 +1,9 @@
 # Topic Pipeline
 
-Rev. 0 | Created: 2026-08-28 | Updated: 2026-08-28 00:09 CDT
+Rev. 1 | Created: 2026-08-28 | Updated: 2026-08-28 15:58 CDT
 
-`ranking=topics` 로 그릴 topic 을 만드는 script 세 개이다. plugin 과 별개로 돌며, zip 에도
-들어가지 않는다. 세 script 는 순서대로 실행하고, 앞 단계의 JSON 을 다음 단계가 읽는다.
+`ranking=topics` 로 그릴 topic 을 만드는 script 네 개이다. plugin 과 별개로 돌며, zip 에도
+들어가지 않는다. 네 script 는 순서대로 실행하고, 앞 단계의 JSON 을 다음 단계가 읽는다.
 
 ## 1. Reason
 
@@ -73,7 +73,35 @@ Embedding model 의 선택이 결과를 크게 바꾼다. 영어 중심 model �
 거리를 거의 구별하지 못한다. 같은 자료에서 `nomic-embed-text` 는 한국어 54 개를 무리
 하나로 만들었고, `bge-m3` 는 33 개로 나누었다.
 
-### 3.3. Push
+### 3.3. Label
+
+무리마다 어느 분야의 것인지를 붙인다. 분야 이름은 부르는 쪽이 적고, model 은 각 무리가
+그중 어디에 드는지만 답한다. 이 단계는 건너뛸 수 있으며, 건너뛰면 plugin 은 분야를 가르지
+않고 전부 그린다.
+
+```bash
+python tools/label_fields.py --input cluster_keywords.json \
+    --fields "semiconductor, machine learning, applied statistics"
+```
+
+무리 하나가 여러 분야에 들 수 있고, 어디에도 안 드는 무리는 그대로 남는다. 목록에 없는
+이름을 model 이 지어내면 버리고 몇 개를 버렸는지 센다. 어느 분야에도 무리가 남지 않으면
+결과를 쓰지 않고 멈춘다. 그 상태로 올리면 구름이 빈 이유를 site 에서 찾게 된다.
+
+Table 2. Labelling 240 clusters into three fields with `qwen3:8b`
+
+| Field | Clusters |
+|---|---|
+| applied statistics | 37 |
+| machine learning | 26 |
+| semiconductor | 15 |
+| in none of them | 165 |
+
+240 개를 20 개씩 묶어 물어 224 초가 걸렸고, 목록에 없는 이름 3 개가 버려졌다. 분야가 둘
+붙은 무리가 있어 열의 합은 240 을 넘는다. 세 분야로 가르면 대부분의 무리는 어디에도 들지
+않는다. 분야를 좁게 잡을수록 그 수는 늘고, 그것이 분야를 고르는 목적이다.
+
+### 3.4. Push
 
 무리를 topic 으로 바꾸어 site 에 올린다. 인증은 WordPress application password 이며,
 글을 고칠 수 있는 사용자여야 한다.
@@ -83,8 +111,8 @@ export WP_URL=https://example.com/wordpress
 export WP_USERNAME=<LOGIN_NAME>
 export WP_APP_PASSWORD=<APPLICATION_PASSWORD>
 
-python tools/push_topics.py --dry-run true    # 무엇을 보낼지 먼저 본다
-python tools/push_topics.py --min-posts 2
+python tools/push_topics.py --input label_fields.json --dry-run true
+python tools/push_topics.py --input label_fields.json --min-posts 2
 ```
 
 Application password 는 WP 관리자 → 사용자 → 프로필에서 발급한다. Site 가 https 가
@@ -97,5 +125,5 @@ Application password 는 WP 관리자 → 사용자 → 프로필에서 발급�
   나왔고 그중 둘 이상의 글에 걸친 것은 15 개뿐이었다. 묶지 않으면 구름이 되지 않는다.
 - 무리에 뜻이 다른 phrase 가 섞이는 일이 남는다. Threshold 로 줄일 수는 있으나 없앨 수는
   없다.
-- 글이 늘거나 바뀌면 세 단계를 다시 돌려야 한다. Plugin 은 마지막으로 올라온 topic 을
+- 글이 늘거나 바뀌면 네 단계를 다시 돌려야 한다. Plugin 은 마지막으로 올라온 topic 을
   계속 보여 줄 뿐 스스로 갱신하지 않는다.

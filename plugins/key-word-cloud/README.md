@@ -60,6 +60,17 @@ plugins/key-word-cloud/
 값을 쓴다. 편집 화면의 미리보기는 브라우저가 아니라 서버가 그린 것을 받아 온다. 규칙을
 PHP 한 곳에만 두려는 것이고, 그래서 미리보기와 실제 화면이 갈라지지 않는다.
 
+항목은 세 묶음이고, 묶음은 편집기가 이미 가진 탭이다. 탭을 새로 만들지 않는다.
+
+| Group | Tab | 들어가는 것 |
+|---|---|---|
+| Content | Settings | 언어, 분야, 최소 글 수, topic 수, 클릭 동작 |
+| Appearance | Styles | 모양과 크기, 글꼴, 색 |
+| Data | Advanced | 캐시 |
+
+둘로 나누지 않은 것은 캐시 때문이다. 캐시는 무엇을 그리는지도 어떻게 보이는지도 아니라서
+둘 중 어디에 넣어도 그 묶음의 이름이 거짓이 된다.
+
 `editor.js` 는 JSX 없이 `wp` 전역만 쓰는 평범한 JavaScript다. 이 저장소에는 build 단계가
 없으므로, 의존 script 목록은 `editor.asset.php` 에 손으로 적어 둔다.
 
@@ -81,15 +92,20 @@ Content-Type: application/json
     {
       "label": "ai assisted development",
       "posts": 6,
+      "fields": ["machine learning"],
       "phrases": ["agentic automation", "ai agent worker", "ai assistant"]
     }
   ]
 }
 ```
 
-`posts` 가 글자 크기를 정하고, `phrases` 는 마우스를 올렸을 때 보인다. `label` 이 비었거나
-`posts` 가 1 미만인 항목은 버리고 무엇을 왜 버렸는지 응답과 error log 에 적는다. 쓸 수 있는
-항목이 하나도 없으면 저장하지 않고 400 을 돌려준다. 저장에 성공하면 캐시를 비운다.
+`posts` 가 글자 크기를 정하고, `phrases` 는 마우스를 올렸을 때 보이며, `fields` 는 어느
+분야의 구름에 나올지를 정한다. `fields` 는 없어도 되고, 없으면 분야를 고르지 않은 구름에만
+나온다.
+
+`label` 이 비었거나 `posts` 가 1 미만인 항목은 버리고 무엇을 왜 버렸는지 응답과 error log
+에 적는다. 쓸 수 있는 항목이 하나도 없으면 저장하지 않고 400 을 돌려준다. 저장에 성공하면
+캐시를 비운다.
 
 `GET` 으로 같은 주소를 부르면 저장된 것을 그대로 돌려준다. 무엇이 올라갔는지 확인할 때
 쓴다. 설정 화면 위쪽에도 개수와 시각, generator 가 보인다.
@@ -112,6 +128,27 @@ python3 tools/push_topics.py --write plugins/key-word-cloud/dist/topics.json --d
 받아오기에 실패해도 이미 저장된 topic 은 그대로 두고 무엇이 어긋났는지 기록한다. 설정
 화면에 마지막 시도와 그 결과, 다음 자동 갱신 시각이 보이고, 하루를 기다리지 않고 바로
 받아오는 단추가 있다. 받아오기를 끄거나 플러그인을 비활성화하면 일정도 걷는다.
+
+## 분야
+
+Topic 마다 어느 분야의 것인지가 붙어 있고, 고른 분야의 topic 만 그린다. 분야는
+`tools/label_fields.py` 가 붙인다. 부를 때 분야 이름을 직접 적으므로 무엇으로 가를지는
+글을 쓴 사람이 정하고, 모델은 각 topic 이 그중 어디에 드는지만 답한다.
+
+```bash
+python3 tools/label_fields.py --input cluster_keywords.json \
+    --fields "semiconductor, machine learning, applied statistics"
+```
+
+Topic 하나가 여러 분야에 들 수 있고, 어디에도 안 드는 topic 은 그대로 남되 분야를 고른
+구름에는 나오지 않는다. 모델이 목록에 없는 이름을 지어내면 버리고 몇 개를 버렸는지 센다.
+전부 버려져 어느 분야에도 남지 않으면 결과를 쓰지 않고 멈춘다. 그 상태로 올리면 구름이
+빈 이유를 알 수 없기 때문이다.
+
+고르는 자리는 설정 화면과 블록 사이드바의 체크박스, 그리고 숏코드 `fields` 속성이다.
+목록은 플러그인이 아니라 올라온 topic 에서 읽으므로, 파이프라인에 분야를 하나 더 넣으면
+두 화면에 저절로 생긴다. 올라온 topic 에 없는 이름을 적으면 있는 이름을 알려 주는 오류가
+난다. 오타를 "그 분야에 든 topic 이 없다" 로 흘리면 빈 구름의 이유를 찾을 수 없다.
 
 ## 언어
 
@@ -171,6 +208,7 @@ topic 에 마우스를 올리면 어떤 구절에서 온 것인지와 글 수가
 | Attribute | Default | 설명 |
 |---|---|---|
 | `language` | `en` | `en`, `ko`, `both` |
+| `fields` | `''` | 그릴 분야를 쉼표로. 비거나 `*` 면 분야를 가리지 않는다 |
 | `min_posts` | 2 | 이보다 적은 글에서 온 topic 은 그리지 않는다 |
 | `max` | 60 | 그릴 topic 수, 1..500 |
 | `min_size` | 12 | 가장 작은 글자 크기 px |

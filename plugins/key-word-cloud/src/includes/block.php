@@ -15,6 +15,9 @@ final class KWC_Block {
 	const NAME     = 'key-word-cloud/word-cloud';
 	const CATEGORY = 'yrocket';
 
+	/** register_block_type 이 붙여 준 editor script 의 handle. 목록을 실어 보낼 자리다. */
+	private static $editor_handle = '';
+
 	/**
 	 * 인서터의 yRocket 묶음. block.json 의 category 가 이 slug 를 가리킨다.
 	 *
@@ -51,6 +54,17 @@ final class KWC_Block {
 	public static function enqueue_editor_assets() {
 		wp_enqueue_style( 'key-word-cloud' );
 		wp_enqueue_script( 'key-word-cloud' );
+
+		// 분야 목록은 올라온 topic 에서 나온다. 편집기가 그것을 알아야 체크박스를 그린다.
+		if ( '' === self::$editor_handle ) {
+			error_log( '[key-word-cloud] the block editor script has no handle; the field list is unavailable' );
+			return;
+		}
+		$fields = array();
+		foreach ( KWC_Topics::fields() as $name => $count ) {
+			$fields[] = array( 'name' => (string) $name, 'count' => (int) $count );
+		}
+		wp_localize_script( self::$editor_handle, 'KWC_BLOCK', array( 'fields' => $fields ) );
 	}
 
 	/**
@@ -80,6 +94,11 @@ final class KWC_Block {
 		);
 		if ( false === $registered ) {
 			error_log( '[key-word-cloud] register_block_type failed for ' . self::NAME );
+			return;
+		}
+		// handle 은 block.json 의 이름에서 만들어진다. 짐작해 적으면 이름이 바뀌는 날 조용히 어긋난다.
+		if ( ! empty( $registered->editor_script_handles ) ) {
+			self::$editor_handle = (string) $registered->editor_script_handles[0];
 		}
 	}
 
