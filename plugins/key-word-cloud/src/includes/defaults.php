@@ -25,6 +25,8 @@ final class KWC_Defaults {
 			'color_end'   => '#12355b',
 			'link_mode'   => 'search',    // search | none
 			'cache_ttl'   => 3600,
+			'pull_enabled' => 1,          // 하루 한 번 topic 을 받아올지
+			'pull_url'     => 'https://raw.githubusercontent.com/ykim2718/WordPress/main/plugins/key-word-cloud/dist/topics.json',
 			'cache_salt'  => 1,
 		);
 	}

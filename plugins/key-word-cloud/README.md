@@ -24,7 +24,8 @@ plugins/key-word-cloud/
 │   └── assets/
 ├── dist/                    ← 빌드 결과. 워드프레스가 여기서 받는다
 │   ├── key-word-cloud.zip
-│   └── version.json
+│   ├── version.json
+│   └── topics.json          ← 하루 한 번 가져가는 topic
 ├── tools/                   ← topic 파이프라인 (GPU 있는 기계에서 돈다)
 ├── DESCRIPTION.md           ← View details 의 Description 탭
 ├── CHANGELOG.md             ← View details 의 Changelog 탭
@@ -40,7 +41,7 @@ plugins/key-word-cloud/
 | `key-word-cloud.php` | 헤더와 상수, 훅 등록, 캐시 비우기 |
 | `includes/defaults.php` | 기본 설정값 |
 | `includes/language.php` | 한글/영어 판정 |
-| `includes/topics.php` | topic 을 REST 로 받아 저장 |
+| `includes/topics.php` | topic 을 REST 로 받거나 하루 한 번 가져와 저장 |
 | `includes/cloud.php` | 저장된 topic 으로 HTML 을 만든다 |
 | `includes/shortcode.php` | `[wpwordcloud]` 와 속성 검증 |
 | `includes/block.php` | block 등록과 서버 렌더링 |
@@ -94,6 +95,23 @@ Content-Type: application/json
 
 Topic 을 만드는 파이프라인은 `tools/` 에 있다.
 
+## 하루 한 번 가져오기
+
+올리는 길이 하나 더 있다. 파이프라인이 결과를 `dist/topics.json` 에 써서 저장소에
+올리면, 플러그인이 하루에 한 번 그 주소에서 받아 저장한다. `updater.php` 가
+`version.json` 을 받는 것과 같은 구조라 application password 도, 열린 포트도 필요 없다.
+
+```bash
+python3 tools/push_topics.py --write plugins/key-word-cloud/dist/topics.json --dry-run true
+```
+
+받아오는 것이지 분석하는 것이 아니다. **갱신 이후에 쓴 글은 파이프라인을 다시 돌려 그
+파일을 새로 올릴 때까지 반영되지 않는다.**
+
+받아오기에 실패해도 이미 저장된 topic 은 그대로 두고 무엇이 어긋났는지 기록한다. 설정
+화면에 마지막 시도와 그 결과, 다음 자동 갱신 시각이 보이고, 하루를 기다리지 않고 바로
+받아오는 단추가 있다. 받아오기를 끄거나 플러그인을 비활성화하면 일정도 걷는다.
+
 ## 언어
 
 한글 음절이 한 자라도 있으면 한글로, 없으면 영어로 본다. `종합소득세 신고` 는 한글,
@@ -113,6 +131,8 @@ Topic 을 만드는 파이프라인은 `tools/` 에 있다.
 | `color_end` | `#12355b` | 많은 글에서 온 topic 의 색 |
 | `link` | `search` | `search` 또는 `none` |
 | `cache` | 3600 | 캐시 초. 0이면 캐시하지 않는다 |
+
+`pull_enabled` 와 `pull_url` 은 사이트 전체에 걸리는 설정이라 숏코드 속성에는 없다.
 
 값이 범위를 벗어나거나 형식이 틀리면 기본값으로 되돌리지 않고 그 자리에 오류를 적는다.
 그릴 것이 없을 때도 빈 화면 대신 topic 이 몇 개였고 무엇에 걸렸는지 적는다. 같은 내용이

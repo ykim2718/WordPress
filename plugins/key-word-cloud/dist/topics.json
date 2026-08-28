@@ -1,0 +1,667 @@
+{
+ "generator": "qwen3:8b + bge-m3 @0.40",
+ "topics": [
+  {
+   "label": "stochastic optimization",
+   "posts": 7,
+   "phrases": [
+    "bayesian optimization",
+    "large language models",
+    "learning-based method",
+    "machine learning methodologies",
+    "object-oriented programming",
+    "stochastic optimization",
+    "tree-based models"
+   ]
+  },
+  {
+   "label": "ai assisted development",
+   "posts": 6,
+   "phrases": [
+    "ai agent worker",
+    "ai assistant",
+    "ai assisted development",
+    "ai model brain",
+    "ai-assisted coding",
+    "ai-native environments",
+    "ai-native startup"
+   ]
+  },
+  {
+   "label": "server side rendering",
+   "posts": 5,
+   "phrases": [
+    "browser-side rendering",
+    "client side rendering",
+    "core components",
+    "modular client-server-host",
+    "react server components",
+    "server components",
+    "server side rendering",
+    "server-side execution"
+   ]
+  },
+  {
+   "label": "youtube video",
+   "posts": 5,
+   "phrases": [
+    "shorts links",
+    "video link",
+    "video links",
+    "video title",
+    "youtube shorts",
+    "youtube url",
+    "youtube video",
+    "youtube watch"
+   ]
+  },
+  {
+   "label": "keyword optimization",
+   "posts": 4,
+   "phrases": [
+    "keyword matching",
+    "keyword optimization",
+    "top 5 keywords"
+   ]
+  },
+  {
+   "label": "one factor at a time",
+   "posts": 4,
+   "phrases": [
+    "efficiency increases",
+    "human-centric",
+    "one factor at a time",
+    "results driven"
+   ]
+  },
+  {
+   "label": "residual bias",
+   "posts": 4,
+   "phrases": [
+    "inductive bias",
+    "learning bias",
+    "observational bias",
+    "residual bias",
+    "residual variance"
+   ]
+  },
+  {
+   "label": "smart manufacturing",
+   "posts": 4,
+   "phrases": [
+    "manufacturing execution system",
+    "semiconductor manufacturing",
+    "smart manufacturing"
+   ]
+  },
+  {
+   "label": "system prompt",
+   "posts": 4,
+   "phrases": [
+    "ai prompt framework",
+    "assistant prompt",
+    "modular prompt engineering",
+    "prompt library",
+    "system prompt",
+    "test-driven prompt",
+    "user prompt"
+   ]
+  },
+  {
+   "label": "wp rest api",
+   "posts": 4,
+   "phrases": [
+    "api-based integration",
+    "rest api",
+    "windows api",
+    "wp rest api"
+   ]
+  },
+  {
+   "label": "세무서",
+   "posts": 4,
+   "phrases": [
+    "세금 계산",
+    "세무서",
+    "세법상 미국인",
+    "세액공제"
+   ]
+  },
+  {
+   "label": "agentic automation",
+   "posts": 3,
+   "phrases": [
+    "agentic automation",
+    "agentic workflows",
+    "autonomous automation",
+    "cognitive automation",
+    "robotic process automation"
+   ]
+  },
+  {
+   "label": "agile development",
+   "posts": 3,
+   "phrases": [
+    "agile development",
+    "agile manifesto"
+   ]
+  },
+  {
+   "label": "applicant tracking system",
+   "posts": 3,
+   "phrases": [
+    "applicant tracking system",
+    "face recognition system"
+   ]
+  },
+  {
+   "label": "categorical variables",
+   "posts": 3,
+   "phrases": [
+    "categorical features",
+    "categorical inference bias",
+    "categorical variables"
+   ]
+  },
+  {
+   "label": "co-development",
+   "posts": 3,
+   "phrases": [
+    "co-development",
+    "cost sharing",
+    "inclusion"
+   ]
+  },
+  {
+   "label": "continuous loop",
+   "posts": 3,
+   "phrases": [
+    "continuous deployment",
+    "continuous loop",
+    "iterative cycle"
+   ]
+  },
+  {
+   "label": "customer collaboration",
+   "posts": 3,
+   "phrases": [
+    "customer collaboration",
+    "value customer"
+   ]
+  },
+  {
+   "label": "file type compatibility",
+   "posts": 3,
+   "phrases": [
+    "file type compatibility",
+    "working software"
+   ]
+  },
+  {
+   "label": "flexibility real-time",
+   "posts": 3,
+   "phrases": [
+    "flexibility real-time",
+    "real-time data processing",
+    "time to interactive"
+   ]
+  },
+  {
+   "label": "high-stakes environments",
+   "posts": 3,
+   "phrases": [
+    "challenging project",
+    "high-stakes environments",
+    "strict rules"
+   ]
+  },
+  {
+   "label": "language server protocol",
+   "posts": 3,
+   "phrases": [
+    "language server protocol",
+    "model context protocol"
+   ]
+  },
+  {
+   "label": "min-max scaling",
+   "posts": 3,
+   "phrases": [
+    "min-max scaling",
+    "reusability scalability",
+    "transistor scaling"
+   ]
+  },
+  {
+   "label": "recruitment management tool",
+   "posts": 3,
+   "phrases": [
+    "job selection process",
+    "recruiter efficiency",
+    "recruitment management tool"
+   ]
+  },
+  {
+   "label": "reference number",
+   "posts": 3,
+   "phrases": [
+    "final reference list",
+    "reference display",
+    "reference indexing",
+    "reference number"
+   ]
+  },
+  {
+   "label": "response noise",
+   "posts": 3,
+   "phrases": [
+    "noise features",
+    "response noise",
+    "responsiveness sensitivity"
+   ]
+  },
+  {
+   "label": "statistical model",
+   "posts": 3,
+   "phrases": [
+    "sample statistics",
+    "statistical model",
+    "systematic model error"
+   ]
+  },
+  {
+   "label": "version control systems",
+   "posts": 3,
+   "phrases": [
+    "version control a/b testing",
+    "version control systems",
+    "version-control prompts"
+   ]
+  },
+  {
+   "label": "종합소득세 신고",
+   "posts": 3,
+   "phrases": [
+    "부가세 연 1회 신고",
+    "종합소득세 신고",
+    "종합소득세 신고서"
+   ]
+  },
+  {
+   "label": "1 to 1 identity line",
+   "posts": 2,
+   "phrases": [
+    "1 to 1 identity line",
+    "identity line"
+   ]
+  },
+  {
+   "label": "4-axis matrix",
+   "posts": 2,
+   "phrases": [
+    "4-axis matrix",
+    "four pillars"
+   ]
+  },
+  {
+   "label": "ats score",
+   "posts": 2,
+   "phrases": [
+    "ats score",
+    "ats-friendly resume"
+   ]
+  },
+  {
+   "label": "chain of verification",
+   "posts": 2,
+   "phrases": [
+    "chain of thought",
+    "chain of verification",
+    "source verification"
+   ]
+  },
+  {
+   "label": "clear headings",
+   "posts": 2,
+   "phrases": [
+    "clear headings",
+    "headless cms"
+   ]
+  },
+  {
+   "label": "collective intelligence",
+   "posts": 2,
+   "phrases": [
+    "collective intelligence",
+    "generalization performance"
+   ]
+  },
+  {
+   "label": "composite chip",
+   "posts": 2,
+   "phrases": [
+    "central composite design",
+    "composite chip",
+    "independent chip designs"
+   ]
+  },
+  {
+   "label": "concordance correlation coefficient",
+   "posts": 2,
+   "phrases": [
+    "coefficient of determination",
+    "concordance correlation coefficient",
+    "pearson correlation coefficient"
+   ]
+  },
+  {
+   "label": "core values",
+   "posts": 2,
+   "phrases": [
+    "core definition",
+    "core values"
+   ]
+  },
+  {
+   "label": "cross-functional team",
+   "posts": 2,
+   "phrases": [
+    "cross-functional team",
+    "team differences"
+   ]
+  },
+  {
+   "label": "design of experiments",
+   "posts": 2,
+   "phrases": [
+    "design of experiments"
+   ]
+  },
+  {
+   "label": "deterministic architecture",
+   "posts": 2,
+   "phrases": [
+    "deterministic approach",
+    "deterministic architecture"
+   ]
+  },
+  {
+   "label": "examples sentence",
+   "posts": 2,
+   "phrases": [
+    "direct quotes",
+    "examples sentence"
+   ]
+  },
+  {
+   "label": "explained variation",
+   "posts": 2,
+   "phrases": [
+    "analysis of variance",
+    "explained variation",
+    "predictor variance",
+    "unexplained variation"
+   ]
+  },
+  {
+   "label": "external data sources",
+   "posts": 2,
+   "phrases": [
+    "external data sources",
+    "web based source"
+   ]
+  },
+  {
+   "label": "factors levels",
+   "posts": 2,
+   "phrases": [
+    "factors levels",
+    "factors levels response"
+   ]
+  },
+  {
+   "label": "fault isolation",
+   "posts": 2,
+   "phrases": [
+    "fault detection classification",
+    "fault isolation"
+   ]
+  },
+  {
+   "label": "feature selection",
+   "posts": 2,
+   "phrases": [
+    "feature importance",
+    "feature selection"
+   ]
+  },
+  {
+   "label": "fetch mcp server",
+   "posts": 2,
+   "phrases": [
+    "fetch mcp server",
+    "filesystem mcp server",
+    "git mcp server",
+    "mcp on wordpress.com"
+   ]
+  },
+  {
+   "label": "flip turn",
+   "posts": 2,
+   "phrases": [
+    "butterfly turn",
+    "flip turn",
+    "jump turn",
+    "side turn"
+   ]
+  },
+  {
+   "label": "hello world",
+   "posts": 2,
+   "phrases": [
+    "hello world",
+    "please provide"
+   ]
+  },
+  {
+   "label": "input feature engineering",
+   "posts": 2,
+   "phrases": [
+    "engineering data system",
+    "input feature engineering",
+    "output feature engineering"
+   ]
+  },
+  {
+   "label": "inverse transform",
+   "posts": 2,
+   "phrases": [
+    "inverse transform",
+    "inverted org chart"
+   ]
+  },
+  {
+   "label": "loss function",
+   "posts": 2,
+   "phrases": [
+    "loss function"
+   ]
+  },
+  {
+   "label": "missing values",
+   "posts": 2,
+   "phrases": [
+    "gradient vanishing",
+    "missing values"
+   ]
+  },
+  {
+   "label": "one intel",
+   "posts": 2,
+   "phrases": [
+    "one intel",
+    "one-hot encoding"
+   ]
+  },
+  {
+   "label": "positive spin",
+   "posts": 2,
+   "phrases": [
+    "positive spin",
+    "small positive ranges"
+   ]
+  },
+  {
+   "label": "power consumption",
+   "posts": 2,
+   "phrases": [
+    "power consumption",
+    "power performance area"
+   ]
+  },
+  {
+   "label": "pythonic way",
+   "posts": 2,
+   "phrases": [
+    "pydantic-ai",
+    "pythonic way"
+   ]
+  },
+  {
+   "label": "r squared",
+   "posts": 2,
+   "phrases": [
+    "centered r squared",
+    "explainability r squared",
+    "r squared",
+    "uncentered r squared"
+   ]
+  },
+  {
+   "label": "react framework",
+   "posts": 2,
+   "phrases": [
+    "co-star framework",
+    "race framework",
+    "react framework",
+    "risen framework",
+    "rtf framework"
+   ]
+  },
+  {
+   "label": "resume formatting",
+   "posts": 2,
+   "phrases": [
+    "resume formatting",
+    "resume screening"
+   ]
+  },
+  {
+   "label": "screening interview",
+   "posts": 2,
+   "phrases": [
+    "first interview",
+    "screening interview",
+    "technical interviews"
+   ]
+  },
+  {
+   "label": "self-awareness",
+   "posts": 2,
+   "phrases": [
+    "self-awareness",
+    "self-interrogate"
+   ]
+  },
+  {
+   "label": "shadow space",
+   "posts": 2,
+   "phrases": [
+    "shadow engineering",
+    "shadow space"
+   ]
+  },
+  {
+   "label": "smart method",
+   "posts": 2,
+   "phrases": [
+    "smart method",
+    "star method",
+    "start method"
+   ]
+  },
+  {
+   "label": "standard test data format",
+   "posts": 2,
+   "phrases": [
+    "standard test data format",
+    "task output format"
+   ]
+  },
+  {
+   "label": "structured record system",
+   "posts": 2,
+   "phrases": [
+    "spatial structure",
+    "structured record system"
+   ]
+  },
+  {
+   "label": "target non-stationarity",
+   "posts": 2,
+   "phrases": [
+    "target non-stationarity",
+    "target time"
+   ]
+  },
+  {
+   "label": "test yield data",
+   "posts": 2,
+   "phrases": [
+    "test yield data",
+    "yield analysis"
+   ]
+  },
+  {
+   "label": "time series embedding",
+   "posts": 2,
+   "phrases": [
+    "embedded content",
+    "time series embedding",
+    "time series vectorization"
+   ]
+  },
+  {
+   "label": "universal rendering",
+   "posts": 2,
+   "phrases": [
+    "universal adapter",
+    "universal rendering"
+   ]
+  },
+  {
+   "label": "unknown categories",
+   "posts": 2,
+   "phrases": [
+    "i don't know",
+    "unknown categories"
+   ]
+  },
+  {
+   "label": "vibe coding",
+   "posts": 2,
+   "phrases": [
+    "code block",
+    "vibe coding"
+   ]
+  },
+  {
+   "label": "전략적 비교",
+   "posts": 2,
+   "phrases": [
+    "비판적 분석",
+    "전략적 비교"
+   ]
+  }
+ ]
+}

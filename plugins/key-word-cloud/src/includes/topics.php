@@ -19,8 +19,10 @@ defined( 'ABSPATH' ) || exit;
 
 final class KWC_Topics {
 
-	const OPTION    = 'kwc_topics';
-	const NAMESPACE = 'key-word-cloud/v1';
+	const OPTION      = 'kwc_topics';
+	const PULL_OPTION = 'kwc_last_pull';
+	const NAMESPACE   = 'key-word-cloud/v1';
+	const CRON_HOOK   = 'kwc_pull_topics';
 
 	/**
 	 * REST route 등록. init 이 아니라 rest_api_init 에서 부른다.
@@ -90,7 +92,20 @@ final class KWC_Topics {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public static function receive( $request ) {
-		$body = $request->get_json_params();
+		$stored = self::store( $request->get_json_params() );
+		if ( is_wp_error( $stored ) ) {
+			return $stored;
+		}
+		return new WP_REST_Response( $stored, 200 );
+	}
+
+	/**
+	 * 받은 자료를 검증해 option 에 넣는다. REST 와 하루 한 번의 가져오기가 같이 쓴다.
+	 *
+	 * @param mixed $body {"generator": "...", "topics": [...]} 형태의 배열.
+	 * @return array|WP_Error stored 와 rejected 를 가진 배열.
+	 */
+	public static function store( $body ) {
 		if ( ! is_array( $body ) || ! isset( $body['topics'] ) || ! is_array( $body['topics'] ) ) {
 			return new WP_Error( 'kwc_no_topics', 'body 에 topics 배열이 없다.', array( 'status' => 400 ) );
 		}
@@ -154,10 +169,102 @@ final class KWC_Topics {
 				. implode( '; ', array_slice( $rejected, 0, 5 ) ) );
 		}
 
-		return new WP_REST_Response( array(
+		return array(
 			'stored'   => count( $topics ),
 			'rejected' => $rejected,
-		), 200 );
+		);
+	}
+
+	/**
+	 * 하루 한 번 topic 을 가져오는 일정을 건다. 활성화와 설정 저장에서 부른다.
+	 *
+	 * @param bool $enabled 켤 것인가.
+	 */
+	public static function schedule( $enabled ) {
+		$next = wp_next_scheduled( self::CRON_HOOK );
+		if ( ! $enabled ) {
+			if ( $next ) {
+				wp_unschedule_event( $next, self::CRON_HOOK );
+			}
+			return;
+		}
+		if ( ! $next ) {
+			wp_schedule_event( time() + HOUR_IN_SECONDS, 'daily', self::CRON_HOOK );
+		}
+	}
+
+	/**
+	 * 정해진 주소에서 topic 을 받아 저장한다. 하루 한 번 cron 이 부른다.
+	 *
+	 * 파이프라인은 GPU 가 있는 기계에서 돌고 결과를 그 주소에 둔다. 여기서는 받아
+	 * 넣기만 하므로, 갱신 이후 쓴 글은 파이프라인을 다시 돌리기 전까지 반영되지 않는다.
+	 *
+	 * @return array|WP_Error
+	 */
+	public static function pull() {
+		$options = KWC_Cloud::options();
+		$url     = trim( (string) $options['pull_url'] );
+		if ( '' === $url ) {
+			error_log( '[key-word-cloud] daily pull is on but no URL is set' );
+			return new WP_Error( 'kwc_no_pull_url', '가져올 주소가 비었다.' );
+		}
+
+		$response = wp_remote_get( $url, array(
+			'timeout' => 20,
+			'headers' => array( 'User-Agent' => 'wp-key-word-cloud/' . KWC_VERSION ),
+		) );
+
+		if ( is_wp_error( $response ) ) {
+			// 조용히 넘기면 구름이 몇 달째 낡은 이유를 알 수 없게 된다.
+			error_log( '[key-word-cloud] pull failed: ' . $response->get_error_message() . ' url=' . $url );
+			self::note_pull( 'failed: ' . $response->get_error_message() );
+			return $response;
+		}
+		$code = (int) wp_remote_retrieve_response_code( $response );
+		if ( 200 !== $code ) {
+			error_log( '[key-word-cloud] pull HTTP ' . $code . ' url=' . $url );
+			self::note_pull( 'HTTP ' . $code );
+			return new WP_Error( 'kwc_pull_http', 'HTTP ' . $code );
+		}
+
+		$body = json_decode( wp_remote_retrieve_body( $response ), true );
+		$done = self::store( $body );
+		if ( is_wp_error( $done ) ) {
+			error_log( '[key-word-cloud] pulled body was unusable: ' . $done->get_error_message() . ' url=' . $url );
+			self::note_pull( 'unusable: ' . $done->get_error_message() );
+			return $done;
+		}
+
+		self::note_pull( 'stored ' . $done['stored'] );
+		return $done;
+	}
+
+	/**
+	 * 마지막 가져오기의 시각과 결과를 남긴다. 성공만 남기면 실패가 보이지 않는다.
+	 *
+	 * @param string $result 한 줄 요약.
+	 */
+	private static function note_pull( $result ) {
+		update_option( self::PULL_OPTION, array(
+			'at'     => gmdate( 'c' ),
+			'result' => $result,
+		), false );
+	}
+
+	/**
+	 * 마지막 가져오기 기록.
+	 *
+	 * @return array at, result.
+	 */
+	public static function last_pull() {
+		$saved = get_option( self::PULL_OPTION, array() );
+		if ( ! is_array( $saved ) ) {
+			return array( 'at' => '', 'result' => '' );
+		}
+		return array(
+			'at'     => isset( $saved['at'] ) ? (string) $saved['at'] : '',
+			'result' => isset( $saved['result'] ) ? (string) $saved['result'] : '',
+		);
 	}
 
 	/**

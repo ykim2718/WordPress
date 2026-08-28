@@ -3,7 +3,7 @@
  * Plugin Name:       Key Word Cloud
  * Plugin URI:        https://github.com/ykim2718/WordPress
  * Description:       Draws the topics of your site as a word cloud. Topics are prepared elsewhere by a language model and uploaded over REST, so the site only stores and draws them.
- * Version:           2.0.0
+ * Version:           2.1.0
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Author:            yRocket
@@ -25,7 +25,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('KWC_VERSION', '2.0.0');
+define('KWC_VERSION', '2.1.0');
 define('KWC_FILE', __FILE__);
 define('KWC_DIR', plugin_dir_path(__FILE__));
 define('KWC_URL', plugin_dir_url(__FILE__));
@@ -44,12 +44,18 @@ add_action('init', array('KWC_Shortcode', 'register'));
 add_action('init', array('KWC_Cloud', 'register_assets'));
 add_action('init', array('KWC_Block', 'register'));
 add_action('rest_api_init', array('KWC_Topics', 'register_routes'));
+add_action(KWC_Topics::CRON_HOOK, array('KWC_Topics', 'pull'));
 
 if (is_admin()) {
     KWC_Settings::init();
 }
 
 register_activation_hook(__FILE__, array('KWC_Settings', 'on_activate'));
+
+/** 비활성화하면 하루 한 번의 일정도 걷는다. 남겨 두면 없는 코드를 부르게 된다. */
+register_deactivation_hook(__FILE__, function () {
+    KWC_Topics::schedule(false);
+});
 
 /** 설정과 topic 은 남기고 캐시만 비운다. 비활성화할 때도 한 번 돈다. */
 function kwc_flush_cache() {

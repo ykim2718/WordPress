@@ -19,6 +19,7 @@ final class KWC_Settings {
 		add_action( 'admin_menu', array( __CLASS__, 'add_menu' ) );
 		add_action( 'admin_init', array( __CLASS__, 'register_settings' ) );
 		add_action( 'admin_post_kwc_flush_cache', array( __CLASS__, 'handle_flush_cache' ) );
+		add_action( 'admin_post_kwc_pull_now', array( __CLASS__, 'handle_pull_now' ) );
 		add_filter( 'plugin_action_links_' . plugin_basename( KWC_FILE ), array( __CLASS__, 'action_links' ) );
 	}
 
@@ -29,6 +30,8 @@ final class KWC_Settings {
 		if ( false === get_option( KWC_OPTION, false ) ) {
 			add_option( KWC_OPTION, KWC_Defaults::options() );
 		}
+		$options = KWC_Cloud::options();
+		KWC_Topics::schedule( ! empty( $options['pull_enabled'] ) );
 	}
 
 	/**
@@ -74,6 +77,7 @@ final class KWC_Settings {
 		$sections = array(
 			'kwc_pick'  => '무엇을 그릴까',
 			'kwc_style' => '크기와 색상',
+			'kwc_pull'  => '하루 한 번 가져오기',
 			'kwc_cache' => '캐시',
 		);
 		foreach ( $sections as $id => $title ) {
@@ -87,6 +91,8 @@ final class KWC_Settings {
 			array( 'size', '글자 크기 (px)', 'kwc_style', 'field_size' ),
 			array( 'color', '색상 (적음 → 많음)', 'kwc_style', 'field_color' ),
 			array( 'link_mode', 'topic 클릭 동작', 'kwc_style', 'field_link_mode' ),
+			array( 'pull_enabled', '하루 한 번 받아오기', 'kwc_pull', 'field_pull_enabled' ),
+			array( 'pull_url', '가져올 주소', 'kwc_pull', 'field_pull_url' ),
 			array( 'cache_ttl', '캐시 유지 시간 (초)', 'kwc_cache', 'field_cache_ttl' ),
 		);
 		foreach ( $fields as $field ) {
@@ -161,6 +167,22 @@ final class KWC_Settings {
 			$out[ $name ] = $color;
 		}
 
+		$out['pull_enabled'] = empty( $input['pull_enabled'] ) ? 0 : 1;
+
+		$url = isset( $input['pull_url'] ) ? trim( (string) $input['pull_url'] ) : '';
+		if ( '' === $url ) {
+			$out['pull_url'] = '';
+			if ( $out['pull_enabled'] ) {
+				$errors[] = '하루 한 번 받아오기를 켰는데 가져올 주소가 비었다.';
+			}
+		} elseif ( ! wp_http_validate_url( $url ) ) {
+			$errors[] = '가져올 주소가 URL 이 아니다: ' . $url;
+		} else {
+			$out['pull_url'] = esc_url_raw( $url );
+		}
+
+		KWC_Topics::schedule( (bool) $out['pull_enabled'] );
+
 		// 설정이 바뀌면 캐시된 구름은 낡은 것이다.
 		$out['cache_salt'] = (int) $current['cache_salt'] + 1;
 
@@ -182,6 +204,23 @@ final class KWC_Settings {
 		check_admin_referer( 'kwc_flush_cache' );
 		KWC_Cloud::flush_cache();
 		wp_safe_redirect( add_query_arg( 'kwc_flushed', '1', admin_url( 'admin.php?page=' . self::PAGE ) ) );
+		exit;
+	}
+
+	/**
+	 * 지금 바로 한 번 받아온다. 하루를 기다리지 않고 확인할 때 쓴다.
+	 */
+	public static function handle_pull_now() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( '권한이 없다.', 403 );
+		}
+		check_admin_referer( 'kwc_pull_now' );
+		$done = KWC_Topics::pull();
+		wp_safe_redirect( add_query_arg(
+			'kwc_pulled',
+			is_wp_error( $done ) ? rawurlencode( $done->get_error_message() ) : (int) $done['stored'],
+			admin_url( 'admin.php?page=' . self::PAGE )
+		) );
 		exit;
 	}
 
@@ -294,6 +333,33 @@ final class KWC_Settings {
 		);
 	}
 
+	public static function field_pull_enabled() {
+		printf(
+			'<label><input type="checkbox" name="%s" value="1" %s> 하루에 한 번 아래 주소에서 topic 을 받아온다</label>',
+			esc_attr( self::name( 'pull_enabled' ) ),
+			checked( 1, (int) self::value( 'pull_enabled' ), false )
+		);
+		echo '<p class="description">받아오는 것이지 분석하는 것이 아니다. 새로 쓴 글은 파이프라인을 다시 돌려 그 주소의 파일을 갱신해야 반영된다.</p>';
+	}
+
+	public static function field_pull_url() {
+		printf(
+			'<input type="url" name="%s" value="%s" class="large-text code" placeholder="https://…/topics.json">',
+			esc_attr( self::name( 'pull_url' ) ),
+			esc_attr( (string) self::value( 'pull_url' ) )
+		);
+		$last = KWC_Topics::last_pull();
+		if ( '' === $last['at'] ) {
+			echo '<p class="description">아직 한 번도 받아오지 않았다.</p>';
+		} else {
+			printf(
+				'<p class="description">마지막 시도: %s — %s</p>',
+				esc_html( $last['at'] ),
+				esc_html( $last['result'] )
+			);
+		}
+	}
+
 	public static function field_cache_ttl() {
 		self::number_field( 'cache_ttl', 0, 604800, '0 이면 캐시하지 않는다. 설정을 저장하면 캐시는 자동으로 무효화된다.' );
 	}
@@ -310,6 +376,14 @@ final class KWC_Settings {
 
 		if ( isset( $_GET['kwc_flushed'] ) ) {
 			echo '<div class="notice notice-success is-dismissible"><p>캐시를 비웠다.</p></div>';
+		}
+		if ( isset( $_GET['kwc_pulled'] ) ) {
+			$result = sanitize_text_field( wp_unslash( $_GET['kwc_pulled'] ) );
+			if ( 1 === preg_match( '/^\d+$/', $result ) ) {
+				printf( '<div class="notice notice-success is-dismissible"><p>topic %d개를 받아 저장했다.</p></div>', (int) $result );
+			} else {
+				printf( '<div class="notice notice-error is-dismissible"><p>받아오지 못했다: %s</p></div>', esc_html( $result ) );
+			}
 		}
 
 		// 최상위 메뉴 페이지는 검증 오류가 자동으로 뜨지 않는다. 직접 띄운다.
@@ -346,12 +420,28 @@ final class KWC_Settings {
 			</form>
 
 			<hr>
-			<h2>캐시</h2>
-			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+			<h2>지금 하기</h2>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline">
+				<input type="hidden" name="action" value="kwc_pull_now">
+				<?php wp_nonce_field( 'kwc_pull_now' ); ?>
+				<?php submit_button( '지금 받아오기', 'primary', 'submit', false ); ?>
+			</form>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline;margin-left:8px">
 				<input type="hidden" name="action" value="kwc_flush_cache">
 				<?php wp_nonce_field( 'kwc_flush_cache' ); ?>
 				<?php submit_button( '캐시 비우기', 'secondary', 'submit', false ); ?>
 			</form>
+			<?php
+			$next = wp_next_scheduled( KWC_Topics::CRON_HOOK );
+			if ( $next ) {
+				printf(
+					'<p class="description">다음 자동 갱신: %s</p>',
+					esc_html( gmdate( 'c', $next ) )
+				);
+			} else {
+				echo '<p class="description">자동 갱신이 걸려 있지 않다.</p>';
+			}
+			?>
 
 			<hr>
 			<h2>미리보기</h2>

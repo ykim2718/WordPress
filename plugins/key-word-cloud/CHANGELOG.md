@@ -1,3 +1,20 @@
+## 2.1.0
+
+- Fetch the topics once a day instead of waiting for someone to push them. The
+  plugin reads a JSON file over https on a WP-Cron schedule, the same way it
+  already reads `version.json` to find updates, so a site behind a NAS needs no
+  application password and no open port.
+- The pipeline writes that file with `push_topics.py --write`, and it is
+  committed to the repository as `dist/topics.json`.
+- A failed fetch keeps the topics already stored and records what went wrong;
+  the settings screen shows the last attempt, the next scheduled run, and a
+  button that fetches now rather than tomorrow.
+- Turning the daily fetch off unschedules it, and so does deactivating the
+  plugin.
+
+Fetching is not analysing. A post written after the last pipeline run does not
+appear until the pipeline runs again and republishes the file.
+
 ## 2.0.0
 
 - Keep only the uploaded topics and remove the two counting rankings. TF-IDF

@@ -12,6 +12,12 @@ words already in the text, so it never produces a phrase such as *within-wafer
 variation*; grouping does. WordPress stores what arrives and draws it, which is
 why the site needs no GPU and no extra PHP extension.
 
+**Refreshed once a day.** The site fetches the published topics on a daily
+schedule, so nobody has to log in to update the cloud. Fetching is not
+analysing: a post written after the last pipeline run appears once the pipeline
+runs again and republishes the file. The settings screen shows the last
+attempt, the next run, and a button that fetches now.
+
 **Sized by reach, not by repetition.** A topic is as large as the number of
 posts it covers, spread on a square-root scale so one broad topic does not
 flatten the rest. Its tooltip lists the phrases it was folded from.

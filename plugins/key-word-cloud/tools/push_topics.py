@@ -11,14 +11,19 @@ so it never reaches the shell history:
 
     WP_URL, WP_USERNAME, WP_APP_PASSWORD
 
+--write publishes the same payload as a file instead. Committed to the
+repository, it is what the plugin's once-a-day pull reads, which needs no
+password and no port open on the site.
+
 Changelog
+    0.1.0  Add --write for the once-a-day pull.
     0.0.0  First version.
 """
 
 from __future__ import annotations
 
 __author__ = 'yRocket'
-__version__ = "0.0.0.2026.8.28"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
+__version__ = "0.1.0.2026.8.28"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
 
 import argparse
 import base64
@@ -87,8 +92,17 @@ def run(*, args: argparse.Namespace) -> int:
     if len(topics) > 10:
         print(f"  ... and {len(topics) - 10} more")
 
+    if args.write:
+        destination = pathlib.Path(args.write)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_text(
+            json.dumps({'generator': args.generator, 'topics': topics}, ensure_ascii=False, indent=1),
+            encoding='utf-8',
+        )
+        print(f"\nwrote {destination}")
+
     if args.dry_run:
-        print("\n--dry-run: nothing was sent")
+        print("--dry-run: nothing was sent over the network")
         return 0
 
     answer = push(topics=topics, generator=args.generator, url=os.environ['WP_URL'],
@@ -114,6 +128,8 @@ def parse_args() -> argparse.Namespace:
                         help='drop topics drawn from fewer posts than this')
     parser.add_argument('--limit', type=int, default=80, help='upload at most this many topics')
     parser.add_argument('--generator', default='llm+bge-m3', help='note stored beside the topics')
+    parser.add_argument('--write', default='',
+                        help='also write the payload here, for the plugin to pull daily')
     parser.add_argument('--dry-run', choices=['true', 'false'], default='false',
                         help='print what would be sent and stop')
     parser.add_argument('--timeout', type=int, default=60, help='seconds to wait for the site')
