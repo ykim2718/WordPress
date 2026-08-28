@@ -1,3 +1,15 @@
+## 2.8.1
+
+- The editor no longer breaks when a topic is clicked. The preview's topics
+  were real links, and the editor canvas is an iframe: clicking one navigated
+  the canvas to the search results, the editor lost the document it was
+  editing, and everything after that failed with `Cannot destructure property
+  'documentElement' of 'D' as it is null` until the page was reloaded. The
+  preview now draws the topics as plain text. Links on the published page are
+  untouched.
+- The settings screen's preview loses its links for the same reason: clicking
+  a topic there walked out of the settings screen.
+
 ## 2.8.0
 
 - Draw only the fields you pick. `tools/label_fields.py` asks the model which

@@ -582,7 +582,8 @@ final class KWC_Settings {
 			<?php
 			// 현재 설정 그대로 그려 본다. 출력은 KWC_Cloud::render 안에서 전부 이스케이프된다.
 			// wp_kses_post 를 걸면 인라인 크기/색상이 지워져 미리보기가 실물과 달라진다.
-			echo do_shortcode( '[wpwordcloud]' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			// 링크만 뺀다. 여기서 낱말을 누르면 설정 화면을 떠나 검색 결과로 간다.
+			echo do_shortcode( '[wpwordcloud link="none"]' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			?>
 		</div>
 		<?php

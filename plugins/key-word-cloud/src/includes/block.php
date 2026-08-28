@@ -103,6 +103,22 @@ final class KWC_Block {
 	}
 
 	/**
+	 * 이 렌더링이 편집 화면의 미리보기인가.
+	 *
+	 * 미리보기는 block-renderer 경로로 오고 그 요청만 context=edit 을 달고 온다.
+	 * REST 인지만 보면 headless 로 본문을 받아 가는 쪽까지 같이 걸린다.
+	 *
+	 * @return bool
+	 */
+	private static function is_editor_preview() {
+		if ( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) {
+			return false;
+		}
+		$context = isset( $_GET['context'] ) ? sanitize_text_field( wp_unslash( $_GET['context'] ) ) : '';
+		return 'edit' === $context;
+	}
+
+	/**
 	 * 서버 렌더링. 값이 있는 속성만 숏코드로 넘긴다.
 	 *
 	 * @param array $attributes block 속성.
@@ -118,6 +134,13 @@ final class KWC_Block {
 			if ( '' !== $value ) {
 				$atts[ $key ] = $value;
 			}
+		}
+
+		// 편집 캔버스는 iframe 이다. 그 안에서 낱말을 누르면 캔버스가 검색 결과로 떠나고,
+		// 편집기는 제 문서를 잃어 다시 읽기 전까지 깨진 채로 남는다. 미리보기에서는 링크를
+		// 걸지 않는다. 실제 화면의 링크는 그대로다.
+		if ( self::is_editor_preview() ) {
+			$atts['link'] = 'none';
 		}
 
 		$html = KWC_Shortcode::render( $atts );
