@@ -24,12 +24,13 @@ plugins/key-word-cloud/
 ├── dist/                    ← 빌드 결과. 워드프레스가 여기서 받는다
 │   ├── key-word-cloud.zip
 │   └── version.json
+├── tools/                   ← topic 파이프라인 (GPU 있는 기계에서 돈다)
 ├── DESCRIPTION.md           ← View details 의 Description 탭
 ├── CHANGELOG.md             ← View details 의 Changelog 탭
 └── README.md
 ```
 
-`src/` 밖의 것은 zip에 들어가지 않는다. screenshots 폴더는 아직 없다. 그림을 찍어
+`src/` 밖의 것은 zip에 들어가지 않는다. `tools/` 의 파이프라인도 그래서 빠진다. screenshots 폴더는 아직 없다. 그림을 찍어
 `screenshots/` 에 두고 `DESCRIPTION.md` 에서 파일명만으로 참조하면, 빌드가 그 경로를
 `raw.githubusercontent.com` 주소로 바꿔 View details 창에 싣는다.
 
@@ -125,7 +126,7 @@ Content-Type: application/json
 `posts` 가 1 미만인 항목은 버리고 무엇을 왜 버렸는지 응답과 error log 에 적는다. 쓸 수 있는
 항목이 하나도 없으면 저장하지 않고 400 을 돌려준다. 저장에 성공하면 캐시를 비운다.
 
-topic 을 만드는 파이프라인은 이 저장소에 없다. LLM 과 embedding 모델이 필요하므로 GPU 가
+topic 을 만드는 파이프라인은 `tools/` 에 있다. LLM 과 embedding 모델이 필요하므로 GPU 가
 있는 기계에서 돌리고, 결과만 위 주소로 보낸다.
 
 ## 속성
