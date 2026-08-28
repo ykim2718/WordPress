@@ -121,9 +121,12 @@
 		}
 		if ( ! placed ) {
 			// 담지 못했으면 손대지 않고 그대로 둔다. 낱말을 잃는 것보다 낫다.
+			cloud.classList.remove( 'kwc-cloud--rows' );
 			window.console && window.console.warn( '[key-word-cloud] could not lay out the ellipse; left as a block' );
 			return;
 		}
+		// 줄이 실제로 생긴 뒤에만 세로 쌓기를 켠다.
+		cloud.classList.add( 'kwc-cloud--rows' );
 
 		for ( var r = 0; r < placed.length; r++ ) {
 			if ( ! placed[ r ].length ) {
@@ -224,18 +227,87 @@
 		return ( index >= words.length ) ? out : null;
 	}
 
+	/**
+	 * 이 페이지와 같은 출처의 iframe 문서까지 모은다.
+	 *
+	 * 블록 편집기의 캔버스는 iframe 이다. 그 안의 구름도 앉혀야 편집 화면과 실제 화면이
+	 * 같아진다. 다른 출처의 iframe 은 읽을 수 없으므로 조용히 건너뛴다.
+	 */
+	function documents() {
+		var docs = [ document ];
+		var frames = document.querySelectorAll( 'iframe' );
+		for ( var i = 0; i < frames.length; i++ ) {
+			var inner = null;
+			try {
+				inner = frames[ i ].contentDocument;
+			} catch ( error ) {
+				inner = null;   // cross-origin. 읽을 수 없는 것이 정상이다.
+			}
+			if ( inner && inner.body ) {
+				docs.push( inner );
+			}
+		}
+		return docs;
+	}
+
 	function layoutAll() {
-		var clouds = document.querySelectorAll( '.kwc-cloud--ellipse' );
-		for ( var i = 0; i < clouds.length; i++ ) {
-			layoutEllipse( clouds[ i ] );
+		var docs = documents();
+		for ( var d = 0; d < docs.length; d++ ) {
+			var clouds = docs[ d ].querySelectorAll( '.kwc-cloud--ellipse' );
+			for ( var i = 0; i < clouds.length; i++ ) {
+				layoutEllipse( clouds[ i ] );
+			}
 		}
 	}
 
-	if ( 'loading' === document.readyState ) {
-		document.addEventListener( 'DOMContentLoaded', layoutAll );
-	} else {
-		layoutAll();
+	/**
+	 * 구름이 나중에 들어오는 경우를 잡는다.
+	 *
+	 * 편집기의 미리보기는 서버에서 받아 와 나중에 붙고, 설정을 바꿀 때마다 통째로
+	 * 다시 붙는다. 그때마다 새 요소이므로 폭 기억이 없어 다시 앉는다.
+	 */
+	var watched = [];
+	var watcher = null;
+	var pending = null;
+
+	function onChange() {
+		window.clearTimeout( pending );
+		pending = window.setTimeout( function () {
+			layoutAll();
+			watchForClouds();   // 그 사이에 생긴 문서에도 붙는다
+		}, 100 );
 	}
+
+	function watchForClouds() {
+		if ( ! window.MutationObserver ) {
+			return;
+		}
+		if ( ! watcher ) {
+			watcher = new window.MutationObserver( onChange );
+		}
+		// 편집 캔버스 iframe 은 page load 뒤에 생긴다. 한 번 붙이고 끝내면 그 안의
+		// 변화를 놓쳐, 설정을 바꿔 다시 그려진 구름이 줄 없이 남는다.
+		var docs = documents();
+		for ( var d = 0; d < docs.length; d++ ) {
+			if ( watched.indexOf( docs[ d ] ) < 0 ) {
+				watcher.observe( docs[ d ].body, { childList: true, subtree: true } );
+				watched.push( docs[ d ] );
+			}
+		}
+	}
+
+	function start() {
+		layoutAll();
+		watchForClouds();
+	}
+
+	if ( 'loading' === document.readyState ) {
+		document.addEventListener( 'DOMContentLoaded', start );
+	} else {
+		start();
+	}
+	// 편집기의 캔버스 iframe 은 늦게 붙는다. 붙은 뒤 그 안도 감시해야 한다.
+	window.addEventListener( 'load', watchForClouds );
 	// 글꼴이 늦게 오면 글자 폭이 달라져 다시 재야 한다.
 	if ( document.fonts && document.fonts.ready ) {
 		document.fonts.ready.then( layoutAll );
@@ -256,9 +328,12 @@
 			resizeTimer = window.setTimeout( layoutAll, 150 );
 		} );
 		var watch = function () {
-			var clouds = document.querySelectorAll( '.kwc-cloud--ellipse' );
-			for ( var i = 0; i < clouds.length; i++ ) {
-				observer.observe( clouds[ i ] );
+			var docs = documents();
+			for ( var d = 0; d < docs.length; d++ ) {
+				var clouds = docs[ d ].querySelectorAll( '.kwc-cloud--ellipse' );
+				for ( var i = 0; i < clouds.length; i++ ) {
+					observer.observe( clouds[ i ] );
+				}
 			}
 		};
 		if ( 'loading' === document.readyState ) {

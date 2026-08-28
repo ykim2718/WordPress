@@ -43,6 +43,17 @@ final class KWC_Block {
 	}
 
 	/**
+	 * 편집 화면에도 구름의 CSS 와 script 를 싣는다.
+	 *
+	 * 이것이 없으면 편집기의 미리보기는 줄이 만들어지지 않아 낱말이 세로로 쌓이고,
+	 * 실제 화면과 달라 보인다. script 는 편집 캔버스 iframe 안까지 훑는다.
+	 */
+	public static function enqueue_editor_assets() {
+		wp_enqueue_style( 'key-word-cloud' );
+		wp_enqueue_script( 'key-word-cloud' );
+	}
+
+	/**
 	 * block 등록. init 에서 부른다.
 	 */
 	public static function register() {

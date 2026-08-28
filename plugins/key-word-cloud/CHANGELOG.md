@@ -1,3 +1,18 @@
+## 2.5.0
+
+- Draw the same ellipse in the editor as on the front end. The layout script
+  was never loaded on the editor screen, so the preview fell back to the
+  stylesheet alone — and the stylesheet stacked the topics vertically, which
+  looked nothing like the published cloud.
+- Stack vertically only once the rows exist. `flex-direction: column` was on
+  the ellipse itself, so anywhere the script had not run the topics came out
+  one per line. It now rides on a class the script adds after it has built the
+  rows, and the fallback is the wrapped block it always should have been.
+- Follow the cloud into the editor's canvas iframe, and keep watching it. The
+  preview is fetched from the server and replaced wholesale whenever a setting
+  changes; a one-time scan missed both the iframe, which is created after the
+  page loads, and every later replacement.
+
 ## 2.4.1
 
 - Separate the post count from the phrases with a colon in the tooltip: "3

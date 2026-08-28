@@ -3,7 +3,7 @@
  * Plugin Name:       Key Word Cloud
  * Plugin URI:        https://github.com/ykim2718/WordPress
  * Description:       Draws the topics of your site as a word cloud. Topics are prepared elsewhere by a language model and uploaded over REST, so the site only stores and draws them.
- * Version:           2.4.1
+ * Version:           2.5.0
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Author:            yRocket
@@ -25,7 +25,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('KWC_VERSION', '2.4.1');
+define('KWC_VERSION', '2.5.0');
 define('KWC_FILE', __FILE__);
 define('KWC_DIR', plugin_dir_path(__FILE__));
 define('KWC_URL', plugin_dir_url(__FILE__));
@@ -44,6 +44,7 @@ add_action('init', array('KWC_Shortcode', 'register'));
 add_action('init', array('KWC_Cloud', 'register_assets'));
 add_action('init', array('KWC_Block', 'register'));
 add_action('rest_api_init', array('KWC_Topics', 'register_routes'));
+add_action('enqueue_block_editor_assets', array('KWC_Block', 'enqueue_editor_assets'));
 add_action(KWC_Topics::CRON_HOOK, array('KWC_Topics', 'pull'));
 
 if (is_admin()) {
