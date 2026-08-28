@@ -1,3 +1,11 @@
+## 2.3.1
+
+- Do not lay the ellipse out against a container that is not on screen yet. A
+  cloud measured at zero width produced 142 rows, 112 of them empty. The layout
+  now waits until the container is at least 40px wide, watches it with a
+  ResizeObserver so it runs when the cloud is revealed or its column changes,
+  and never emits an empty row.
+
 ## 2.3.0
 
 - Put the largest topics in the middle and let them shrink towards the edge.

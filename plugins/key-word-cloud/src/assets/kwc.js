@@ -87,8 +87,10 @@
 			cloud.appendChild( words[ i ] );
 		}
 
+		// 화면에 아직 놓이지 않았거나 칸이 낱말 하나도 못 담을 만큼 좁으면 손대지 않는다.
+		// 그 상태로 재면 줄이 수백 개 나오고 대부분이 빈 줄이 된다.
 		var full = cloud.clientWidth;
-		if ( ! full ) {
+		if ( full < 40 ) {
 			return;
 		}
 
@@ -117,6 +119,9 @@
 		}
 
 		for ( var r = 0; r < placed.length; r++ ) {
+			if ( ! placed[ r ].length ) {
+				continue;   // 빈 줄은 만들지 않는다. 자리만 벌어진다.
+			}
 			var row = document.createElement( 'div' );
 			row.className = 'kwc-row';
 			for ( var j = 0; j < placed[ r ].length; j++ ) {
@@ -233,6 +238,26 @@
 		window.clearTimeout( resizeTimer );
 		resizeTimer = window.setTimeout( layoutAll, 150 );
 	} );
+
+	// 구름이 숨어 있다가 나타나거나 칸 너비가 바뀌면 다시 앉힌다. window resize 만으로는
+	// 접힌 영역 안에서 펼쳐지는 경우를 놓친다.
+	if ( window.ResizeObserver ) {
+		var observer = new window.ResizeObserver( function () {
+			window.clearTimeout( resizeTimer );
+			resizeTimer = window.setTimeout( layoutAll, 150 );
+		} );
+		var watch = function () {
+			var clouds = document.querySelectorAll( '.kwc-cloud--ellipse' );
+			for ( var i = 0; i < clouds.length; i++ ) {
+				observer.observe( clouds[ i ] );
+			}
+		};
+		if ( 'loading' === document.readyState ) {
+			document.addEventListener( 'DOMContentLoaded', watch );
+		} else {
+			watch();
+		}
+	}
 
 	document.addEventListener( 'click', function ( event ) {
 		var button = event.target.closest ? event.target.closest( '.kwc-refresh' ) : null;
