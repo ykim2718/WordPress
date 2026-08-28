@@ -1,3 +1,20 @@
+## 2.4.0
+
+- Write everything a reader sees in English. The tooltip said 글 3개; it now
+  says "3 posts", with the singular and plural split so one post does not read
+  as "1 posts". The refresh button, its states, and the two on-page error
+  messages moved over with it. The settings screen stays in Korean — that one
+  is for the site's owner, not its readers.
+- Make the refresh button visible. It was 11px grey text in the corner; it is
+  now 13px with a darker border, it takes the cloud's own font, and it does not
+  wrap when a theme sets `word-break` on buttons. It still appears only for
+  users who may edit posts, so a reader who does not see it is not seeing a
+  bug.
+- Re-lay the cloud out whenever its width has actually changed, whatever
+  reported the change, and skip the work when it has not. A ResizeObserver
+  alone was not enough: it does not fire under every automation, and the cloud
+  stayed as it was laid out at the wrong width.
+
 ## 2.3.1
 
 - Do not lay the ellipse out against a container that is not on screen yet. A

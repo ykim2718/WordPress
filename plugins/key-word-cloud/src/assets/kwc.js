@@ -25,13 +25,13 @@
 		if ( ! settings || ! settings.url ) {
 			// 조용히 아무 일도 안 하면 눌러도 왜 안 되는지 알 수 없다.
 			window.console && window.console.error( '[key-word-cloud] KWC_REFRESH is missing; the button cannot call the site' );
-			label( button, '설정 없음', 'failed' );
+			label( button, 'Not configured', 'failed' );
 			return;
 		}
 
 		var original = button.textContent;
 		button.disabled = true;
-		label( button, '받는 중…' );
+		label( button, 'Fetching…' );
 
 		window.fetch( settings.url, {
 			method: 'POST',
@@ -45,11 +45,11 @@
 			if ( ! result.ok ) {
 				throw new Error( ( result.body && result.body.message ) || ( 'HTTP ' + result.status ) );
 			}
-			label( button, '갱신됨 ' + result.body.stored );
+			label( button, 'Stored ' + result.body.stored );
 			window.location.reload();
 		} ).catch( function ( error ) {
 			window.console && window.console.error( '[key-word-cloud] refresh failed: ' + error.message );
-			label( button, '실패', 'failed' );
+			label( button, 'Failed', 'failed' );
 			button.title = error.message;
 			button.disabled = false;
 			window.setTimeout( function () {
@@ -79,19 +79,26 @@
 			return;
 		}
 
-		// 재기 전에 지난 줄을 풀어 원래 낱말만 남긴다.
+		// 폭부터 본다. 줄을 풀어 놓고 나서 빠져나가면 낱말이 줄 없이 흩어진 채 남는다.
+		// 화면에 아직 놓이지 않았거나 낱말 하나도 못 담을 만큼 좁으면 손대지 않는다.
+		var full = cloud.clientWidth;
+		if ( full < 40 ) {
+			return;
+		}
+
+		// 지난번과 같은 폭이면 다시 앉힐 것이 없다. 이 덕분에 자주 불러도 값이 싸고,
+		// 폭이 달라졌으면 무엇이 알려 주었든 상관없이 스스로 고쳐 앉는다.
+		if ( cloud.__kwcWidth === full ) {
+			return;
+		}
+		cloud.__kwcWidth = full;
+
+		// 지난 줄을 풀어 원래 낱말만 남기고 다시 잰다.
 		while ( cloud.firstChild ) {
 			cloud.removeChild( cloud.firstChild );
 		}
 		for ( var i = 0; i < words.length; i++ ) {
 			cloud.appendChild( words[ i ] );
-		}
-
-		// 화면에 아직 놓이지 않았거나 칸이 낱말 하나도 못 담을 만큼 좁으면 손대지 않는다.
-		// 그 상태로 재면 줄이 수백 개 나오고 대부분이 빈 줄이 된다.
-		var full = cloud.clientWidth;
-		if ( full < 40 ) {
-			return;
 		}
 
 		var widths = words.map( function ( word ) {
@@ -233,6 +240,8 @@
 	if ( document.fonts && document.fonts.ready ) {
 		document.fonts.ready.then( layoutAll );
 	}
+	// 그림이나 늦게 붙는 것이 자리를 밀어 칸 너비가 바뀌었을 수 있다.
+	window.addEventListener( 'load', layoutAll );
 	var resizeTimer = null;
 	window.addEventListener( 'resize', function () {
 		window.clearTimeout( resizeTimer );

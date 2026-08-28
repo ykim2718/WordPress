@@ -50,7 +50,8 @@ final class KWC_Cloud {
 			'nonce' => wp_create_nonce( 'wp_rest' ),
 		) );
 		return '<button type="button" class="kwc-refresh" title="'
-			. esc_attr( '지금 topic 을 다시 받아온다' ) . '">새로고침</button>';
+			. esc_attr__( 'Fetch the published topics now', 'key-word-cloud' ) . '">'
+			. esc_html__( 'Refresh', 'key-word-cloud' ) . '</button>';
 	}
 
 	/**
@@ -155,8 +156,8 @@ final class KWC_Cloud {
 		if ( empty( $topics ) ) {
 			// 아직 아무것도 안 올라왔다는 것과 구름이 비었다는 것은 다른 일이다.
 			error_log( '[key-word-cloud] nothing to draw: no topics have been uploaded yet' );
-			return '<p class="kwc-error">Key Word Cloud: 올라온 topic 이 없다. '
-				. esc_html( 'tools/push_topics.py 로 먼저 올려라.' ) . '</p>';
+			return '<p class="kwc-error">Key Word Cloud: '
+				. esc_html__( 'no topics have been uploaded yet.', 'key-word-cloud' ) . '</p>';
 		}
 
 		$min_posts = (int) $args['min_posts'];
@@ -178,7 +179,8 @@ final class KWC_Cloud {
 				'text'  => (string) $topic['label'],
 				'posts' => $posts,
 				'tip'   => sprintf(
-					'글 %d개%s',
+					/* translators: 1: number of posts, 2: the phrases the topic was folded from */
+					_n( '%1$d post%2$s', '%1$d posts%2$s', $posts, 'key-word-cloud' ),
 					$posts,
 					empty( $phrases ) ? '' : "\n" . implode( ' · ', array_slice( $phrases, 0, 8 ) )
 				),
@@ -190,11 +192,13 @@ final class KWC_Cloud {
 
 		if ( empty( $entries ) ) {
 			$why = sprintf(
-				'topic %d개 중 %d개는 글 %d개 미만이고 %d개는 %s 가 아니다.',
+				/* translators: 1: topics held, 2: how many came from too few posts, 3: that floor, 4: how many are in another language, 5: the chosen language */
+				__( 'of %1$d topics, %2$d come from fewer than %3$d posts and %4$d are not %5$s.', 'key-word-cloud' ),
 				count( $topics ), $too_few, $min_posts, $other_language, $args['language']
 			);
 			error_log( '[key-word-cloud] no topic survived: ' . $why );
-			return '<p class="kwc-error">Key Word Cloud: 표시할 topic 이 없다. ' . esc_html( $why ) . '</p>';
+			return '<p class="kwc-error">Key Word Cloud: '
+				. esc_html__( 'nothing to draw — ', 'key-word-cloud' ) . esc_html( $why ) . '</p>';
 		}
 
 		$html = self::draw( $entries, $args );
