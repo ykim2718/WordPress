@@ -27,16 +27,9 @@ final class KWC_Shortcode {
 
 		$atts = shortcode_atts(
 			array(
-				'ranking'     => $options['ranking'],
-				'min_docs_pct' => $options['min_docs_pct'],
-				'source'      => $options['source'],
-				'post_type'   => implode( ',', (array) $options['post_types'] ),
-				'category'    => '',
-				'tag'         => '',
-				'limit'       => $options['scan_limit'],
+				'language'    => $options['language'],
 				'max'         => $options['max_words'],
-				'min_count'   => $options['min_count'],
-				'min_len'     => $options['min_len'],
+				'min_posts'   => $options['min_posts'],
 				'min_size'    => $options['min_size'],
 				'max_size'    => $options['max_size'],
 				'color_start' => $options['color_start'],
@@ -66,14 +59,9 @@ final class KWC_Shortcode {
 	 * @return array|WP_Error
 	 */
 	public static function normalize( array $atts, array $options ) {
-		$source = strtolower( trim( (string) $atts['source'] ) );
-		if ( ! in_array( $source, array( 'content', 'excerpt' ), true ) ) {
-			return new WP_Error( 'kwc_bad_source', 'source 는 content 또는 excerpt 여야 한다. 받은 값: ' . $atts['source'] );
-		}
-
-		$ranking = strtolower( trim( (string) $atts['ranking'] ) );
-		if ( ! in_array( $ranking, array( 'tfidf', 'count', 'topics' ), true ) ) {
-			return new WP_Error( 'kwc_bad_ranking', 'ranking 은 tfidf, count, topics 중 하나여야 한다. 받은 값: ' . $atts['ranking'] );
+		$language = strtolower( trim( (string) $atts['language'] ) );
+		if ( ! in_array( $language, array( 'en', 'ko', 'both' ), true ) ) {
+			return new WP_Error( 'kwc_bad_language', 'language 는 en, ko, both 중 하나여야 한다. 받은 값: ' . $atts['language'] );
 		}
 
 		$link = strtolower( trim( (string) $atts['link'] ) );
@@ -81,24 +69,9 @@ final class KWC_Shortcode {
 			return new WP_Error( 'kwc_bad_link', 'link 는 search 또는 none 이어야 한다. 받은 값: ' . $atts['link'] );
 		}
 
-		$registered = get_post_types( array( 'public' => true ), 'names' );
-		$post_types = array();
-		foreach ( array_filter( array_map( 'trim', explode( ',', (string) $atts['post_type'] ) ) ) as $type ) {
-			if ( ! isset( $registered[ $type ] ) ) {
-				return new WP_Error( 'kwc_bad_post_type', '등록되지 않았거나 공개가 아닌 post type: ' . $type );
-			}
-			$post_types[] = $type;
-		}
-		if ( empty( $post_types ) ) {
-			return new WP_Error( 'kwc_no_post_type', 'post_type 이 비었다.' );
-		}
-
 		$ints = array(
-			'limit'     => array( 1, 5000 ),
 			'max'       => array( 1, 500 ),
-			'min_count' => array( 1, 1000 ),
-			'min_docs_pct' => array( 0, 100 ),
-			'min_len'   => array( 1, 20 ),
+			'min_posts' => array( 1, 1000 ),
 			'min_size'  => array( 6, 200 ),
 			'max_size'  => array( 6, 200 ),
 			'cache'     => array( 0, 604800 ),
@@ -126,28 +99,16 @@ final class KWC_Shortcode {
 		}
 
 		return array(
-			'ranking'          => $ranking,
-			'min_docs_pct'     => $values['min_docs_pct'],
-			'source'           => $source,
-			'excerpt_fallback' => (int) $options['excerpt_fallback'],
-			'post_types'       => $post_types,
-			'category'         => sanitize_title( (string) $atts['category'] ),
-			'tag'              => sanitize_title( (string) $atts['tag'] ),
-			'scan_limit'       => $values['limit'],
-			'max_words'        => $values['max'],
-			'min_count'        => $values['min_count'],
-			'min_len'          => $values['min_len'],
-			'min_size'         => $values['min_size'],
-			'max_size'         => $values['max_size'],
-			'color_start'      => $color_start,
-			'color_end'        => $color_end,
-			'link_mode'        => $link,
-			'cache_ttl'        => $values['cache'],
-			'kr_particles_on'  => (int) $options['kr_particles_on'],
-			'kr_min_stem'      => (int) $options['kr_min_stem'],
-			'kr_particles'     => KWC_Tokenizer::sort_particles( KWC_Defaults::to_list( $options['kr_particles'] ) ),
-			'stopwords'        => KWC_Defaults::to_list( $options['stopwords'] ),
-			'cache_salt'       => (int) $options['cache_salt'],
+			'language'    => $language,
+			'max_words'   => $values['max'],
+			'min_posts'   => $values['min_posts'],
+			'min_size'    => $values['min_size'],
+			'max_size'    => $values['max_size'],
+			'color_start' => $color_start,
+			'color_end'   => $color_end,
+			'link_mode'   => $link,
+			'cache_ttl'   => $values['cache'],
+			'cache_salt'  => (int) $options['cache_salt'],
 		);
 	}
 }

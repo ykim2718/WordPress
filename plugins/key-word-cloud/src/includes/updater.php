@@ -117,7 +117,7 @@ add_filter('plugins_api', function ($result, $action, $args) {
         'sections'      => array(
             'description' => !empty($rel['desc'])
                 ? wp_kses_post($rel['desc'])
-                : esc_html__('Builds a word cloud from the content or the excerpt of your posts.', 'key-word-cloud'),
+                : esc_html__('Draws the topics of your site as a word cloud.', 'key-word-cloud'),
             'changelog'   => !empty($rel['log']) ? wp_kses_post($rel['log']) : '',
         ),
     );

@@ -1,3 +1,20 @@
+## 2.0.0
+
+- Keep only the uploaded topics and remove the two counting rankings. TF-IDF
+  and raw frequency both rank single words, and a keyword is usually a phrase;
+  once the topics were there the counting paths were a second answer to a
+  question already answered, carrying a tokenizer, a stopword list, a Korean
+  particle list and eight settings of their own. The plugin is now about half
+  its former size and no longer needs the `mbstring` extension.
+- Choose the language of the cloud: English, Korean, or both, English by
+  default. A topic counts as Korean when it holds a single Hangul syllable.
+- Show on the settings screen how many topics have arrived, when, and from
+  which generator, so an empty cloud can be told from a stale one.
+- **Breaking.** `ranking`, `source`, `post_type`, `category`, `tag`, `limit`,
+  `min_count`, `min_len`, `min_docs_pct`, the stopword list and the particle
+  settings are gone. `min_count` is now `min_posts` and counts posts, not
+  occurrences. A cloud draws nothing until topics have been uploaded.
+
 ## 1.3.0
 
 - Add `ranking=topics`, which draws topics prepared elsewhere instead of

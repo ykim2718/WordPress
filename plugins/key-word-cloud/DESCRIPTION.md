@@ -1,92 +1,57 @@
-Reads your published posts, counts the words in them, and prints the result as
-a word cloud. Insert the **Key Word Cloud** block, or type the shortcode.
+Draws the topics of your site as a word cloud. Insert the **Key Word Cloud**
+block, or type the shortcode.
 
 ```
 [wpwordcloud]
 ```
 
-The block carries the same settings in its sidebar. A field left empty there
-means "use the value from the settings screen", so nothing has to be repeated.
-The editor previews the block by asking the server to draw it, which is the
-same code the front end runs.
+**The site does not count words.** Topics are prepared elsewhere — a language
+model reads the posts, an embedding model groups the phrases it finds — and
+uploaded to `/wp-json/key-word-cloud/v1/topics`. Counting can only rank the
+words already in the text, so it never produces a phrase such as *within-wafer
+variation*; grouping does. WordPress stores what arrives and draws it, which is
+why the site needs no GPU and no extra PHP extension.
 
-**Keywords, not just frequent words.** Words are ranked by TF-IDF: a word that
-appears in every post is pushed down, a word that clusters in a few is pushed
-up. Counting occurrences alone tends to surface whatever the site says most
-often, which describes nothing. A floor on how many posts a word must appear
-in — 10% of the posts scanned by default — keeps a typo from a single post
-from winning on rarity alone. Set `ranking` to `count` for plain frequency.
+**Sized by reach, not by repetition.** A topic is as large as the number of
+posts it covers, spread on a square-root scale so one broad topic does not
+flatten the rest. Its tooltip lists the phrases it was folded from.
 
-**Topics from outside, when counting is not enough.** Set `ranking` to `topics`
-and the cloud draws topics uploaded to `/wp-json/key-word-cloud/v1/topics`
-instead of counting words itself. Counting can only rank the words that are
-already there; a pipeline running elsewhere can read the posts with a language
-model, group the phrases it finds, and send back topics such as *within-wafer
-variation* that no word count would produce. Each topic is sized by the number
-of posts it covers, and its tooltip lists the phrases behind it.
+**Korean, English, or both.** A topic counts as Korean when it holds a single
+Hangul syllable. Pick one on the settings screen or per cloud; English is the
+default.
 
-**Content or excerpt, your choice.** The plugin can read the post body or the
-post excerpt. When it reads excerpts and a post has none, that post is skipped
-rather than quietly swapped for its body; turn the fallback on in the settings
-if you want the swap.
-
-**Korean particles are stripped.** A rule-based pass removes the trailing
-particle from a Korean word so that the same noun stops appearing three times.
-`학교에서는`, `학교를` and `학교가` all land on `학교`. The particle list is
-editable, and a minimum stem length guards short words. This is not a
-morphological analyser: if a word like `고양이` gets cut to `고양`, raise the
-minimum stem length or drop that particle from the list.
-
-**Stopwords are yours to edit.** Korean and English defaults ship with the
-plugin. The list is checked twice, once on the raw word and once after the
-particle has been stripped.
-
-**Every word sits horizontally.** No rotation, no vertical text, no canvas.
+**Every topic sits horizontally.** No rotation, no vertical text, no canvas.
 The cloud is plain anchors in a flex container, so it reflows on a phone and
 stays selectable and readable.
 
-**Click a word to see the posts.** Each word links to the site search for that
-word, so the reader lands on the ordinary post list of your theme.
+**Click a topic to see the posts.** Each one links to the site search for it,
+so the reader lands on the ordinary post list of your theme.
 
 ### What you can set
 
-- Text source, content or excerpt, and whether an empty excerpt falls back to
-  the body.
-- Which post types to read, and how many of the newest posts to scan.
-- Stopword list, Korean particle list, minimum stem length.
-- Minimum word length, minimum number of occurrences, maximum number of words.
-- Smallest and largest font size in px. Frequencies are spread between them on
-  a square-root scale so one very common word does not flatten the rest.
-- Start and end colour. Rare words get the first colour, common words the
-  second, and everything in between is interpolated.
-- Whether a word links to the search results or is plain text.
-- How long the rendered cloud is cached. Saving the settings clears it.
+- Language: English, Korean, or both.
+- The least number of posts a topic must cover, and how many topics to draw.
+- Smallest and largest font size in px.
+- Start and end colour, interpolated between the smallest and the largest.
+- Whether a topic links to the search results or is plain text.
+- How long the rendered cloud is cached. Saving the settings clears it, and so
+  does an upload.
 
 ### Shortcode attributes
 
 Attributes override the saved settings for that one cloud. A bad value is
 reported on the page instead of being silently replaced by a default.
 
-- `ranking` — `tfidf`, `count`, or `topics`.
-- `min_docs_pct` — TF-IDF floor: least share of scanned posts a word must appear
-  in, `0` to remove it.
-- `source` — `content` or `excerpt`.
-- `post_type` — comma separated. Public post types only.
-- `category`, `tag` — slugs, to narrow the posts that are read.
-- `limit` — how many of the newest posts to scan, 300 by default.
-- `max` — how many words to draw, 60 by default.
-- `min_count` — smallest number of occurrences a word needs.
-- `min_len` — smallest number of characters a word needs.
+- `language` — `en`, `ko`, or `both`.
+- `min_posts` — a topic drawn from fewer posts than this is left out.
+- `max` — how many topics to draw, 60 by default.
 - `min_size`, `max_size` — font size range in px, 12 and 44 by default.
-- `color_start`, `color_end` — `#rrggbb`, rare and common.
+- `color_start`, `color_end` — `#rrggbb`, smallest and largest.
 - `link` — `search` or `none`.
 - `cache` — cache seconds, `0` to skip the cache.
 
 ### Where the settings live
 
-The sidebar of WP Admin gets a **Key Word Cloud** menu. Everything above is on
-that one screen, with the current cloud rendered underneath as a preview and a
-button that empties the cache.
-
-PHP needs the `mbstring` extension. Without it the plugin says so in an admin
-notice instead of producing a broken cloud.
+The sidebar of WP Admin gets a **Key Word Cloud** menu. It shows how many
+topics have arrived and when, carries every setting above, renders the current
+cloud as a preview, and has a button that empties the cache.
