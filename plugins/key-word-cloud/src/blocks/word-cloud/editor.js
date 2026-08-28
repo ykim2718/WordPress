@@ -32,6 +32,18 @@
 		{ label: __( 'Both', 'key-word-cloud' ), value: 'both' }
 	];
 
+	var SHAPES = [
+		{ label: __( 'Saved setting', 'key-word-cloud' ), value: '' },
+		{ label: __( 'Ellipse', 'key-word-cloud' ), value: 'ellipse' },
+		{ label: __( 'Block', 'key-word-cloud' ), value: 'block' }
+	];
+
+	var COLOR_MODES = [
+		{ label: __( 'Saved setting', 'key-word-cloud' ), value: '' },
+		{ label: __( 'Several colours', 'key-word-cloud' ), value: 'palette' },
+		{ label: __( 'One-hue gradient', 'key-word-cloud' ), value: 'gradient' }
+	];
+
 	var LINKS = [
 		{ label: __( 'Saved setting', 'key-word-cloud' ), value: '' },
 		{ label: __( 'Search results for the topic', 'key-word-cloud' ), value: 'search' },
@@ -80,6 +92,8 @@
 				text( props, 'max', __( 'Topics to draw', 'key-word-cloud' ) )
 			] ),
 			panel( __( 'Size and colour', 'key-word-cloud' ), false, [
+				select( props, 'shape', __( 'Shape', 'key-word-cloud' ), SHAPES ),
+				select( props, 'color_mode', __( 'Colour', 'key-word-cloud' ), COLOR_MODES ),
 				text( props, 'min_size', __( 'Smallest size in px', 'key-word-cloud' ) ),
 				text( props, 'max_size', __( 'Largest size in px', 'key-word-cloud' ) ),
 				text( props, 'color_start', __( 'Colour of the smallest', 'key-word-cloud' ), '#rrggbb' ),

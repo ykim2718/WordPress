@@ -14,6 +14,8 @@
 	},
 	"attributes": {
 		"language": { "type": "string", "default": "" },
+		"shape": { "type": "string", "default": "" },
+		"color_mode": { "type": "string", "default": "" },
 		"max": { "type": "string", "default": "" },
 		"min_posts": { "type": "string", "default": "" },
 		"min_size": { "type": "string", "default": "" },

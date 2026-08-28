@@ -1,4 +1,40 @@
-/* Key Word Cloud 0.0.0.2026.8.25 */
+/* Key Word Cloud 2.2.0 */
+
+.kwc {
+	position: relative;
+	margin: 1em 0;
+}
+
+/* 새로고침 단추는 구름의 오른쪽 위 모서리에 앉는다. */
+.kwc-refresh {
+	position: absolute;
+	top: 0;
+	right: 0;
+	z-index: 2;
+	padding: 2px 8px;
+	border: 1px solid #d0d0cc;
+	border-radius: 4px;
+	background: #fff;
+	color: #5a5a55;
+	font-size: 11px;
+	line-height: 1.6;
+	cursor: pointer;
+}
+
+.kwc-refresh:hover:not([disabled]) {
+	border-color: #9a9a94;
+	color: #1a1a19;
+}
+
+.kwc-refresh[disabled] {
+	cursor: default;
+	opacity: 0.6;
+}
+
+.kwc-refresh[data-state="failed"] {
+	border-color: #bf3130;
+	color: #bf3130;
+}
 
 .kwc-cloud {
 	display: flex;
@@ -6,13 +42,31 @@
 	align-items: baseline;
 	justify-content: center;
 	gap: 0.35em 0.75em;
-	margin: 1em 0;
+	margin: 0;
 	padding: 0;
 	line-height: 1.35;
 }
 
+/* 타원. kwc.js 가 낱말을 줄로 묶고 줄마다 폭을 타원 곡선에 맞춘다.
+   script 가 없으면 줄 묶음이 만들어지지 않고 위의 flex 배치가 그대로 남는다. */
+.kwc-cloud--ellipse {
+	flex-direction: column;
+	align-items: center;
+	gap: 0.2em;
+}
+
+.kwc-row {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: baseline;
+	justify-content: center;
+	gap: 0.75em;
+	max-width: 100%;
+}
+
 /* 모든 단어는 가로로만 놓는다. 테마가 회전/세로쓰기를 걸어도 무시한다. */
 .kwc-cloud .kwc-word {
+	position: relative;
 	display: inline-block;
 	white-space: nowrap;
 	writing-mode: horizontal-tb !important;
@@ -35,10 +89,50 @@
 	cursor: default;
 }
 
+/* 이웃한 topic 을 갈라 보이게 하는 색이다. 색 자체는 뜻이 없고, 크기가 글 수를 나타낸다.
+   다섯 색은 색맹 구분과 4.5:1 대비를 검증해서 고른 것이다. */
+.kwc-word--c0 { color: #1f66bd; }
+.kwc-word--c1 { color: #0f7d57; }
+.kwc-word--c2 { color: #c4501f; }
+.kwc-word--c3 { color: #4a3aa7; }
+.kwc-word--c4 { color: #7a6a00; }
+
+/* 마우스를 올리면 어떤 구절에서 온 topic 인지 보인다. */
+.kwc-word[data-tip]::after {
+	content: attr(data-tip);
+	position: absolute;
+	left: 50%;
+	bottom: 100%;
+	z-index: 3;
+	transform: translate(-50%, -6px);
+	visibility: hidden;
+	opacity: 0;
+	min-width: 12em;
+	max-width: 22em;
+	padding: 6px 9px;
+	border-radius: 5px;
+	background: #1a1a19;
+	color: #fff;
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 1.45;
+	white-space: normal;
+	text-align: left;
+	text-decoration: none;
+	pointer-events: none;
+	transition: opacity 0.12s ease;
+}
+
+.kwc-word[data-tip]:hover::after,
+.kwc-word[data-tip]:focus::after {
+	visibility: visible;
+	opacity: 1;
+}
+
 .kwc-error {
 	margin: 1em 0;
 	padding: 0.6em 0.9em;
-	border-left: 4px solid #b3202e;
+	border-left: 4px solid #bf3130;
 	background: #fff4f4;
 	color: #7a1620;
 	font-size: 0.95em;

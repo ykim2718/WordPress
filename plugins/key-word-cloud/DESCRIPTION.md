@@ -26,9 +26,19 @@ flatten the rest. Its tooltip lists the phrases it was folded from.
 Hangul syllable. Pick one on the settings screen or per cloud; English is the
 default.
 
-**Every topic sits horizontally.** No rotation, no vertical text, no canvas.
-The cloud is plain anchors in a flex container, so it reflows on a phone and
-stays selectable and readable.
+**Shaped as an ellipse, coloured to be read.** Rows narrow towards the top and
+bottom so the cloud reads as an oval rather than a paragraph. Topics take five
+hues so neighbours are told apart; the hue means nothing, size still means the
+number of posts, and all five clear the colourblind and contrast checks because
+here the colour *is* the text. Nothing rotates and nothing is vertical, so the
+cloud reflows on a phone and stays selectable.
+
+**Hover a topic to see what it is made of.** The tooltip lists the phrases the
+topic was folded from, and how many posts it covers.
+
+**Refresh without leaving the page.** Users who may edit posts get a small
+button at the top right of the cloud that fetches the published topics now
+instead of waiting for the daily schedule. Readers never see it.
 
 **Click a topic to see the posts.** Each one links to the site search for it,
 so the reader lands on the ordinary post list of your theme.

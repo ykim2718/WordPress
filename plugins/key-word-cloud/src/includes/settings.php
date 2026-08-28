@@ -88,6 +88,8 @@ final class KWC_Settings {
 			array( 'language', '언어', 'kwc_pick', 'field_language' ),
 			array( 'min_posts', '최소 글 수', 'kwc_pick', 'field_min_posts' ),
 			array( 'max_words', '최대 topic 수', 'kwc_pick', 'field_max_words' ),
+			array( 'shape', '모양', 'kwc_style', 'field_shape' ),
+			array( 'color_mode', '색 쓰는 법', 'kwc_style', 'field_color_mode' ),
 			array( 'size', '글자 크기 (px)', 'kwc_style', 'field_size' ),
 			array( 'color', '색상 (적음 → 많음)', 'kwc_style', 'field_color' ),
 			array( 'link_mode', 'topic 클릭 동작', 'kwc_style', 'field_link_mode' ),
@@ -123,6 +125,15 @@ final class KWC_Settings {
 			$out['language'] = $language;
 		} else {
 			$errors[] = '언어 값이 잘못됐다: ' . $language;
+		}
+
+		foreach ( array( 'shape' => array( 'ellipse', 'block' ), 'color_mode' => array( 'palette', 'gradient' ) ) as $name => $allowed ) {
+			$value = isset( $input[ $name ] ) ? (string) $input[ $name ] : '';
+			if ( in_array( $value, $allowed, true ) ) {
+				$out[ $name ] = $value;
+			} else {
+				$errors[] = $name . ' 값이 잘못됐다: ' . $value;
+			}
 		}
 
 		$link = isset( $input['link_mode'] ) ? (string) $input['link_mode'] : '';
@@ -305,6 +316,22 @@ final class KWC_Settings {
 
 	public static function field_max_words() {
 		self::number_field( 'max_words', 1, 500, '글 수 상위 N 개만 그린다.' );
+	}
+
+	public static function field_shape() {
+		self::radio_field(
+			'shape',
+			array( 'ellipse' => '타원', 'block' => '네모' ),
+			'타원은 CSS shape-outside 로 깎는다. 지원하지 않는 브라우저에서는 네모로 보인다.'
+		);
+	}
+
+	public static function field_color_mode() {
+		self::radio_field(
+			'color_mode',
+			array( 'palette' => '여러 색으로 구분', 'gradient' => '한 색 그러데이션' ),
+			'여러 색은 이웃한 topic 을 갈라 보이게 할 뿐 뜻은 없다. 글 수는 글자 크기가 나타낸다. 아래 색상 두 개는 그러데이션에서만 쓰인다.'
+		);
 	}
 
 	public static function field_size() {

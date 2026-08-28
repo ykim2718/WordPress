@@ -23,6 +23,8 @@ final class KWC_Defaults {
 			'max_size'    => 44,
 			'color_start' => '#8aa4c8',
 			'color_end'   => '#12355b',
+			'shape'       => 'ellipse',   // ellipse | block
+			'color_mode'  => 'palette',   // palette | gradient
 			'link_mode'   => 'search',    // search | none
 			'cache_ttl'   => 3600,
 			'pull_enabled' => 1,          // 하루 한 번 topic 을 받아올지

@@ -1,3 +1,25 @@
+## 2.2.0
+
+- Lay the cloud out as an ellipse. Rows are built in JavaScript and each row is
+  given the width the ellipse allows at its height, because CSS `shape-outside`
+  cannot do it: that needs the box height up front, and the height depends on
+  how many rows the phrases make. A row always takes at least one phrase, so a
+  phrase wider than the row is never dropped. Without JavaScript the cloud stays
+  the plain wrapped block it was.
+- Colour the topics from a five-hue palette so neighbours are told apart. The
+  hue carries no meaning — size still carries the number of posts — and the five
+  were chosen by running the palette validator: they clear the colourblind
+  separation floor and every one sits at 4.5:1 or better against the page, which
+  matters here because the colour is the text. `color_mode=gradient` restores
+  the single-hue ramp.
+- Show the phrases a topic was folded from in a tooltip on hover, replacing the
+  browser's own `title` bubble.
+- Put a small refresh button at the top right of the cloud for users who may
+  edit posts. It fetches the published topics now rather than tomorrow, through
+  a REST route that checks the same capability, and reloads.
+- Key the cloud cache on whether the reader may edit posts. Without that an
+  editor was served the guest copy and the button was missing from it.
+
 ## 2.1.0
 
 - Fetch the topics once a day instead of waiting for someone to push them. The

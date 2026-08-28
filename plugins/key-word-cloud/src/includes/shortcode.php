@@ -28,6 +28,8 @@ final class KWC_Shortcode {
 		$atts = shortcode_atts(
 			array(
 				'language'    => $options['language'],
+				'shape'       => $options['shape'],
+				'color_mode'  => $options['color_mode'],
 				'max'         => $options['max_words'],
 				'min_posts'   => $options['min_posts'],
 				'min_size'    => $options['min_size'],
@@ -62,6 +64,16 @@ final class KWC_Shortcode {
 		$language = strtolower( trim( (string) $atts['language'] ) );
 		if ( ! in_array( $language, array( 'en', 'ko', 'both' ), true ) ) {
 			return new WP_Error( 'kwc_bad_language', 'language 는 en, ko, both 중 하나여야 한다. 받은 값: ' . $atts['language'] );
+		}
+
+		$shape = strtolower( trim( (string) $atts['shape'] ) );
+		if ( ! in_array( $shape, array( 'ellipse', 'block' ), true ) ) {
+			return new WP_Error( 'kwc_bad_shape', 'shape 는 ellipse 또는 block 이어야 한다. 받은 값: ' . $atts['shape'] );
+		}
+
+		$color_mode = strtolower( trim( (string) $atts['color_mode'] ) );
+		if ( ! in_array( $color_mode, array( 'palette', 'gradient' ), true ) ) {
+			return new WP_Error( 'kwc_bad_color_mode', 'color_mode 는 palette 또는 gradient 여야 한다. 받은 값: ' . $atts['color_mode'] );
 		}
 
 		$link = strtolower( trim( (string) $atts['link'] ) );
@@ -100,6 +112,8 @@ final class KWC_Shortcode {
 
 		return array(
 			'language'    => $language,
+			'shape'       => $shape,
+			'color_mode'  => $color_mode,
 			'max_words'   => $values['max'],
 			'min_posts'   => $values['min_posts'],
 			'min_size'    => $values['min_size'],

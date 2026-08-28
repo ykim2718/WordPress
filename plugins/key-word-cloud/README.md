@@ -48,7 +48,8 @@ plugins/key-word-cloud/
 | `includes/settings.php` | 사이드바 메뉴와 설정 화면 |
 | `includes/updater.php` | 저장소에서 갱신, View details 창 |
 | `blocks/word-cloud/` | `block.json`, `editor.js`, `editor.asset.php` |
-| `assets/kwc.css` | 가로 배치와 오류 문구 서식 |
+| `assets/kwc.css` | 배치, 색, tooltip, 단추 서식 |
+| `assets/kwc.js` | 타원 줄 배치와 새로고침 단추 |
 
 플러그인은 본문을 읽지 않는다. 받아 둔 topic 을 꺼내 크기와 색만 입힌다. 그래서 GPU 도,
 `mbstring` 같은 확장도 필요 없다.
@@ -118,6 +119,42 @@ python3 tools/push_topics.py --write plugins/key-word-cloud/dist/topics.json --d
 `ats score` 는 영어다. 설정 화면에서 영어 / 한글 / 혼재 중에 고르고 기본값은 영어이며,
 숏코드 `language` 로 개별 구름마다 덮어쓴다.
 
+## 모양과 색
+
+줄마다 폭을 타원 곡선에 맞춰 낱말을 앉힌다. CSS 의 `shape-outside` 로는 되지 않는다.
+그것은 상자 높이가 먼저 정해져 있어야 하는데 높이는 몇 줄이 되느냐에 달려 있고, 칸이
+좁으면 긴 구절이 들어갈 자리가 위아래 어디에도 없어 타원 밖으로 밀려난다. 그래서
+`assets/kwc.js` 가 직접 줄을 나눈다. 한 줄에 적어도 하나는 담으므로 허용 폭보다 긴
+구절도 버려지지 않는다. JavaScript 가 없으면 예전처럼 네모로 흐른다.
+
+색은 다섯 가지를 돌려 쓴다. 이웃한 topic 을 갈라 보이게 할 뿐 **색 자체에는 뜻이 없다.**
+글 수는 글자 크기가 나타낸다. 다섯 색은 색맹 구분 기준과 배경 대비 4.5:1 을 검증해서
+고른 것이다. 여기서는 색이 곧 글자라 대비가 읽기에 직접 걸린다.
+
+| Slot | Hex | Contrast |
+|---|---|---|
+| 1 | `#1f66bd` | 5.54 |
+| 2 | `#0f7d57` | 5.00 |
+| 3 | `#c4501f` | 4.53 |
+| 4 | `#4a3aa7` | 8.33 |
+| 5 | `#7a6a00` | 5.26 |
+
+`color_mode=gradient` 로 두면 예전처럼 `color_start` 에서 `color_end` 로 가는 한 색
+그러데이션을 쓴다.
+
+## 새로고침 단추
+
+구름 오른쪽 위에 작은 단추가 붙는다. 글을 고칠 수 있는 사용자에게만 보이고, 누르면
+하루를 기다리지 않고 지금 topic 을 받아온 뒤 화면을 새로 그린다. 단추를 감추는 것은
+편의일 뿐이고 `POST /wp-json/key-word-cloud/v1/refresh` 가 같은 권한을 다시 확인한다.
+
+단추가 붙는지는 보는 사람에 따라 다르므로 캐시 키에 그 여부가 들어간다.
+
+## 마우스 올림
+
+topic 에 마우스를 올리면 어떤 구절에서 온 것인지와 글 수가 보인다. 브라우저 기본
+`title` 풍선이 아니라 CSS 로 그린 것이라 바로 뜬다.
+
 ## 속성
 
 | Attribute | Default | 설명 |
@@ -129,6 +166,8 @@ python3 tools/push_topics.py --write plugins/key-word-cloud/dist/topics.json --d
 | `max_size` | 44 | 가장 큰 글자 크기 px |
 | `color_start` | `#8aa4c8` | 적은 글에서 온 topic 의 색 |
 | `color_end` | `#12355b` | 많은 글에서 온 topic 의 색 |
+| `shape` | `ellipse` | `ellipse` 또는 `block` |
+| `color_mode` | `palette` | `palette` 또는 `gradient` |
 | `link` | `search` | `search` 또는 `none` |
 | `cache` | 3600 | 캐시 초. 0이면 캐시하지 않는다 |
 

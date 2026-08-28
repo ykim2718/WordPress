@@ -14,11 +14,43 @@ final class KWC_Cloud {
 
 	const TRANSIENT_PREFIX = 'kwc_';
 
+	/** 이웃을 갈라 보이게 하는 색. 개수는 CSS 의 .kwc-word--cN 과 맞춰야 한다. */
+	const PALETTE_SIZE = 5;
+
 	/**
-	 * 프런트엔드 CSS 등록. 숏코드가 실제로 쓰일 때만 enqueue 한다.
+	 * 프런트엔드 자산 등록. 숏코드가 실제로 쓰일 때만 enqueue 한다.
 	 */
 	public static function register_assets() {
 		wp_register_style( 'key-word-cloud', KWC_URL . 'assets/kwc.css', array(), KWC_VERSION );
+		wp_register_script( 'key-word-cloud', KWC_URL . 'assets/kwc.js', array(), KWC_VERSION, true );
+	}
+
+	/**
+	 * 구름을 그릴 때 CSS 와 script 를 함께 싣는다.
+	 *
+	 * script 는 편집자만이 아니라 모든 방문자에게 필요하다. 타원의 높이를 내용에 맞춰
+	 * 넣는 일이 거기에 있기 때문이다.
+	 */
+	private static function enqueue_assets() {
+		wp_enqueue_style( 'key-word-cloud' );
+		wp_enqueue_script( 'key-word-cloud' );
+	}
+
+	/**
+	 * 새로고침 단추와 그 script 를 붙인다. 글을 고칠 수 있는 사람에게만 보인다.
+	 *
+	 * @return string 단추의 HTML. 권한이 없으면 빈 문자열.
+	 */
+	private static function refresh_button() {
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			return '';
+		}
+		wp_localize_script( 'key-word-cloud', 'KWC_REFRESH', array(
+			'url'   => rest_url( KWC_Topics::NAMESPACE . '/refresh' ),
+			'nonce' => wp_create_nonce( 'wp_rest' ),
+		) );
+		return '<button type="button" class="kwc-refresh" title="'
+			. esc_attr( '지금 topic 을 다시 받아온다' ) . '">새로고침</button>';
 	}
 
 	/**
@@ -80,11 +112,15 @@ final class KWC_Cloud {
 	 */
 	public static function render( array $args ) {
 		$ttl = (int) $args['cache_ttl'];
-		$key = self::TRANSIENT_PREFIX . md5( wp_json_encode( $args ) );
+		// 새로고침 단추가 붙는지는 보는 사람에 따라 다르다. 키에 넣지 않으면 편집자가
+		// 손님용으로 캐시된 HTML 을 받아 단추가 사라진다.
+		$key = self::TRANSIENT_PREFIX . md5(
+			wp_json_encode( $args ) . '|' . ( current_user_can( 'edit_posts' ) ? 'editor' : 'guest' )
+		);
 
 		$html = ( $ttl > 0 ) ? get_transient( $key ) : false;
 		if ( is_string( $html ) ) {
-			wp_enqueue_style( 'key-word-cloud' );
+			self::enqueue_assets();
 			return $html;
 		}
 
@@ -114,11 +150,10 @@ final class KWC_Cloud {
 			$entries[] = array(
 				'text'  => (string) $topic['label'],
 				'posts' => $posts,
-				'title' => sprintf(
-					'%s — 글 %d개%s',
-					$topic['label'],
+				'tip'   => sprintf(
+					'글 %d개%s',
 					$posts,
-					empty( $phrases ) ? '' : ' · ' . implode( ', ', array_slice( $phrases, 0, 6 ) )
+					empty( $phrases ) ? '' : "\n" . implode( ' · ', array_slice( $phrases, 0, 8 ) )
 				),
 			);
 			if ( count( $entries ) >= (int) $args['max_words'] ) {
@@ -141,7 +176,7 @@ final class KWC_Cloud {
 			set_transient( $key, $html, $ttl );
 		}
 
-		wp_enqueue_style( 'key-word-cloud' );
+		self::enqueue_assets();
 		return $html;
 	}
 
@@ -159,37 +194,79 @@ final class KWC_Cloud {
 		// sqrt 스케일이 선형보다 차이를 덜 과장한다.
 		$span = sqrt( $max ) - sqrt( $min );
 
+		// 타원으로 깎을 때는 큰 글자가 가운데로 가야 모양이 산다.
+		if ( 'ellipse' === $args['shape'] ) {
+			$entries = self::centre_heaviest( $entries );
+		}
+
 		$items = array();
+		$index = 0;
 		foreach ( $entries as $entry ) {
 			$weight = ( $span > 0 ) ? ( ( sqrt( $entry['posts'] ) - sqrt( $min ) ) / $span ) : 1.0;
 			$size   = $args['min_size'] + ( $args['max_size'] - $args['min_size'] ) * $weight;
-			$style  = sprintf(
-				'font-size:%.1fpx;color:%s;',
-				$size,
-				self::mix_color( $args['color_start'], $args['color_end'], $weight )
-			);
+
+			$class = 'kwc-word';
+			if ( 'palette' === $args['color_mode'] ) {
+				$class .= ' kwc-word--c' . ( $index % self::PALETTE_SIZE );
+				$style  = sprintf( 'font-size:%.1fpx;', $size );
+			} else {
+				$style = sprintf(
+					'font-size:%.1fpx;color:%s;',
+					$size,
+					self::mix_color( $args['color_start'], $args['color_end'], $weight )
+				);
+			}
+			$index++;
 
 			if ( 'search' === $args['link_mode'] ) {
 				$items[] = sprintf(
-					'<a class="kwc-word" href="%s" style="%s" title="%s" data-count="%d">%s</a>',
+					'<a class="%s" href="%s" style="%s" data-tip="%s" data-count="%d">%s</a>',
+					esc_attr( $class ),
 					esc_url( add_query_arg( array( 's' => $entry['text'] ), home_url( '/' ) ) ),
 					esc_attr( $style ),
-					esc_attr( $entry['title'] ),
+					esc_attr( $entry['tip'] ),
 					(int) $entry['posts'],
 					esc_html( $entry['text'] )
 				);
 			} else {
 				$items[] = sprintf(
-					'<span class="kwc-word kwc-word--static" style="%s" title="%s" data-count="%d">%s</span>',
+					'<span class="%s kwc-word--static" style="%s" data-tip="%s" data-count="%d">%s</span>',
+					esc_attr( $class ),
 					esc_attr( $style ),
-					esc_attr( $entry['title'] ),
+					esc_attr( $entry['tip'] ),
 					(int) $entry['posts'],
 					esc_html( $entry['text'] )
 				);
 			}
 		}
 
-		return '<div class="kwc-cloud">' . implode( "\n", $items ) . '</div>';
+		$cloud_class = ( 'ellipse' === $args['shape'] ) ? 'kwc-cloud kwc-cloud--ellipse' : 'kwc-cloud';
+
+		return '<div class="kwc">' . self::refresh_button()
+			. '<div class="' . esc_attr( $cloud_class ) . '">' . implode( "\n", $items ) . '</div></div>';
+	}
+
+	/**
+	 * 큰 것을 가운데에, 작은 것을 양 끝에 오도록 다시 늘어놓는다.
+	 *
+	 * 타원은 가운데가 넓고 끝이 좁다. 빈도순 그대로 두면 큰 글자가 위쪽 좁은 곳에
+	 * 몰려 모양이 무너진다.
+	 *
+	 * @param array $entries 글 수 내림차순으로 정렬된 항목들.
+	 * @return array
+	 */
+	private static function centre_heaviest( array $entries ) {
+		$left  = array();
+		$right = array();
+		foreach ( $entries as $position => $entry ) {
+			if ( 0 === $position % 2 ) {
+				$left[] = $entry;   // 큰 것부터 번갈아 담아
+			} else {
+				$right[] = $entry;
+			}
+		}
+		// 한쪽을 뒤집어 이으면 작은 것 - 큰 것 - 작은 것 순서가 된다.
+		return array_merge( array_reverse( $left ), $right );
 	}
 
 	/**

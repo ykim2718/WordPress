@@ -44,6 +44,30 @@ final class KWC_Topics {
 				),
 			)
 		);
+
+		register_rest_route(
+			self::NAMESPACE,
+			'/refresh',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( __CLASS__, 'refresh' ),
+				'permission_callback' => array( __CLASS__, 'may_write' ),
+			)
+		);
+	}
+
+	/**
+	 * 구름의 새로고침 단추가 부른다. 하루를 기다리지 않고 지금 가져온다.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public static function refresh() {
+		$done = self::pull();
+		if ( is_wp_error( $done ) ) {
+			$done->add_data( array( 'status' => 502 ) );
+			return $done;
+		}
+		return new WP_REST_Response( $done, 200 );
 	}
 
 	/**
