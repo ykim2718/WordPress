@@ -1,3 +1,25 @@
+## 2.9.0
+
+- Choosing a language no longer hides half the site. Every topic now carries
+  both an English and a Korean name, written by `tools/translate_topics.py`, so
+  a topic found in Korean posts is drawn in English on an English cloud and the
+  other way round. On the rehearsal site the English cloud went from 71 topics
+  to 74 and the Korean one from 3 to 73.
+- Only the name is translated. The phrases behind it are what the topic was
+  folded from and stay as they were written, which is what the tooltip says
+  they are.
+- Two topics can translate to the same name. The one drawn from more posts is
+  kept and the other dropped, rather than the two being added together: one
+  post can sit in both topics, so a sum would claim more posts than the site
+  has.
+- Topics uploaded before this version keep working. Without both names the
+  cloud falls back to the old rule and shows a topic only on the cloud of the
+  language it was written in.
+- The cloud's version is written faintly at its top left, opposite the refresh
+  button, so what is on screen says which version drew it. The version is part
+  of the cache key now, so an update cannot leave an old number, or an old
+  drawing, in place.
+
 ## 2.8.1
 
 - The editor no longer breaks when a topic is clicked. The preview's topics

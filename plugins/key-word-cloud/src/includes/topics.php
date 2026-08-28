@@ -10,6 +10,7 @@
  *   POST /wp-json/key-word-cloud/v1/topics
  *   Authorization: Basic <application password>
  *   {"generator":"...","topics":[{"label":"ai assistant","posts":10,
+ *                                 "labels":{"en":"ai assistant","ko":"ai 비서"},
  *                                 "fields":["machine learning"],
  *                                 "phrases":["agentic automation", ...]}, ...]}
  *
@@ -196,6 +197,18 @@ final class KWC_Topics {
 				}
 			}
 
+			// 두 언어의 이름. 없으면 label 하나만 두고, 그때는 예전처럼 글자로 언어를 가른다.
+			$labels = array();
+			foreach ( array( 'en', 'ko' ) as $code ) {
+				if ( ! isset( $topic['labels'][ $code ] ) ) {
+					continue;
+				}
+				$name = sanitize_text_field( trim( (string) $topic['labels'][ $code ] ) );
+				if ( '' !== $name ) {
+					$labels[ $code ] = $name;
+				}
+			}
+
 			$fields = array();
 			foreach ( (array) ( isset( $topic['fields'] ) ? $topic['fields'] : array() ) as $field ) {
 				$field = self::normalize_field( $field );
@@ -206,6 +219,7 @@ final class KWC_Topics {
 
 			$topics[] = array(
 				'label'   => sanitize_text_field( $label ),
+				'labels'  => $labels,
 				'posts'   => $posts,
 				'fields'  => $fields,
 				'phrases' => $phrases,

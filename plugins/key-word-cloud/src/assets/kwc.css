@@ -10,6 +10,28 @@
 }
 
 /* 새로고침 단추는 구름의 오른쪽 위 모서리에 앉는다. */
+/* 판 번호. 왼쪽 위에 흐리게 둔다. 읽으라고 두는 것이 아니라 찾으면 보이라고 두는 것이라
+   구름의 가장 작은 글자보다 작고, 마우스를 올리면 진해진다. */
+.kwc-version {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 2;
+	font-family: inherit;
+	font-size: 11px;
+	line-height: 1.5;
+	color: #6b6b66;
+	opacity: 0.45;
+	/* 테마가 span 에 word-break 를 걸어 두면 판 번호가 한 글자씩 세로로 선다. */
+	white-space: nowrap;
+	user-select: none;
+	pointer-events: none;
+}
+
+.kwc:hover .kwc-version {
+	opacity: 0.8;
+}
+
 .kwc-refresh {
 	position: absolute;
 	top: 0;

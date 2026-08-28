@@ -29,9 +29,12 @@ applied statistics in another, on the same page. Tick as many fields as a
 cloud should hold. The list comes from the topics that were uploaded, so it
 grows with the pipeline rather than with the plugin.
 
-**Korean, English, or both.** A topic counts as Korean when it holds a single
-Hangul syllable. Pick one on the settings screen or per cloud; English is the
-default.
+**Korean, English, or both — without losing half the site.** Every topic
+carries both an English and a Korean name, so a topic found in Korean posts is
+drawn in English on an English cloud and the other way round. Choosing a
+language chooses how the cloud reads, not which half of the writing survives.
+Pick one on the settings screen or per cloud; English is the default, and
+Both draws each topic under the name it was written in.
 
 **Big in the middle, small at the edge.** Rows fill from the centre outwards
 and each row centres its own largest phrase, so size falls away in every
@@ -51,6 +54,10 @@ cloud reflows on a phone and stays selectable.
 
 **Hover a topic to see what it is made of.** The tooltip lists the phrases the
 topic was folded from, and how many posts it covers.
+
+**The cloud says which version drew it.** The version sits faintly at the top
+left, opposite the refresh button, small enough to ignore and there when you
+look for it.
 
 **Refresh without leaving the page.** Users who may edit posts get a small
 button at the top right of the cloud that fetches the published topics now

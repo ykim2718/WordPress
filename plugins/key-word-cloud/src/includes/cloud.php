@@ -41,6 +41,15 @@ final class KWC_Cloud {
 	 *
 	 * @return string 단추의 HTML. 권한이 없으면 빈 문자열.
 	 */
+	/**
+	 * 구름 왼쪽 위의 판 번호. 어느 판이 그리고 있는지 화면에서 바로 보이게 한다.
+	 *
+	 * @return string
+	 */
+	private static function version_mark() {
+		return '<span class="kwc-version">' . esc_html( KWC_VERSION ) . '</span>';
+	}
+
 	private static function refresh_button() {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			return '';
@@ -185,8 +194,11 @@ final class KWC_Cloud {
 		$ttl = (int) $args['cache_ttl'];
 		// 새로고침 단추가 붙는지는 보는 사람에 따라 다르다. 키에 넣지 않으면 편집자가
 		// 손님용으로 캐시된 HTML 을 받아 단추가 사라진다.
+		// 판 번호도 키에 넣는다. 구름에 그 번호가 적혀 있으므로 캐시가 남으면 옛 번호를
+		// 보여 주게 되고, 새 판이 다르게 그리는 경우에도 옛 그림이 남는다.
 		$key = self::TRANSIENT_PREFIX . md5(
 			wp_json_encode( $args ) . '|' . ( current_user_can( 'edit_posts' ) ? 'editor' : 'guest' )
+				. '|' . KWC_VERSION
 		);
 
 		$html = ( $ttl > 0 ) ? get_transient( $key ) : false;
@@ -206,6 +218,7 @@ final class KWC_Cloud {
 		$min_posts = (int) $args['min_posts'];
 		$wanted    = self::parse_fields( $args['fields'] );
 		$entries   = array();
+		$drawn     = array();
 		$too_few   = 0;
 		$other_language = 0;
 		$other_field    = 0;
@@ -215,10 +228,19 @@ final class KWC_Cloud {
 				$too_few++;
 				continue;
 			}
-			if ( ! KWC_Language::matches( $topic['label'], $args['language'] ) ) {
+			$text = KWC_Language::label_for( $topic, $args['language'] );
+			if ( null === $text ) {
 				$other_language++;
 				continue;
 			}
+			// 서로 다른 두 topic 이 같은 이름으로 번역될 수 있다. 같은 낱말이 구름에 두 번
+			// 나오면 고장으로 보이므로, 글 수가 큰 쪽만 남긴다. topic 을 합치지는 않는다.
+			// 한 글이 두 topic 에 걸려 있으면 합계가 글 수보다 커지기 때문이다.
+			$key = KWC_Topics::normalize_field( $text );
+			if ( isset( $drawn[ $key ] ) ) {
+				continue;
+			}
+			$drawn[ $key ] = true;
 			if ( null !== $wanted
 				&& empty( array_intersect( $wanted, (array) ( isset( $topic['fields'] ) ? $topic['fields'] : array() ) ) ) ) {
 				$other_field++;
@@ -226,7 +248,7 @@ final class KWC_Cloud {
 			}
 			$phrases   = isset( $topic['phrases'] ) ? (array) $topic['phrases'] : array();
 			$entries[] = array(
-				'text'  => (string) $topic['label'],
+				'text'  => $text,
 				'posts' => $posts,
 				'tip'   => sprintf(
 					/* translators: 1: number of posts, 2: a colon and the phrases the topic was folded from */
@@ -361,7 +383,7 @@ final class KWC_Cloud {
 
 		$style_attr = empty( $styles ) ? '' : ' style="' . esc_attr( implode( ';', $styles ) . ';' ) . '"';
 
-		return '<div class="kwc">' . self::refresh_button()
+		return '<div class="kwc">' . self::version_mark() . self::refresh_button()
 			. '<div class="' . esc_attr( $cloud_class ) . '"' . $data . $style_attr . '>'
 			. implode( "\n", $items ) . '</div></div>';
 	}

@@ -1,9 +1,9 @@
 # Topic Pipeline
 
-Rev. 1 | Created: 2026-08-28 | Updated: 2026-08-28 15:58 CDT
+Rev. 2 | Created: 2026-08-28 | Updated: 2026-08-28 19:44 CDT
 
-`ranking=topics` 로 그릴 topic 을 만드는 script 네 개이다. plugin 과 별개로 돌며, zip 에도
-들어가지 않는다. 네 script 는 순서대로 실행하고, 앞 단계의 JSON 을 다음 단계가 읽는다.
+`ranking=topics` 로 그릴 topic 을 만드는 script 다섯 개이다. plugin 과 별개로 돌며, zip 에도
+들어가지 않는다. 다섯 script 는 순서대로 실행하고, 앞 단계의 JSON 을 다음 단계가 읽는다.
 
 ## 1. Reason
 
@@ -101,7 +101,36 @@ Table 2. Labelling 240 clusters into three fields with `qwen3:8b`
 붙은 무리가 있어 열의 합은 240 을 넘는다. 세 분야로 가르면 대부분의 무리는 어디에도 들지
 않는다. 분야를 좁게 잡을수록 그 수는 늘고, 그것이 분야를 고르는 목적이다.
 
-### 3.4. Push
+### 3.4. Translate
+
+무리마다 영어 이름과 한글 이름을 붙인다. 이 단계가 없으면 언어를 고르는 일이 한쪽 언어로
+쓴 글을 통째로 감추는 일이 된다. 이름만 옮기고 구절은 그대로 둔다.
+
+```bash
+python tools/translate_topics.py --input label_fields.json
+```
+
+두 방향을 같은 기준으로 검사할 수 없다. 한글이 든 영어 이름은 명백한 실패라 버리지만,
+한글이 없는 한국어 이름은 실패가 아니다. `wp rest api` 나 `on-chip sram` 은 한국어로 써도
+그대로 쓰는 말이고, 그것을 버리면 이 단계가 없애려던 문제가 다시 생긴다. 그래서 그대로 온
+이름은 남기고 따로 센다. 세지 않으면 번역을 멈춘 model 과 원래 그렇게 쓰는 말을 구별할 수
+없다.
+
+Table 3. Naming 240 clusters in both languages with `qwen3:8b`
+
+| Outcome | Clusters |
+|---|---|
+| ko translated | 111 |
+| ko kept as written | 85 |
+| en translated | 43 |
+| in a third script, dropped | 1 |
+
+표는 물어본 것만 센다. 240 개 중 197 개는 이미 영어 이름이 있어 한글만 물었고, 43 개는 그
+반대였다. 34.8 초가 걸렸고 240 개 중 239 개가 두 이름을 갖게 되었다. 버린 하나는 model 이 키릴
+문자를 섞어 답한 것이다. 영어도 한글도 아닌 글자는 읽을 수 없으므로 인쇄 가능한 ASCII 와
+한글 밖의 글자는 버린다.
+
+### 3.5. Push
 
 무리를 topic 으로 바꾸어 site 에 올린다. 인증은 WordPress application password 이며,
 글을 고칠 수 있는 사용자여야 한다.
@@ -111,8 +140,8 @@ export WP_URL=https://example.com/wordpress
 export WP_USERNAME=<LOGIN_NAME>
 export WP_APP_PASSWORD=<APPLICATION_PASSWORD>
 
-python tools/push_topics.py --input label_fields.json --dry-run true
-python tools/push_topics.py --input label_fields.json --min-posts 2
+python tools/push_topics.py --input translate_topics.json --dry-run true
+python tools/push_topics.py --input translate_topics.json --min-posts 2
 ```
 
 Application password 는 WP 관리자 → 사용자 → 프로필에서 발급한다. Site 가 https 가
@@ -125,5 +154,5 @@ Application password 는 WP 관리자 → 사용자 → 프로필에서 발급�
   나왔고 그중 둘 이상의 글에 걸친 것은 15 개뿐이었다. 묶지 않으면 구름이 되지 않는다.
 - 무리에 뜻이 다른 phrase 가 섞이는 일이 남는다. Threshold 로 줄일 수는 있으나 없앨 수는
   없다.
-- 글이 늘거나 바뀌면 네 단계를 다시 돌려야 한다. Plugin 은 마지막으로 올라온 topic 을
+- 글이 늘거나 바뀌면 다섯 단계를 다시 돌려야 한다. Plugin 은 마지막으로 올라온 topic 을
   계속 보여 줄 뿐 스스로 갱신하지 않는다.

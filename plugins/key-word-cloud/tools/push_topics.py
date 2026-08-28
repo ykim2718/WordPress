@@ -16,6 +16,7 @@ repository, it is what the plugin's once-a-day pull reads, which needs no
 password and no port open on the site.
 
 Changelog
+    0.3.0  Carry the two-language names that translate_topics.py writes.
     0.2.0  Carry the field labels that label_fields.py writes.
     0.1.0  Add --write for the once-a-day pull.
     0.0.0  First version.
@@ -24,7 +25,7 @@ Changelog
 from __future__ import annotations
 
 __author__ = 'yRocket'
-__version__ = "0.2.0.2026.8.28"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
+__version__ = "0.3.0.2026.8.28"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
 
 import argparse
 import base64
@@ -55,9 +56,16 @@ def load_clusters(*, path: pathlib.Path, min_posts: int, limit: int) -> list[dic
 
     kept = [
         {'label': c['label'], 'posts': int(c['posts']), 'phrases': list(c['phrases']),
-         'fields': list(c.get('fields', []))}
+         'fields': list(c.get('fields', [])), 'labels': dict(c.get('labels', {}))}
         for c in saved['clusters'] if int(c['posts']) >= min_posts
     ]
+    both = sum(1 for c in kept if len(c['labels']) == 2)
+    if both:
+        print(f"{both}/{len(kept)} topics carry both an English and a Korean name")
+    else:
+        # Without both names, choosing a language hides the posts written in the other.
+        print("no topic carries both names; run translate_topics.py to add them")
+
     labelled = sum(1 for c in kept if c['fields'])
     if labelled:
         print(f"{labelled}/{len(kept)} topics carry field labels")
