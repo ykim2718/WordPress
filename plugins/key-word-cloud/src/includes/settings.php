@@ -90,6 +90,7 @@ final class KWC_Settings {
 			array( 'max_words', '최대 topic 수', 'kwc_pick', 'field_max_words' ),
 			array( 'shape', '모양', 'kwc_style', 'field_shape' ),
 			array( 'ratio', '타원 가로:세로', 'kwc_style', 'field_ratio' ),
+			array( 'size_px', '크기 (px)', 'kwc_style', 'field_size_px' ),
 			array( 'font', '글꼴', 'kwc_style', 'field_font' ),
 			array( 'color_mode', '색 쓰는 법', 'kwc_style', 'field_color_mode' ),
 			array( 'size', '글자 크기 (px)', 'kwc_style', 'field_size' ),
@@ -167,6 +168,8 @@ final class KWC_Settings {
 		}
 
 		$ints = array(
+			'width_px'  => array( 0, 4000 ),
+			'height_px' => array( 0, 4000 ),
 			'max_words' => array( 1, 500 ),
 			'min_posts' => array( 1, 1000 ),
 			'min_size'  => array( 6, 200 ),
@@ -347,6 +350,16 @@ final class KWC_Settings {
 			array( 'ellipse' => '타원', 'block' => '네모' ),
 			'타원은 CSS shape-outside 로 깎는다. 지원하지 않는 브라우저에서는 네모로 보인다.'
 		);
+	}
+
+	public static function field_size_px() {
+		echo '가로 ';
+		self::number_field( 'width_px', 0, 4000 );
+		echo ' &nbsp; 세로 ';
+		self::number_field( 'height_px', 0, 4000 );
+		echo '<p class="description">둘 다 0 이면 가로는 칸 너비를 그대로 쓰고 세로는 위의 비가 정한다. '
+			. '가로를 주면 그만큼만 쓰되 좁은 화면에서는 칸을 넘지 않는다. '
+			. '세로를 주면 그 높이에 맞추며, 이때 위의 비는 쓰이지 않는다.</p>';
 	}
 
 	public static function field_font() {

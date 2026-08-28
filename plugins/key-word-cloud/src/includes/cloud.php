@@ -293,20 +293,36 @@ final class KWC_Cloud {
 			$cloud_class .= ' kwc-cloud--ellipse';
 		}
 
-		$cloud_style = '';
+		$styles = array();
 		if ( 'custom' === $args['font'] ) {
-			$cloud_style = ' style="font-family:' . esc_attr( $args['font_custom'] ) . ';"';
+			$styles[] = 'font-family:' . $args['font_custom'];
 		} elseif ( 'theme' !== $args['font'] ) {
 			$cloud_class .= ' kwc-cloud--font-' . $args['font'];
 		}
 
-		// 목표 비율은 script 가 읽는다. 칸이 좁으면 글자를 줄여 이 비율에 다가간다.
-		$ratio = ( 'ellipse' === $args['shape'] )
-			? sprintf( ' data-ratio="%.2f"', $args['ratio'] )
-			: '';
+		// 폭을 px 로 주더라도 좁은 화면에서는 칸을 넘지 않게 100% 로 묶는다.
+		if ( $args['width_px'] > 0 ) {
+			$styles[] = sprintf( 'width:min(%dpx, 100%%)', $args['width_px'] );
+			$styles[] = 'margin-inline:auto';
+		}
+		// 내용이 목표보다 짧아도 상자는 그 높이를 지키게 한다.
+		if ( $args['height_px'] > 0 ) {
+			$styles[] = sprintf( 'min-height:%dpx', $args['height_px'] );
+		}
+
+		// 크기 목표는 script 가 읽는다. 높이를 px 로 주면 그것이 목표가 되고 비는 쓰이지 않는다.
+		$data = '';
+		if ( 'ellipse' === $args['shape'] ) {
+			$data = sprintf( ' data-ratio="%.2f"', $args['ratio'] );
+			if ( $args['height_px'] > 0 ) {
+				$data .= sprintf( ' data-height="%d"', $args['height_px'] );
+			}
+		}
+
+		$style_attr = empty( $styles ) ? '' : ' style="' . esc_attr( implode( ';', $styles ) . ';' ) . '"';
 
 		return '<div class="kwc">' . self::refresh_button()
-			. '<div class="' . esc_attr( $cloud_class ) . '"' . $ratio . $cloud_style . '>'
+			. '<div class="' . esc_attr( $cloud_class ) . '"' . $data . $style_attr . '>'
 			. implode( "\n", $items ) . '</div></div>';
 	}
 

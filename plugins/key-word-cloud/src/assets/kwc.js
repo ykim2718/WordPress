@@ -110,13 +110,15 @@
 		} );
 		var gap = 12;
 
-		// 목표 비율. 칸이 좁아지면 글자를 줄여 가로로 긴 모양을 지킨다. 배율을 무한정
-		// 낮추면 글씨가 읽히지 않으므로 0.55 에서 멈춘다.
-		var target = parseFloat( cloud.getAttribute( 'data-ratio' ) );
-		if ( ! ( target > 0 ) ) {
-			target = 2;
+		// 목표. 높이를 px 로 받았으면 그것을 맞추고, 없으면 가로세로 비를 맞춘다.
+		// 둘 다 좇으면 서로 어긋나므로 높이가 있으면 비는 쓰지 않는다.
+		var wantHeight = parseFloat( cloud.getAttribute( 'data-height' ) );
+		var wantRatio = parseFloat( cloud.getAttribute( 'data-ratio' ) );
+		if ( ! ( wantRatio > 0 ) ) {
+			wantRatio = 2;
 		}
 
+		// 배율을 무한정 낮추면 글씨가 읽히지 않으므로 0.55 에서 멈춘다.
 		var chosen = null;
 		var scales = [ 1, 0.92, 0.84, 0.76, 0.68, 0.62, 0.55 ];
 		for ( var s = 0; s < scales.length; s++ ) {
@@ -125,9 +127,17 @@
 				continue;
 			}
 			chosen = trial;
-			if ( trial.ratio >= target ) {
+			var reached = ( wantHeight > 0 ) ? ( trial.height <= wantHeight ) : ( trial.ratio >= wantRatio );
+			if ( reached ) {
 				break;   // 목표에 닿았다. 더 줄일 이유가 없다.
 			}
+		}
+		if ( chosen && wantHeight > 0 && chosen.height > wantHeight ) {
+			// 0.55 까지 줄여도 안 들어간다. 감추지 않고 알린다.
+			window.console && window.console.warn(
+				'[key-word-cloud] cannot fit ' + words.length + ' topics in ' + wantHeight
+				+ 'px; it needs about ' + Math.round( chosen.height ) + 'px. Draw fewer topics or allow more height.'
+			);
 		}
 		if ( ! chosen ) {
 			cloud.classList.remove( 'kwc-cloud--rows' );
@@ -201,6 +211,7 @@
 		return {
 			scale: scale,
 			placed: placed,
+			height: height,
 			ratio: height > 0 ? ( full / height ) : 0,
 		};
 	}

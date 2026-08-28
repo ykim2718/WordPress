@@ -1,3 +1,17 @@
+## 2.7.0
+
+- Set the cloud's width and height in pixels, from the settings screen, the
+  block sidebar, or the `width` and `height` shortcode attributes. Both default
+  to 0, which keeps the old behaviour: the column's width, and a height from
+  the ratio.
+- A pixel width is a maximum, not a promise. It is written as
+  `min(Npx, 100%)`, so a 900px cloud is 900px on a desktop and 452px in a 500px
+  window, and never puts a horizontal scrollbar on the page.
+- A pixel height replaces the ratio rather than competing with it. Giving both
+  a height and a ratio would be two answers to one question, so the height
+  wins and the ratio is simply not read. When even the smallest text will not
+  fit the height asked for, the console says how much room it actually needs.
+
 ## 2.6.0
 
 - Keep the ellipse wide when the column is narrow. The shape had no target: it

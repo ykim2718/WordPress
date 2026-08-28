@@ -57,6 +57,8 @@ so the reader lands on the ordinary post list of your theme.
 - Language: English, Korean, or both.
 - The least number of posts a topic must cover, and how many topics to draw.
 - Smallest and largest font size in px.
+- The cloud's width and height in pixels. Leave them at 0 and the cloud takes
+  the column's width and the height its shape implies.
 - Start and end colour, interpolated between the smallest and the largest.
 - Whether a topic links to the search results or is plain text.
 - How long the rendered cloud is cached. Saving the settings clears it, and so
@@ -72,6 +74,10 @@ reported on the page instead of being silently replaced by a default.
 - `max` — how many topics to draw, 60 by default.
 - `min_size`, `max_size` — font size range in px, 12 and 44 by default.
 - `color_start`, `color_end` — `#rrggbb`, smallest and largest.
+- `width`, `height` — the cloud's size in px, `0` for automatic. A width is a
+  ceiling rather than a promise: a 900px cloud is 900px wide on a desktop and
+  as wide as the column in a phone window, so it never pushes a scrollbar onto
+  the page. A height replaces the ellipse ratio instead of arguing with it.
 - `link` — `search` or `none`.
 - `cache` — cache seconds, `0` to skip the cache.
 

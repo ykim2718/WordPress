@@ -181,6 +181,8 @@ topic 에 마우스를 올리면 어떤 구절에서 온 것인지와 글 수가
 | `font` | `rounded` | `rounded`, `sans`, `serif`, `mono`, `theme`, `custom` |
 | `font_custom` | `''` | `font=custom` 일 때 쓸 CSS font-family |
 | `color_mode` | `palette` | `palette` 또는 `gradient` |
+| `width` | 0 | 가로 px. 0 이면 칸 너비. 좁은 화면에서는 칸을 넘지 않는다 |
+| `height` | 0 | 세로 px. 0 이면 `ratio` 가 정한다. 주면 `ratio` 는 쓰이지 않는다 |
 | `link` | `search` | `search` 또는 `none` |
 | `cache` | 3600 | 캐시 초. 0이면 캐시하지 않는다 |
 

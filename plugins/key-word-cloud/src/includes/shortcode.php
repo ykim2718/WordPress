@@ -30,6 +30,8 @@ final class KWC_Shortcode {
 				'language'    => $options['language'],
 				'shape'       => $options['shape'],
 				'ratio'       => $options['ratio'],
+				'width'       => $options['width_px'],
+				'height'      => $options['height_px'],
 				'font'        => $options['font'],
 				'font_custom' => $options['font_custom'],
 				'color_mode'  => $options['color_mode'],
@@ -105,6 +107,8 @@ final class KWC_Shortcode {
 			'min_posts' => array( 1, 1000 ),
 			'min_size'  => array( 6, 200 ),
 			'max_size'  => array( 6, 200 ),
+			'width'     => array( 0, 4000 ),
+			'height'    => array( 0, 4000 ),
 			'cache'     => array( 0, 604800 ),
 		);
 		$values = array();
@@ -133,6 +137,8 @@ final class KWC_Shortcode {
 			'language'    => $language,
 			'shape'       => $shape,
 			'ratio'       => $ratio,
+			'width_px'    => $values['width'],
+			'height_px'   => $values['height'],
 			'font'        => $font,
 			'font_custom' => $font_custom,
 			'color_mode'  => $color_mode,

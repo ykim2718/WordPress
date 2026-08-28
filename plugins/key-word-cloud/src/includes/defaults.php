@@ -24,7 +24,9 @@ final class KWC_Defaults {
 			'color_start' => '#8aa4c8',
 			'color_end'   => '#12355b',
 			'shape'       => 'ellipse',   // ellipse | block
-			'ratio'       => '2.0',       // 타원의 목표 가로:세로
+			'ratio'       => '2.0',       // 타원의 목표 가로:세로. height_px 를 주면 무시된다
+			'width_px'    => 0,           // 0 이면 칸 너비를 그대로 쓴다
+			'height_px'   => 0,           // 0 이면 ratio 가 높이를 정한다
 			'font'        => 'rounded',   // rounded | sans | serif | mono | theme | custom
 			'font_custom' => '',          // font=custom 일 때 쓸 CSS font-family
 			'color_mode'  => 'palette',   // palette | gradient
