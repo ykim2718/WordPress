@@ -1,3 +1,11 @@
+## 2.14.1
+
+- The settings screen says that posts filed under the RESTRICTED category are
+  left out -- of the counting and of the list a click opens. The rule was in
+  the code and in the README only, where the site's owner would not meet it.
+  When no category of that name exists on the site, the screen says that too,
+  so a name that does not match cannot look like a rule that does not work.
+
 ## 2.14.0
 
 - Posts filed under the **RESTRICTED** category stay out of the cloud. They are

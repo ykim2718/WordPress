@@ -669,6 +669,13 @@ final class KWC_Settings {
 				한글로 쓴 글에서 나온 topic 도 영어 이름으로 나오고, 한글을 고르면 그 반대다.
 				언어를 고르는 일이 글의 절반을 감추는 일이 되지 않게 하려는 것이다.</p>
 
+			<p><strong>RESTRICTED</strong> 분류에 든 글은 제외한다. topic 의 글 수를 셀 때 세지 않고,
+				낱말을 눌러 열리는 목록에도 넣지 않는다. 아래 분류에 든 글도 함께 빠지며, 분류는
+				슬러그가 아니라 이름으로 찾으므로 대소문자는 가리지 않는다.
+				<?php if ( empty( KWC_Sources::restricted() ) ) : ?>
+					<em>이 사이트에는 그런 이름의 분류가 없어 지금은 빠지는 글이 없다.</em>
+				<?php endif; ?></p>
+
 			<h2>Version</h2>
 			<p>이 사이트에서 도는 판은 <strong><?php echo esc_html( KWC_VERSION ); ?></strong> 이다.
 				구름 왼쪽 위에도 같은 번호가 흐리게 적히므로, 화면에 보이는 구름이 어느 판이 그린
