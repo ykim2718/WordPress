@@ -42,6 +42,7 @@ plugins/key-word-cloud/
 | `includes/defaults.php` | 기본 설정값 |
 | `includes/language.php` | 한글/영어 판정 |
 | `includes/topics.php` | topic 을 REST 로 받거나 하루 한 번 가져와 저장 |
+| `includes/sources.php` | 고른 자리를 뒤져 topic 마다 글 수를 다시 셈 |
 | `includes/cloud.php` | 저장된 topic 으로 HTML 을 만든다 |
 | `includes/shortcode.php` | `[wpwordcloud]` 와 속성 검증 |
 | `includes/block.php` | block 등록과 서버 렌더링 |
@@ -113,7 +114,7 @@ Content-Type: application/json
       "label": "ai assisted development",
       "posts": 6,
       "labels": {"en": "ai assisted development", "ko": "ai 지원 개발"},
-      "fields": ["machine learning"],
+      "fields": ["data science"],
       "phrases": ["agentic automation", "ai agent worker", "ai assistant"]
     }
   ]
@@ -159,7 +160,7 @@ Topic 마다 어느 분야의 것인지가 붙어 있고, 고른 분야의 topic
 
 ```bash
 python3 tools/label_fields.py --input cluster_keywords.json \
-    --fields "semiconductor, machine learning, applied statistics"
+    --fields "data science, mathematics, semiconductor, sports, liberal arts"
 ```
 
 Topic 하나가 여러 분야에 들 수 있고, 어디에도 안 드는 topic 은 그대로 남되 분야를 고른
@@ -179,6 +180,29 @@ topic 도 영영 들지 않는다. 목록을 비워 두면 그때만 올라온 t
 괄호 안은 그 분야에 든 topic 수이고 `0` 도 그대로 보인다. 목록에 없는 이름을 적으면 있는
 이름을 알려 주는 오류가 난다. 오타를 "그 분야에 든 topic 이 없다" 로 흘리면 빈 구름의
 이유를 찾을 수 없다.
+
+## 원본 글
+
+파이프라인이 보낸 글 수는 파이프라인이 돌던 날의 것이다. 그 뒤에 쓴 글은 세어지지 않고,
+지운 글은 계속 세어진다. 그래서 어디를 볼지 고르면 그 자리를 지금 뒤져 다시 센다.
+
+| Source | 보는 곳 |
+|---|---|
+| `post` | 글의 본문 |
+| `excerpt` | 글의 요약문 |
+| `page` | 페이지의 본문과 요약문 |
+
+topic 의 이름과 구절을 최대 여덟 개까지 골라 그 자리에서 찾는다. 한 곳에도 안 나오는
+topic 은 이제 그 자리에 없는 것이므로 그리지 않는다. 기본은 본문과 요약문이고, 하나도 안
+고르면 뒤지지 않고 파이프라인이 보낸 수를 그대로 쓴다.
+
+다시 세면 차례가 달라지므로, 세고 나서 정렬한 뒤에 자른다. 세는 도중에 자르면 지금은 큰
+topic 이 옛 차례에 밀려 빠진다.
+
+모델을 부르지 않는다. 이름과 구절을 이미 가진 topic 을 글에서 찾아보기만 하는 일이라
+GPU 도 필요 없다. 다만 topic 하나에 질의 하나씩이라 값이 싸지 않다. 글 835 개에 topic
+74 개를 세는 데 4 초가 걸렸다. 그래서 센 것만 따로 하루 담아 둔다. 색이나 글자 크기를
+바꿔도 다시 세지 않고, 새로고침 단추나 캐시 비우기가 그것을 지운다.
 
 ## 언어
 
@@ -265,6 +289,7 @@ topic 에 마우스를 올리면 어떤 구절에서 온 것인지와 글 수가
 |---|---|---|
 | `language` | `en` | `en`, `ko`, `both` |
 | `fields` | `data science,mathematics,semiconductor` | 그릴 분야를 쉼표로. 비거나 `*` 면 분야를 가리지 않는다 |
+| `sources` | `post,excerpt` | 뒤질 자리를 쉼표로. `post`, `excerpt`, `page`. 비면 뒤지지 않는다 |
 | `min_posts` | 2 | 이보다 적은 글에서 온 topic 은 그리지 않는다 |
 | `max` | 60 | 그릴 topic 수, 1..500 |
 | `min_size` | 12 | 가장 작은 글자 크기 px |

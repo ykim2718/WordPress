@@ -29,6 +29,7 @@ final class KWC_Shortcode {
 			array(
 				'language'    => $options['language'],
 				'fields'      => $options['fields'],
+				'sources'     => $options['sources'],
 				'shape'       => $options['shape'],
 				'ratio'       => $options['ratio'],
 				'width'       => $options['width_px'],
@@ -87,6 +88,15 @@ final class KWC_Shortcode {
 						. '. 쓸 수 있는 분야: ' . ( empty( $known ) ? '없다 (설정의 분야 목록이 비었다)' : implode( ', ', $known ) )
 				);
 			}
+		}
+
+		$sources_raw = trim( (string) $atts['sources'] );
+		$sources     = KWC_Sources::parse( $sources_raw );
+		if ( '' !== $sources_raw && null === $sources ) {
+			return new WP_Error(
+				'kwc_bad_sources',
+				'sources 는 ' . implode( ', ', KWC_Sources::ALL ) . ' 중에서 골라 쉼표로 잇는다. 받은 값: ' . $sources_raw
+			);
 		}
 
 		$shape = strtolower( trim( (string) $atts['shape'] ) );
@@ -154,6 +164,7 @@ final class KWC_Shortcode {
 		return array(
 			'language'    => $language,
 			'fields'      => ( null === $fields ) ? '' : implode( ',', $fields ),
+			'sources'     => ( null === $sources ) ? '' : implode( ',', $sources ),
 			'shape'       => $shape,
 			'ratio'       => $ratio,
 			'width_px'    => $values['width'],

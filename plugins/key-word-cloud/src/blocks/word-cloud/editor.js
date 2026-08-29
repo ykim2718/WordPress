@@ -232,6 +232,44 @@
 	 * Cache is neither what is drawn nor how it looks, so a two-way split would have
 	 * to put it somewhere it does not belong.
 	 */
+	/**
+	 * Which of the site's own writing the topics are counted against. Same rule as
+	 * the fields: an empty attribute follows the settings screen, so the boxes show
+	 * what that ticks, and unticking them all goes back to following it.
+	 */
+	function sourceChecks( props ) {
+		var sources = carried().sources;
+		if ( ! Array.isArray( sources ) || ! sources.length ) {
+			return el( 'p', { key: 'no-sources', className: 'components-base-control__help' },
+				__( 'The list of places to search did not arrive.', 'key-word-cloud' ) );
+		}
+
+		var raw = String( props.attributes.sources || '' );
+		var chosen = ( '' === raw ) ? String( setting( 'sources' ) || '' ).split( ',' ) : raw.split( ',' );
+		var set = setter( props, 'sources' );
+
+		var rows = sources.map( function ( source ) {
+			return el( components.CheckboxControl, {
+				key: source.name,
+				label: source.label,
+				checked: chosen.indexOf( source.name ) !== -1,
+				onChange: function ( on ) {
+					var next = chosen.filter( function ( name ) {
+						return name !== source.name;
+					} );
+					if ( on ) {
+						next.push( source.name );
+					}
+					set( next.join( ',' ) );
+				}
+			} );
+		} );
+
+		rows.push( el( 'p', { key: 'help', className: 'components-base-control__help' },
+			__( 'The ticked places are searched now, so a topic is as large as the writing that still holds it. Tick none to use the number the pipeline sent.', 'key-word-cloud' ) ) );
+		return el( 'div', { key: 'sources' }, rows );
+	}
+
 	function inspector( props ) {
 		return [
 			el( InspectorControls, { key: 'content' }, [
@@ -242,7 +280,8 @@
 					range( props, 'max', __( 'Topics to draw', 'key-word-cloud' ),
 						carried().topics, __( 'The most covered topics, up to this many.', 'key-word-cloud' ) )
 				] ),
-				panel( __( 'Fields', 'key-word-cloud' ), true, [ fieldChecks( props ) ] )
+				panel( __( 'Fields', 'key-word-cloud' ), true, [ fieldChecks( props ) ] ),
+				panel( __( 'Where to look', 'key-word-cloud' ), true, [ sourceChecks( props ) ] )
 			] ),
 			el( InspectorControls, { key: 'appearance', group: 'styles' }, [
 				panel( __( 'Shape and size', 'key-word-cloud' ), true, [

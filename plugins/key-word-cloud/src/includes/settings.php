@@ -164,6 +164,7 @@ final class KWC_Settings {
 
 		$fields = array(
 			array( 'language', '언어', 'kwc_pick', 'field_language' ),
+			array( 'sources', '원본 글', 'kwc_pick', 'field_sources' ),
 			array( 'field_list', '분야 목록', 'kwc_pick', 'field_field_list' ),
 			array( 'fields', '그릴 분야', 'kwc_pick', 'field_fields' ),
 			array( 'min_posts', '최소 글 수', 'kwc_pick', 'field_min_posts' ),
@@ -209,6 +210,19 @@ final class KWC_Settings {
 		} else {
 			$errors[] = '언어 값이 잘못됐다: ' . $language;
 		}
+
+		$sources = array();
+		foreach ( (array) ( isset( $input['sources'] ) ? $input['sources'] : array() ) as $source ) {
+			$source = strtolower( trim( (string) $source ) );
+			if ( ! in_array( $source, KWC_Sources::ALL, true ) ) {
+				$errors[] = '원본 글 값이 잘못됐다: ' . $source;
+				continue;
+			}
+			if ( ! in_array( $source, $sources, true ) ) {
+				$sources[] = $source;
+			}
+		}
+		$out['sources'] = implode( ',', $sources );
 
 		// 목록을 먼저 읽는다. 아래에서 고른 분야가 이 목록에 드는지 보아야 하기 때문이다.
 		$listed = KWC_Cloud::parse_fields( isset( $input['field_list'] ) ? $input['field_list'] : '' );
@@ -437,6 +451,23 @@ final class KWC_Settings {
 		);
 	}
 
+	public static function field_sources() {
+		$chosen = KWC_Sources::parse( self::value( 'sources' ) );
+		$chosen = ( null === $chosen ) ? array() : $chosen;
+		foreach ( KWC_Sources::ALL as $source ) {
+			printf(
+				'<label style="display:inline-block;margin:0 16px 4px 0"><input type="checkbox" name="%s[]" value="%s" %s> %s</label>',
+				esc_attr( self::name( 'sources' ) ),
+				esc_attr( $source ),
+				checked( in_array( $source, $chosen, true ), true, false ),
+				esc_html( KWC_Sources::label( $source ) )
+			);
+		}
+		echo '<p class="description">고른 자리를 지금 뒤져 topic 마다 몇 곳에 나오는지 다시 센다. '
+			. '파이프라인이 돌던 날 이후에 쓴 글도 세어지고, 한 곳에도 안 나오는 topic 은 그리지 않는다. '
+			. '하나도 안 고르면 뒤지지 않고 파이프라인이 보낸 수를 그대로 쓴다.</p>';
+	}
+
 	public static function field_field_list() {
 		printf(
 			'<input type="text" name="%s" value="%s" class="large-text code" '
@@ -637,6 +668,11 @@ final class KWC_Settings {
 			<p>고른 언어로 <strong>번역한 뒤에</strong> 그 언어의 낱말을 찾는다. 영어를 고르면
 				한글로 쓴 글에서 나온 topic 도 영어 이름으로 나오고, 한글을 고르면 그 반대다.
 				언어를 고르는 일이 글의 절반을 감추는 일이 되지 않게 하려는 것이다.</p>
+
+			<h2>Version</h2>
+			<p>이 사이트에서 도는 판은 <strong><?php echo esc_html( KWC_VERSION ); ?></strong> 이다.
+				구름 왼쪽 위에도 같은 번호가 흐리게 적히므로, 화면에 보이는 구름이 어느 판이 그린
+				것인지 바로 알 수 있다. 새 판은 플러그인 화면에 알림으로 뜬다.</p>
 
 			<h2>모델</h2>
 			<p>구름이 되기까지 네 단계를 거치고, 단계마다 모델이 하나씩 붙는다. 뜻이 가까운 것끼리

@@ -18,6 +18,13 @@ analysing: a post written after the last pipeline run appears once the pipeline
 runs again and republishes the file. The settings screen shows the last
 attempt, the next run, and a button that fetches now.
 
+**Counted against what is actually written.** Choose where to look -- the post
+body, the excerpt, pages -- and every topic is searched for there when the
+cloud is drawn, instead of carrying the size it had on the day the pipeline
+ran. Posts written since then count, deleted ones stop counting, and a topic
+that appears nowhere any more is not drawn. Tick nothing to keep the
+pipeline's own numbers.
+
 **Sized by reach, not by repetition.** A topic is as large as the number of
 posts it covers, spread on a square-root scale so one broad topic does not
 flatten the rest. Its tooltip lists the phrases it was folded from.
@@ -70,6 +77,7 @@ so the reader lands on the ordinary post list of your theme.
 ### What you can set
 
 - Language: English, Korean, or both.
+- Where to look: the post body, the excerpt, pages, or none of them.
 - The fields to draw, as many as you like. None ticked draws every field.
 - The least number of posts a topic must cover, and how many topics to draw.
 - Smallest and largest font size in px.
@@ -86,6 +94,8 @@ Attributes override the saved settings for that one cloud. A bad value is
 reported on the page instead of being silently replaced by a default.
 
 - `language` — `en`, `ko`, or `both`.
+- `sources` — where to search, comma separated: `post`, `excerpt`, `page`.
+  Empty keeps the numbers the pipeline sent.
 - `fields` — the fields to draw, comma separated. Empty or `*` draws them all.
   A name outside the settings screen's list is an error listing the ones that
   are in it.

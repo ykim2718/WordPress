@@ -246,13 +246,26 @@ final class KWC_Cloud {
 
 		$min_posts = (int) $args['min_posts'];
 		$wanted    = self::parse_fields( $args['fields'] );
+		$sources   = KWC_Sources::parse( $args['sources'] );
+		$counted   = ( null === $sources ) ? array() : KWC_Sources::counts( $topics, $sources );
 		$entries   = array();
 		$drawn     = array();
 		$too_few   = 0;
 		$other_language = 0;
 		$other_field    = 0;
+		$not_found      = 0;
 		foreach ( $topics as $topic ) {
 			$posts = (int) $topic['posts'];
+			// 자리를 골랐으면 파이프라인이 보낸 수를 믿지 않고 지금 글을 뒤져 다시 센다.
+			// 그 뒤에 쓴 글이 반영되고, 지운 글은 빠진다.
+			if ( null !== $sources ) {
+				$label = (string) $topic['label'];
+				$posts = isset( $counted[ $label ] ) ? (int) $counted[ $label ] : 0;
+				if ( 0 === $posts ) {
+					$not_found++;
+					continue;
+				}
+			}
 			if ( $posts < $min_posts ) {
 				$too_few++;
 				continue;
@@ -287,10 +300,14 @@ final class KWC_Cloud {
 					empty( $phrases ) ? '' : ":\n" . implode( ' · ', array_slice( $phrases, 0, 8 ) )
 				),
 			);
-			if ( count( $entries ) >= (int) $args['max_words'] ) {
-				break;
-			}
 		}
+
+		// 다시 센 뒤에는 차례가 달라진다. 큰 것부터 세우고 나서 자른다. 여기서 자르지 않고
+		// 세는 도중에 자르면, 지금은 큰 topic 이 옛 차례에 밀려 빠진다.
+		usort( $entries, function ( $a, $b ) {
+			return $b['posts'] <=> $a['posts'];
+		} );
+		$entries = array_slice( $entries, 0, (int) $args['max_words'] );
 
 		if ( empty( $entries ) ) {
 			$why = sprintf(
@@ -298,6 +315,14 @@ final class KWC_Cloud {
 				__( 'of %1$d topics, %2$d come from fewer than %3$d posts and %4$d are not %5$s.', 'key-word-cloud' ),
 				count( $topics ), $too_few, $min_posts, $other_language, $args['language']
 			);
+			if ( null !== $sources ) {
+				$why .= ' ' . sprintf(
+					/* translators: 1: how many were not found, 2: the places that were searched */
+					__( '%1$d are in none of the places searched (%2$s).', 'key-word-cloud' ),
+					$not_found,
+					implode( ', ', $sources )
+				);
+			}
 			if ( null !== $wanted ) {
 				$why .= ' ' . sprintf(
 					/* translators: 1: how many are outside the chosen fields, 2: the chosen fields */

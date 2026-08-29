@@ -26,6 +26,7 @@ final class KWC_Block {
 	const SETTING_OF = array(
 		'language'    => 'language',
 		'fields'      => 'fields',
+		'sources'     => 'sources',
 		'shape'       => 'shape',
 		'ratio'       => 'ratio',
 		'width'       => 'width_px',
@@ -106,7 +107,13 @@ final class KWC_Block {
 			$most = max( $most, (int) $topic['posts'] );
 		}
 
+		$sources = array();
+		foreach ( KWC_Sources::ALL as $name ) {
+			$sources[] = array( 'name' => $name, 'label' => KWC_Sources::label( $name ) );
+		}
+
 		wp_localize_script( self::$editor_handle, 'KWC_BLOCK', array(
+			'sources'  => $sources,
 			'fields'   => $fields,
 			'settings' => $settings,
 			'topics'   => count( $topics ),

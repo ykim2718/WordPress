@@ -17,6 +17,7 @@ final class KWC_Defaults {
 	public static function options() {
 		return array(
 			'language'    => 'en',        // en | ko | both
+			'sources'     => 'post,excerpt',  // 어디를 뒤져 셀지. post | excerpt | page
 			'field_list'  => 'data science, mathematics, semiconductor, sports, liberal arts',
 			'fields'      => 'data science,mathematics,semiconductor',  // 그릴 분야. 비면 모든 분야
 			'max_words'   => 60,

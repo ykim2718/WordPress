@@ -1,3 +1,21 @@
+## 2.13.0
+
+- The cloud is counted against the site's own writing. Pick where to look --
+  the post body, the excerpt, pages -- and every topic is searched for there
+  now, rather than being drawn at the size the pipeline measured on the day it
+  ran. A post written since then counts, a deleted one stops counting, and a
+  topic that no longer appears anywhere is not drawn. The body and the excerpt
+  are ticked to begin with; tick nothing and the pipeline's own numbers are
+  used, as before.
+- Sizes can change order, so the topics are sorted after the recount and only
+  then cut to the number asked for. Cutting first would have kept whichever
+  topics were largest on the day the pipeline ran.
+- Counting 74 topics against 835 posts took 4 seconds, so the counts are kept
+  for a day of their own. Changing a colour or a size does not pay for it
+  again, and Refresh or emptying the cache starts it over.
+- The settings screen has a **Version** section above the models, saying which
+  version is running.
+
 ## 2.12.2
 
 - The settings screen said one model took three of the jobs without ever saying
