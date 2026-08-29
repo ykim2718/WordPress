@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-29T04:42:49Z",
+ "generated": "2026-08-29T04:45:00Z",
  "folder": "Images",
  "thumb_dir": ".thumbs",
  "thumb_width": 480,
@@ -746,14 +746,14 @@
    "e": 0
   },
   {
-   "n": "time-series-inference-server-800x900.png",
-   "s": 78416,
-   "h1": "a2d6a9a48d666759963dcbd62d8b354b99be3b58",
-   "d": 1787978557,
+   "n": "time-series-inference-server-800x600.png",
+   "s": 67399,
+   "h1": "5656e2c8695ccbb1a4bb33e5f3c7cce7faae627a",
+   "d": 1787978688,
    "w": 800,
-   "ht": 900,
+   "ht": 600,
    "e": 0,
-   "t": ".thumbs/time-series-inference-server-800x900.png.webp"
+   "t": ".thumbs/time-series-inference-server-800x600.png.webp"
   },
   {
    "n": "vanilla-cashmere-body-mist-backyard.jpg",
