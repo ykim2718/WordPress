@@ -21,25 +21,23 @@
 
 	var el = wp.element.createElement;
 	var __ = wp.i18n.__;
+	var sprintf = wp.i18n.sprintf;
 	var components = wp.components;
 	var InspectorControls = wp.blockEditor.InspectorControls;
 	var ServerSideRender = wp.serverSideRender;
 
 	var LANGUAGES = [
-		{ label: __( 'Saved setting', 'key-word-cloud' ), value: '' },
 		{ label: __( 'English', 'key-word-cloud' ), value: 'en' },
 		{ label: __( 'Korean', 'key-word-cloud' ), value: 'ko' },
 		{ label: __( 'Both', 'key-word-cloud' ), value: 'both' }
 	];
 
 	var SHAPES = [
-		{ label: __( 'Saved setting', 'key-word-cloud' ), value: '' },
 		{ label: __( 'Ellipse', 'key-word-cloud' ), value: 'ellipse' },
 		{ label: __( 'Block', 'key-word-cloud' ), value: 'block' }
 	];
 
 	var FONTS = [
-		{ label: __( 'Saved setting', 'key-word-cloud' ), value: '' },
 		{ label: __( 'Rounded', 'key-word-cloud' ), value: 'rounded' },
 		{ label: __( 'Sans', 'key-word-cloud' ), value: 'sans' },
 		{ label: __( 'Serif', 'key-word-cloud' ), value: 'serif' },
@@ -49,16 +47,35 @@
 	];
 
 	var COLOR_MODES = [
-		{ label: __( 'Saved setting', 'key-word-cloud' ), value: '' },
 		{ label: __( 'Several colours', 'key-word-cloud' ), value: 'palette' },
 		{ label: __( 'One-hue gradient', 'key-word-cloud' ), value: 'gradient' }
 	];
 
-	var LINKS = [
-		{ label: __( 'Saved setting', 'key-word-cloud' ), value: '' },
-		{ label: __( 'Search results for the topic', 'key-word-cloud' ), value: 'search' },
-		{ label: __( 'No link', 'key-word-cloud' ), value: 'none' }
-	];
+	/**
+	 * What the settings screen holds, keyed by the block's own attribute names,
+	 * handed over by block.php. An empty field means "use this", so the field
+	 * shows the value itself rather than the words "saved setting": the point of
+	 * looking at the sidebar is to learn what the cloud will do.
+	 */
+	function carried() {
+		return window.KWC_BLOCK || {};
+	}
+
+	function setting( key ) {
+		var settings = carried().settings;
+		return settings && settings[ key ] !== undefined ? String( settings[ key ] ) : '';
+	}
+
+	/** The saved value's own label, for the first entry of a select. */
+	function settingLabel( key, options ) {
+		var value = setting( key );
+		for ( var i = 0; i < options.length; i++ ) {
+			if ( options[ i ].value === value ) {
+				return options[ i ].label;
+			}
+		}
+		return value;
+	}
 
 	/** 한 attribute 만 바꾸는 setter */
 	function setter( props, key ) {
@@ -70,11 +87,13 @@
 	}
 
 	function select( props, key, label, options ) {
+		/* translators: the value the settings screen holds for this field */
+		var first = { label: sprintf( __( 'Setting: %s', 'key-word-cloud' ), settingLabel( key, options ) ), value: '' };
 		return el( components.SelectControl, {
 			key: key,
 			label: label,
 			value: props.attributes[ key ],
-			options: options,
+			options: [ first ].concat( options ),
 			onChange: setter( props, key )
 		} );
 	}
@@ -85,8 +104,43 @@
 			label: label,
 			help: help,
 			value: props.attributes[ key ],
-			placeholder: __( 'Saved setting', 'key-word-cloud' ),
+			placeholder: setting( key ),
 			onChange: setter( props, key )
+		} );
+	}
+
+	/**
+	 * A count picked on a slider rather than typed.
+	 *
+	 * The slider always stands somewhere, so an empty attribute shows the saved
+	 * setting's own number and reset puts it back to empty. `most` comes from the
+	 * uploaded topics, not from a number written here: a ceiling of 20 would put
+	 * values out of reach once the site grows and leave dead travel while it is
+	 * small.
+	 */
+	function range( props, key, label, most, help ) {
+		var saved = parseInt( setting( key ), 10 );
+		var raw = props.attributes[ key ];
+		var value = ( '' === raw ) ? saved : parseInt( raw, 10 );
+		if ( isNaN( value ) ) {
+			value = 1;
+		}
+		// wp_localize_script sends every number as a string; compare them as numbers.
+		var ceiling = parseInt( most, 10 );
+		// A slider whose ends meet cannot be moved, so it always reaches what it shows.
+		var top = Math.max( 2, isNaN( ceiling ) ? 1 : ceiling, value, isNaN( saved ) ? 1 : saved );
+		return el( components.RangeControl, {
+			key: key,
+			label: label,
+			help: help,
+			value: value,
+			min: 1,
+			max: top,
+			step: 1,
+			allowReset: true,
+			onChange: function ( next ) {
+				setter( props, key )( ( undefined === next || null === next ) ? '' : String( next ) );
+			}
 		} );
 	}
 
@@ -111,7 +165,7 @@
 		var fields = knownFields();
 		if ( ! fields.length ) {
 			return el( 'p', { key: 'no-fields', className: 'components-base-control__help' },
-				__( 'The uploaded topics carry no fields yet. Label them with tools/label_fields.py.', 'key-word-cloud' ) );
+				__( 'The topics on this site carry no fields yet, so there is nothing to tick. Run tools/label_fields.py over them, publish the result, and fetch it from the Key Word Cloud settings screen.', 'key-word-cloud' ) );
 		}
 
 		var value = String( props.attributes.fields || '' );
@@ -162,13 +216,12 @@
 			el( InspectorControls, { key: 'content' }, [
 				panel( __( 'Topics', 'key-word-cloud' ), true, [
 					select( props, 'language', __( 'Language', 'key-word-cloud' ), LANGUAGES ),
-					text( props, 'min_posts', __( 'Least posts', 'key-word-cloud' ), __( 'A topic drawn from fewer posts than this is left out.', 'key-word-cloud' ) ),
-					text( props, 'max', __( 'Topics to draw', 'key-word-cloud' ) )
+					range( props, 'min_posts', __( 'Least post count', 'key-word-cloud' ),
+						carried().mostPosts, __( 'A topic drawn from fewer posts than this is left out.', 'key-word-cloud' ) ),
+					range( props, 'max', __( 'Topics to draw', 'key-word-cloud' ),
+						carried().topics, __( 'The most covered topics, up to this many.', 'key-word-cloud' ) )
 				] ),
-				panel( __( 'Fields', 'key-word-cloud' ), true, [ fieldChecks( props ) ] ),
-				panel( __( 'Behaviour', 'key-word-cloud' ), false, [
-					select( props, 'link', __( 'Clicking a topic', 'key-word-cloud' ), LINKS )
-				] )
+				panel( __( 'Fields', 'key-word-cloud' ), true, [ fieldChecks( props ) ] )
 			] ),
 			el( InspectorControls, { key: 'appearance', group: 'styles' }, [
 				panel( __( 'Shape and size', 'key-word-cloud' ), true, [

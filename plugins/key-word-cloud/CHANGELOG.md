@@ -1,3 +1,22 @@
+## 2.10.0
+
+- The block's sidebar shows the value it would use instead of the words "saved
+  setting". A field left empty still follows the settings screen, but now it
+  says what that is: `Setting: English`, a placeholder of `3600`. Reading the
+  sidebar no longer means opening the settings screen to find out.
+- **Least posts** is now **Least post count**, and both it and **Topics to
+  draw** are sliders. Their ends come from the topics that are uploaded -- the
+  first stops at the largest post count a topic has, the second at how many
+  topics there are -- so neither offers a number that would do nothing. Reset
+  puts a slider back to following the settings screen.
+- The **Behaviour** panel is gone. What a click does is a decision for the
+  whole site, and it was in the block sidebar without effect there: the editor
+  preview has drawn its topics as plain text since 2.8.1, so the control could
+  not show what it changed. The settings screen still holds it, and so does the
+  shortcode's `link` attribute. A block that already carries a value keeps it.
+- The Fields panel says what to do when there is nothing to tick, rather than
+  naming a script and stopping.
+
 ## 2.9.0
 
 - Choosing a language no longer hides half the site. Every topic now carries

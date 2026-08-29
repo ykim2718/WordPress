@@ -19,6 +19,31 @@ final class KWC_Block {
 	private static $editor_handle = '';
 
 	/**
+	 * block 속성 이름 => 설정값 이름.
+	 *
+	 * 둘은 대개 같지만 몇 개는 다르다. 편집기는 속성 이름만 알므로 여기서 옮겨 준다.
+	 */
+	const SETTING_OF = array(
+		'language'    => 'language',
+		'fields'      => 'fields',
+		'shape'       => 'shape',
+		'ratio'       => 'ratio',
+		'width'       => 'width_px',
+		'height'      => 'height_px',
+		'font'        => 'font',
+		'font_custom' => 'font_custom',
+		'color_mode'  => 'color_mode',
+		'max'         => 'max_words',
+		'min_posts'   => 'min_posts',
+		'min_size'    => 'min_size',
+		'max_size'    => 'max_size',
+		'color_start' => 'color_start',
+		'color_end'   => 'color_end',
+		'link'        => 'link_mode',
+		'cache'       => 'cache_ttl',
+	);
+
+	/**
 	 * 인서터의 yRocket 묶음. block.json 의 category 가 이 slug 를 가리킨다.
 	 *
 	 * 등록되지 않은 category 를 가리키면 block 이 인서터에서 사라지므로,
@@ -55,16 +80,38 @@ final class KWC_Block {
 		wp_enqueue_style( 'key-word-cloud' );
 		wp_enqueue_script( 'key-word-cloud' );
 
-		// 분야 목록은 올라온 topic 에서 나온다. 편집기가 그것을 알아야 체크박스를 그린다.
+		// 분야 목록도, 칸을 비웠을 때 쓰이는 설정값도 서버에만 있다. 편집기가 "설정값을
+		// 쓴다" 고만 적으면 그 값이 무엇인지 보려고 설정 화면을 열어야 한다. 값을 보낸다.
 		if ( '' === self::$editor_handle ) {
 			error_log( '[key-word-cloud] the block editor script has no handle; the field list is unavailable' );
 			return;
 		}
+
 		$fields = array();
 		foreach ( KWC_Topics::fields() as $name => $count ) {
 			$fields[] = array( 'name' => (string) $name, 'count' => (int) $count );
 		}
-		wp_localize_script( self::$editor_handle, 'KWC_BLOCK', array( 'fields' => $fields ) );
+
+		$options  = KWC_Cloud::options();
+		$settings = array();
+		foreach ( self::SETTING_OF as $attribute => $option ) {
+			$settings[ $attribute ] = isset( $options[ $option ] ) ? (string) $options[ $option ] : '';
+		}
+
+		// 미끄럼대의 끝은 자료가 정한다. 어림으로 20 이라 적어 두면 글이 늘었을 때 손이
+		// 닿지 않는 값이 생기고, topic 이 적을 때는 쓸모없는 구간이 남는다.
+		$topics = KWC_Topics::stored();
+		$most   = 1;
+		foreach ( $topics as $topic ) {
+			$most = max( $most, (int) $topic['posts'] );
+		}
+
+		wp_localize_script( self::$editor_handle, 'KWC_BLOCK', array(
+			'fields'   => $fields,
+			'settings' => $settings,
+			'topics'   => count( $topics ),
+			'mostPosts' => $most,
+		) );
 	}
 
 	/**

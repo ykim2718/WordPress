@@ -101,8 +101,14 @@ reported on the page instead of being silently replaced by a default.
 ### Where the block's settings live
 
 The block's sidebar uses the editor's own tabs. Settings holds what is drawn --
-language, fields, how many topics, what a click does. Styles holds how it looks
--- shape, size, font, colour. The cache sits under Advanced, being neither.
+language, fields, how many topics, how few posts a topic may come from. Styles
+holds how it looks -- shape, size, font, colour. The cache sits under Advanced,
+being neither.
+
+A field left empty follows the settings screen and says which value that is, so
+the sidebar can be read without opening another screen. The two counts are
+sliders whose ends come from the topics themselves: no further than the largest
+topic, and no more than the topics there are.
 
 ### Where the settings live
 
