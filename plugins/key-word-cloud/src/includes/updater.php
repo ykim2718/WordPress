@@ -114,6 +114,12 @@ add_filter('plugins_api', function ($result, $action, $args) {
         'requires'      => '5.8',
         'requires_php'  => '7.4',
         'tested'        => get_bloginfo('version'),
+        'icons'         => array(
+            'svg'     => 'https://raw.githubusercontent.com/' . KWC_REPO . '/' . KWC_BRANCH
+                . '/plugins/' . KWC_SLUG . '/src/assets/icon.svg',
+            'default' => 'https://raw.githubusercontent.com/' . KWC_REPO . '/' . KWC_BRANCH
+                . '/plugins/' . KWC_SLUG . '/src/assets/icon.svg',
+        ),
         'sections'      => array(
             'description' => !empty($rel['desc'])
                 ? wp_kses_post($rel['desc'])

@@ -114,6 +114,8 @@ topic, and no more than the topics there are.
 
 ### Where the settings live
 
-The sidebar of WP Admin gets a **Key Word Cloud** menu. It shows how many
-topics have arrived and when, carries every setting above, renders the current
-cloud as a preview, and has a button that empties the cache.
+The sidebar of WP Admin gets a **Key Word Cloud** menu, under an icon of its
+own. It opens on what the plugin is and which models did which part of the
+work, then the shortcode and the block, then how many topics have arrived and
+when. Below that it carries every setting above, renders the current cloud as
+a preview, and has a button that empties the cache.

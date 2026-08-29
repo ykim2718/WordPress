@@ -90,6 +90,25 @@ final class KWC_Settings {
 	}
 
 	/**
+	 * 사이드바에 쓸 아이콘.
+	 *
+	 * WordPress 는 icon_url 이 data URI 이면 그대로 배경 그림으로 깔아 준다. 그림 파일
+	 * 주소를 주면 매번 한 번 더 받아 오므로, 작은 SVG 는 그냥 실어 보낸다.
+	 *
+	 * @return string data URI. 파일이 없으면 기본 아이콘 이름.
+	 */
+	private static function menu_icon() {
+		$path = KWC_DIR . 'assets/icon.svg';
+		$svg  = is_readable( $path ) ? file_get_contents( $path ) : '';
+		if ( '' === $svg ) {
+			// 아이콘이 빠진 채 배포되면 메뉴만 조용히 밋밋해진다. 로그에 남긴다.
+			error_log( '[key-word-cloud] assets/icon.svg is missing or unreadable: ' . $path );
+			return 'dashicons-tagcloud';
+		}
+		return 'data:image/svg+xml;base64,' . base64_encode( $svg );
+	}
+
+	/**
 	 * 사이드바 최상위 메뉴.
 	 */
 	public static function add_menu() {
@@ -99,7 +118,7 @@ final class KWC_Settings {
 			'manage_options',
 			self::PAGE,
 			array( __CLASS__, 'render_page' ),
-			'dashicons-tagcloud',
+			self::menu_icon(),
 			81
 		);
 	}
@@ -398,7 +417,8 @@ final class KWC_Settings {
 		self::radio_field(
 			'language',
 			array( 'en' => '영어', 'ko' => '한글', 'both' => '혼재' ),
-			'한글이 한 자라도 있으면 한글로 본다.'
+			'고른 언어로 번역한 이름으로 그린다. 혼재는 원래 쓰인 이름을 그대로 쓴다. '
+				. '이름이 하나뿐인 예전 자료는 한글이 한 자라도 있으면 한글로 보아 그 언어의 구름에만 나온다.'
 		);
 	}
 
@@ -589,8 +609,33 @@ final class KWC_Settings {
 		?>
 		<div class="wrap">
 			<h1>Key Word Cloud</h1>
-			<p>숏코드: <code>[wpwordcloud]</code> — 속성으로 아래 설정을 개별 페이지에서 덮어쓸 수 있다.<br>
-				예: <code>[wpwordcloud language="ko" max="30" min_posts="3" color_end="#b3202e"]</code></p>
+
+			<p>이 사이트가 무엇에 대해 써 왔는지를 구름으로 그린다. 낱말을 세는 것이 아니라,
+				글에서 뽑은 구절을 뜻이 가까운 것끼리 묶어 topic 으로 만들고 그 topic 을 그린다.
+				글자 크기는 그 topic 이 걸친 글 수이고, 색은 이웃을 갈라 보이게 할 뿐 뜻이 없다.
+				낱말을 누르면 그 말로 검색한 글 목록이 열린다.</p>
+
+			<p>고른 언어로 <strong>번역한 뒤에</strong> 그 언어의 낱말을 찾는다. 영어를 고르면
+				한글로 쓴 글에서 나온 topic 도 영어 이름으로 나오고, 한글을 고르면 그 반대다.
+				언어를 고르는 일이 글의 절반을 감추는 일이 되지 않게 하려는 것이다.</p>
+
+			<h2>모델</h2>
+			<p>세 가지 일을 한 모델이 나눠 맡는다. 셋 다 GPU 가 있는 기계에서 도는 파이프라인의
+				일이고, 이 사이트는 그 결과만 받아 그린다. 워드프레스가 모델을 부르지 않으므로
+				GPU 도, 외부 API 키도 필요 없다.</p>
+			<table class="widefat striped" style="max-width:52em">
+				<thead><tr><th>Model</th><th>Role</th></tr></thead>
+				<tbody>
+					<tr><td><code>qwen3:8b</code></td><td>글마다 핵심 구절을 뽑고, topic 을 분야로 가르고, 두 언어의 이름을 붙인다</td></tr>
+					<tr><td><code>bge-m3</code></td><td>구절을 벡터로 바꿔 뜻이 가까운 것끼리 묶는다</td></tr>
+				</tbody>
+			</table>
+
+			<h2>숏코드</h2>
+			<p><code>[wpwordcloud]</code> — 속성으로 아래 설정을 개별 페이지에서 덮어쓸 수 있다.<br>
+				예: <code>[wpwordcloud language="ko" max="30" min_posts="3" fields="mathematics"]</code></p>
+			<p class="description">블록 삽입기의 <strong>yRocket</strong> 묶음에 있는
+				<strong>Key Word Cloud</strong> 블록도 같은 것을 그린다.</p>
 
 			<h2>올라온 topic</h2>
 			<?php if ( 0 === $status['count'] ) : ?>

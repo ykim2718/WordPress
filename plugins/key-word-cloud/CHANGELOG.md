@@ -1,3 +1,16 @@
+## 2.12.0
+
+- The settings screen says what the plugin is before it starts asking for
+  settings: what a cloud is made of, that the chosen language is translated
+  into before the keyword is picked, which two models do which part of the work
+  and that neither of them runs on this site, and then the shortcode and the
+  block. The count of uploaded topics follows all of that instead of opening
+  the screen.
+- The plugin has its own icon: KWC across a cloud, in the blues the cloud
+  itself draws with. It is drawn for the 20px it gets in the admin menu, so the
+  shape is flat and wide and the letters are stretched across it. The same file
+  is offered to the plugin list and the View details window.
+
 ## 2.11.2
 
 - The 2.11.1 upgrade did not fire on the sites it was written for. It decided

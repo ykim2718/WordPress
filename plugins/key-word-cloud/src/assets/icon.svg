@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Key Word Cloud">
+	<!--
+		Drawn at 20px in the admin menu, so the letters have about six pixels of
+		height to work with. Everything here is in service of that: the cloud is
+		flattened and widened to leave one broad band for the text, the lobes sit
+		high so they never crowd it, and KWC is stretched the full width of that
+		band in one heavy weight.
+
+		The blues are the palette the cloud itself draws with. Slot 1 sits at the
+		bottom and the gradient's light end at the top. The text sits on the dark
+		half, where white clears 5.5:1, and that contrast is what holds the letters
+		together once they are six pixels tall.
+	-->
+	<defs>
+		<linearGradient id="kwc-sky" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#7db0e8"/>
+			<stop offset="0.55" stop-color="#2a72c9"/>
+			<stop offset="1" stop-color="#1a5aa8"/>
+		</linearGradient>
+	</defs>
+	<path fill="url(#kwc-sky)" d="M4.7 20.5a4.2 4.2 0 0 1-.8-8.33 5.9 5.9 0 0 1 11.06-2.6 4.4 4.4 0 0 1 6.14 3.2 4.2 4.2 0 0 1-1.4 7.73z"/>
+	<text x="12" y="18.05" text-anchor="middle" textLength="18.6" lengthAdjust="spacingAndGlyphs"
+		font-family="'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+		font-size="8.4" font-weight="700" fill="#ffffff">KWC</text>
+</svg>
