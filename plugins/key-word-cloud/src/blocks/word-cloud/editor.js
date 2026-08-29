@@ -86,6 +86,22 @@
 		};
 	}
 
+	/**
+	 * A select is a drawer you have to open before it says anything. With four
+	 * answers or fewer the radios cost the same room and show all of them.
+	 */
+	function radio( props, key, label, options ) {
+		/* translators: the value the settings screen holds for this field */
+		var first = { label: sprintf( __( 'Setting: %s', 'key-word-cloud' ), settingLabel( key, options ) ), value: '' };
+		return el( components.RadioControl, {
+			key: key,
+			label: label,
+			selected: props.attributes[ key ],
+			options: [ first ].concat( options ),
+			onChange: setter( props, key )
+		} );
+	}
+
 	function select( props, key, label, options ) {
 		/* translators: the value the settings screen holds for this field */
 		var first = { label: sprintf( __( 'Setting: %s', 'key-word-cloud' ), settingLabel( key, options ) ), value: '' };
@@ -168,7 +184,10 @@
 				__( 'The topics on this site carry no fields yet, so there is nothing to tick. Run tools/label_fields.py over them, publish the result, and fetch it from the Key Word Cloud settings screen.', 'key-word-cloud' ) );
 		}
 
-		var value = String( props.attributes.fields || '' );
+		var raw = String( props.attributes.fields || '' );
+		// An empty attribute follows the settings screen, so show what that ticks
+		// rather than nothing. Every other field in this sidebar reads that way.
+		var value = ( '' === raw ) ? setting( 'fields' ) : raw;
 		var all = '*' === value;
 		var chosen = ( all || '' === value ) ? [] : value.split( ',' );
 		var set = setter( props, 'fields' );
@@ -195,13 +214,15 @@
 					if ( on ) {
 						next.push( field.name );
 					}
+					// Nobody wants a cloud of no fields at all, so emptying the list
+					// goes back to following the settings screen.
 					set( next.join( ',' ) );
 				}
 			} ) );
 		} );
 
 		rows.push( el( 'p', { key: 'help', className: 'components-base-control__help' },
-			__( 'Only topics in the ticked fields are drawn. Tick none to use the saved setting.', 'key-word-cloud' ) ) );
+			__( 'Only topics in the ticked fields are drawn. Untick them all to follow the settings screen. A field showing 0 has no topics in it yet.', 'key-word-cloud' ) ) );
 		return el( 'div', { key: 'fields' }, rows );
 	}
 
@@ -215,7 +236,7 @@
 		return [
 			el( InspectorControls, { key: 'content' }, [
 				panel( __( 'Topics', 'key-word-cloud' ), true, [
-					select( props, 'language', __( 'Language', 'key-word-cloud' ), LANGUAGES ),
+					radio( props, 'language', __( 'Language', 'key-word-cloud' ), LANGUAGES ),
 					range( props, 'min_posts', __( 'Least post count', 'key-word-cloud' ),
 						carried().mostPosts, __( 'A topic drawn from fewer posts than this is left out.', 'key-word-cloud' ) ),
 					range( props, 'max', __( 'Topics to draw', 'key-word-cloud' ),

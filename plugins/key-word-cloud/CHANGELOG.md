@@ -1,3 +1,21 @@
+## 2.11.0
+
+- The fields are now declared on the settings screen instead of being read back
+  out of the topics. A field nothing has been classified into yet was invisible,
+  and being invisible it could not be picked, so nothing would ever be
+  classified into it. The list now shows every field with its count, `0`
+  included.
+- The fields ship as data science, mathematics, semiconductor, sports and
+  liberal arts, with the first three ticked. `machine learning` and `applied
+  statistics` are gone; re-run `tools/label_fields.py` with the new names and
+  publish, or the counts will read `0`.
+- Language is radio buttons rather than a select in the block sidebar. Four
+  answers fit in the room a closed select takes up.
+- The block's field boxes start from what the settings screen ticks, the way
+  every other field in that sidebar shows its setting. Unticking them all goes
+  back to following the settings screen, since a cloud of no fields at all is
+  not something to ask for.
+
 ## 2.10.0
 
 - The block's sidebar shows the value it would use instead of the words "saved

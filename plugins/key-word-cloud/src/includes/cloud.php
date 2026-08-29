@@ -114,6 +114,35 @@ final class KWC_Cloud {
 	}
 
 	/**
+	 * 고를 수 있는 분야와 각 분야에 든 topic 수.
+	 *
+	 * 목록은 설정이 정하고 자료가 정하지 않는다. 자료에서 읽으면 아직 topic 이 하나도
+	 * 들지 않은 분야가 화면에서 사라지고, 그 분야를 고를 수 없으니 topic 도 영영 안 는다.
+	 * 설정이 비어 있을 때만 자료에 있는 이름을 쓴다.
+	 *
+	 * @return array 이름 => topic 수.
+	 */
+	public static function known_fields() {
+		$counts  = KWC_Topics::fields();
+		$options = self::options();
+		$listed  = self::parse_fields( isset( $options['field_list'] ) ? $options['field_list'] : '' );
+		if ( null === $listed || empty( $listed ) ) {
+			return $counts;
+		}
+		$known = array();
+		foreach ( $listed as $name ) {
+			$known[ $name ] = isset( $counts[ $name ] ) ? $counts[ $name ] : 0;
+		}
+		// 목록에서 빠졌는데 topic 이 달고 있는 이름은 조용히 감추지 않는다.
+		foreach ( $counts as $name => $count ) {
+			if ( ! isset( $known[ $name ] ) ) {
+				$known[ $name ] = $count;
+			}
+		}
+		return $known;
+	}
+
+	/**
 	 * 그릴 분야 목록을 읽는다.
 	 *
 	 * 빈 문자열과 `*` 는 둘 다 "모든 분야" 다. 값이 있으면 그 분야가 붙은 topic 만

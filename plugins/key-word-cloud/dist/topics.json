@@ -14,7 +14,8 @@
     "tree-based models"
    ],
    "fields": [
-    "machine learning"
+    "mathematics",
+    "data science"
    ],
    "labels": {
     "en": "stochastic optimization",
@@ -34,7 +35,7 @@
     "ai-native startup"
    ],
    "fields": [
-    "machine learning"
+    "data science"
    ],
    "labels": {
     "en": "ai assisted development",
@@ -54,7 +55,9 @@
     "server side rendering",
     "server-side execution"
    ],
-   "fields": [],
+   "fields": [
+    "semiconductor"
+   ],
    "labels": {
     "en": "server side rendering",
     "ko": "서버 측 렌더링"
@@ -73,7 +76,9 @@
     "youtube video",
     "youtube watch"
    ],
-   "fields": [],
+   "fields": [
+    "sports"
+   ],
    "labels": {
     "en": "youtube video",
     "ko": "유튜브 영상"
@@ -88,7 +93,7 @@
     "top 5 keywords"
    ],
    "fields": [
-    "semiconductor"
+    "mathematics"
    ],
    "labels": {
     "en": "keyword optimization",
@@ -104,7 +109,9 @@
     "one factor at a time",
     "results driven"
    ],
-   "fields": [],
+   "fields": [
+    "mathematics"
+   ],
    "labels": {
     "en": "one factor at a time",
     "ko": "하나의 요소씩"
@@ -121,7 +128,7 @@
     "residual variance"
    ],
    "fields": [
-    "applied statistics"
+    "mathematics"
    ],
    "labels": {
     "en": "residual bias",
@@ -157,7 +164,7 @@
     "user prompt"
    ],
    "fields": [
-    "machine learning"
+    "data science"
    ],
    "labels": {
     "en": "system prompt",
@@ -173,7 +180,9 @@
     "windows api",
     "wp rest api"
    ],
-   "fields": [],
+   "fields": [
+    "semiconductor"
+   ],
    "labels": {
     "en": "wp rest api",
     "ko": "wp rest api"
@@ -188,7 +197,9 @@
     "세법상 미국인",
     "세액공제"
    ],
-   "fields": [],
+   "fields": [
+    "liberal arts"
+   ],
    "labels": {
     "ko": "세무서",
     "en": "tax office"
@@ -205,7 +216,7 @@
     "robotic process automation"
    ],
    "fields": [
-    "machine learning"
+    "data science"
    ],
    "labels": {
     "en": "agentic automation"
@@ -218,7 +229,9 @@
     "agile development",
     "agile manifesto"
    ],
-   "fields": [],
+   "fields": [
+    "semiconductor"
+   ],
    "labels": {
     "en": "agile development",
     "ko": "애자일 개발"
@@ -231,7 +244,9 @@
     "applicant tracking system",
     "face recognition system"
    ],
-   "fields": [],
+   "fields": [
+    "semiconductor"
+   ],
    "labels": {
     "en": "applicant tracking system",
     "ko": "지원자 추적 시스템"
@@ -246,7 +261,7 @@
     "categorical variables"
    ],
    "fields": [
-    "applied statistics"
+    "mathematics"
    ],
    "labels": {
     "en": "categorical variables",
@@ -261,7 +276,9 @@
     "cost sharing",
     "inclusion"
    ],
-   "fields": [],
+   "fields": [
+    "liberal arts"
+   ],
    "labels": {
     "en": "co-development",
     "ko": "공동 개발"
@@ -275,7 +292,9 @@
     "continuous loop",
     "iterative cycle"
    ],
-   "fields": [],
+   "fields": [
+    "mathematics"
+   ],
    "labels": {
     "en": "continuous loop",
     "ko": "지속적 루프"
@@ -288,7 +307,9 @@
     "customer collaboration",
     "value customer"
    ],
-   "fields": [],
+   "fields": [
+    "liberal arts"
+   ],
    "labels": {
     "en": "customer collaboration",
     "ko": "고객 협업"
@@ -301,7 +322,9 @@
     "file type compatibility",
     "working software"
    ],
-   "fields": [],
+   "fields": [
+    "semiconductor"
+   ],
    "labels": {
     "en": "file type compatibility",
     "ko": "파일 형식 호환성"
@@ -315,7 +338,9 @@
     "real-time data processing",
     "time to interactive"
    ],
-   "fields": [],
+   "fields": [
+    "mathematics"
+   ],
    "labels": {
     "en": "flexibility real-time",
     "ko": "유연성 실시간"
@@ -342,7 +367,9 @@
     "language server protocol",
     "model context protocol"
    ],
-   "fields": [],
+   "fields": [
+    "semiconductor"
+   ],
    "labels": {
     "en": "language server protocol",
     "ko": "언어 서버 프로토콜"
@@ -357,7 +384,7 @@
     "transistor scaling"
    ],
    "fields": [
-    "applied statistics"
+    "mathematics"
    ],
    "labels": {
     "en": "min-max scaling",
@@ -372,7 +399,9 @@
     "recruiter efficiency",
     "recruitment management tool"
    ],
-   "fields": [],
+   "fields": [
+    "liberal arts"
+   ],
    "labels": {
     "en": "recruitment management tool",
     "ko": "채용 관리 도구"
@@ -387,7 +416,9 @@
     "reference indexing",
     "reference number"
    ],
-   "fields": [],
+   "fields": [
+    "liberal arts"
+   ],
    "labels": {
     "en": "reference number",
     "ko": "참조 번호"
@@ -401,7 +432,9 @@
     "response noise",
     "responsiveness sensitivity"
    ],
-   "fields": [],
+   "fields": [
+    "semiconductor"
+   ],
    "labels": {
     "en": "response noise",
     "ko": "응답 노이즈"
@@ -416,7 +449,8 @@
     "systematic model error"
    ],
    "fields": [
-    "applied statistics"
+    "mathematics",
+    "data science"
    ],
    "labels": {
     "en": "statistical model",
@@ -431,7 +465,9 @@
     "version control systems",
     "version-control prompts"
    ],
-   "fields": [],
+   "fields": [
+    "semiconductor"
+   ],
    "labels": {
     "en": "version control systems",
     "ko": "버전 관리 시스템"
@@ -445,7 +481,9 @@
     "종합소득세 신고",
     "종합소득세 신고서"
    ],
-   "fields": [],
+   "fields": [
+    "liberal arts"
+   ],
    "labels": {
     "ko": "종합소득세 신고",
     "en": "income tax report"
@@ -458,7 +496,9 @@
     "1 to 1 identity line",
     "identity line"
    ],
-   "fields": [],
+   "fields": [
+    "mathematics"
+   ],
    "labels": {
     "en": "1 to 1 identity line",
     "ko": "1 대 1 정체성선"
@@ -471,7 +511,9 @@
     "4-axis matrix",
     "four pillars"
    ],
-   "fields": [],
+   "fields": [
+    "mathematics"
+   ],
    "labels": {
     "en": "4-axis matrix",
     "ko": "4축 매트릭스"
@@ -484,7 +526,9 @@
     "ats score",
     "ats-friendly resume"
    ],
-   "fields": [],
+   "fields": [
+    "semiconductor"
+   ],
    "labels": {
     "en": "ats score",
     "ko": "ats 점수"
@@ -498,7 +542,9 @@
     "chain of verification",
     "source verification"
    ],
-   "fields": [],
+   "fields": [
+    "semiconductor"
+   ],
    "labels": {
     "en": "chain of verification",
     "ko": "검증 체인"
@@ -511,7 +557,9 @@
     "clear headings",
     "headless cms"
    ],
-   "fields": [],
+   "fields": [
+    "liberal arts"
+   ],
    "labels": {
     "en": "clear headings",
     "ko": "명확한 헤딩"
@@ -525,7 +573,7 @@
     "generalization performance"
    ],
    "fields": [
-    "machine learning"
+    "data science"
    ],
    "labels": {
     "en": "collective intelligence",
@@ -557,7 +605,7 @@
     "pearson correlation coefficient"
    ],
    "fields": [
-    "applied statistics"
+    "mathematics"
    ],
    "labels": {
     "en": "concordance correlation coefficient",
@@ -571,7 +619,9 @@
     "core definition",
     "core values"
    ],
-   "fields": [],
+   "fields": [
+    "liberal arts"
+   ],
    "labels": {
     "en": "core values",
     "ko": "핵심 가치"
@@ -584,7 +634,9 @@
     "cross-functional team",
     "team differences"
    ],
-   "fields": [],
+   "fields": [
+    "liberal arts"
+   ],
    "labels": {
     "en": "cross-functional team",
     "ko": "크로스 기능 팀"
@@ -597,7 +649,7 @@
     "design of experiments"
    ],
    "fields": [
-    "applied statistics"
+    "mathematics"
    ],
    "labels": {
     "en": "design of experiments",
@@ -612,7 +664,7 @@
     "deterministic architecture"
    ],
    "fields": [
-    "machine learning"
+    "mathematics"
    ],
    "labels": {
     "en": "deterministic architecture",
@@ -626,7 +678,9 @@
     "direct quotes",
     "examples sentence"
    ],
-   "fields": [],
+   "fields": [
+    "liberal arts"
+   ],
    "labels": {
     "en": "examples sentence",
     "ko": "예시 문장"
@@ -642,7 +696,8 @@
     "unexplained variation"
    ],
    "fields": [
-    "applied statistics"
+    "mathematics",
+    "data science"
    ],
    "labels": {
     "en": "explained variation",
@@ -656,7 +711,9 @@
     "external data sources",
     "web based source"
    ],
-   "fields": [],
+   "fields": [
+    "data science"
+   ],
    "labels": {
     "en": "external data sources",
     "ko": "외부 데이터 소스"
@@ -670,7 +727,7 @@
     "factors levels response"
    ],
    "fields": [
-    "applied statistics"
+    "mathematics"
    ],
    "labels": {
     "en": "factors levels",
@@ -684,7 +741,9 @@
     "fault detection classification",
     "fault isolation"
    ],
-   "fields": [],
+   "fields": [
+    "semiconductor"
+   ],
    "labels": {
     "en": "fault isolation",
     "ko": "결함 격리"
@@ -698,7 +757,7 @@
     "feature selection"
    ],
    "fields": [
-    "machine learning"
+    "data science"
    ],
    "labels": {
     "en": "feature selection",
@@ -714,7 +773,9 @@
     "git mcp server",
     "mcp on wordpress.com"
    ],
-   "fields": [],
+   "fields": [
+    "semiconductor"
+   ],
    "labels": {
     "en": "fetch mcp server",
     "ko": "fetch mcp 서버"
@@ -729,7 +790,9 @@
     "jump turn",
     "side turn"
    ],
-   "fields": [],
+   "fields": [
+    "sports"
+   ],
    "labels": {
     "en": "flip turn",
     "ko": "플립 턴"
@@ -742,7 +805,9 @@
     "hello world",
     "please provide"
    ],
-   "fields": [],
+   "fields": [
+    "liberal arts"
+   ],
    "labels": {
     "en": "hello world",
     "ko": "헬로 월드"
@@ -757,7 +822,7 @@
     "output feature engineering"
    ],
    "fields": [
-    "applied statistics"
+    "data science"
    ],
    "labels": {
     "en": "input feature engineering",
@@ -772,7 +837,7 @@
     "inverted org chart"
    ],
    "fields": [
-    "applied statistics"
+    "data science"
    ],
    "labels": {
     "en": "inverse transform",
@@ -786,7 +851,7 @@
     "loss function"
    ],
    "fields": [
-    "machine learning"
+    "mathematics"
    ],
    "labels": {
     "en": "loss function",
@@ -801,7 +866,7 @@
     "missing values"
    ],
    "fields": [
-    "applied statistics"
+    "data science"
    ],
    "labels": {
     "en": "missing values",
@@ -816,7 +881,7 @@
     "one-hot encoding"
    ],
    "fields": [
-    "machine learning"
+    "data science"
    ],
    "labels": {
     "en": "one intel",
@@ -830,7 +895,9 @@
     "positive spin",
     "small positive ranges"
    ],
-   "fields": [],
+   "fields": [
+    "liberal arts"
+   ],
    "labels": {
     "en": "positive spin",
     "ko": "긍정적 스파인"
@@ -858,7 +925,9 @@
     "pydantic-ai",
     "pythonic way"
    ],
-   "fields": [],
+   "fields": [
+    "data science"
+   ],
    "labels": {
     "en": "pythonic way",
     "ko": "파이썬식"
@@ -874,7 +943,8 @@
     "uncentered r squared"
    ],
    "fields": [
-    "applied statistics"
+    "mathematics",
+    "data science"
    ],
    "labels": {
     "en": "r squared",
@@ -891,7 +961,9 @@
     "risen framework",
     "rtf framework"
    ],
-   "fields": [],
+   "fields": [
+    "data science"
+   ],
    "labels": {
     "en": "react framework",
     "ko": "리액트 프레임워크"
@@ -918,7 +990,9 @@
     "screening interview",
     "technical interviews"
    ],
-   "fields": [],
+   "fields": [
+    "liberal arts"
+   ],
    "labels": {
     "en": "screening interview",
     "ko": "스크리닝 인터뷰"
@@ -931,7 +1005,9 @@
     "self-awareness",
     "self-interrogate"
    ],
-   "fields": [],
+   "fields": [
+    "liberal arts"
+   ],
    "labels": {
     "en": "self-awareness",
     "ko": "자기 인식"
@@ -960,7 +1036,9 @@
     "star method",
     "start method"
    ],
-   "fields": [],
+   "fields": [
+    "liberal arts"
+   ],
    "labels": {
     "en": "smart method",
     "ko": "스마트 방법"
@@ -974,7 +1052,7 @@
     "task output format"
    ],
    "fields": [
-    "machine learning"
+    "data science"
    ],
    "labels": {
     "en": "standard test data format",
@@ -989,7 +1067,7 @@
     "structured record system"
    ],
    "fields": [
-    "applied statistics"
+    "mathematics"
    ],
    "labels": {
     "en": "structured record system",
@@ -1004,7 +1082,7 @@
     "target time"
    ],
    "fields": [
-    "machine learning"
+    "data science"
    ],
    "labels": {
     "en": "target non-stationarity",
@@ -1019,7 +1097,7 @@
     "yield analysis"
    ],
    "fields": [
-    "machine learning"
+    "data science"
    ],
    "labels": {
     "en": "test yield data",
@@ -1035,8 +1113,7 @@
     "time series vectorization"
    ],
    "fields": [
-    "machine learning",
-    "applied statistics"
+    "data science"
    ],
    "labels": {
     "en": "time series embedding",
@@ -1050,7 +1127,9 @@
     "universal adapter",
     "universal rendering"
    ],
-   "fields": [],
+   "fields": [
+    "semiconductor"
+   ],
    "labels": {
     "en": "universal rendering",
     "ko": "유니버설 렌더링"
@@ -1076,7 +1155,9 @@
     "code block",
     "vibe coding"
    ],
-   "fields": [],
+   "fields": [
+    "data science"
+   ],
    "labels": {
     "en": "vibe coding",
     "ko": "비브 코딩"
@@ -1089,7 +1170,9 @@
     "비판적 분석",
     "전략적 비교"
    ],
-   "fields": [],
+   "fields": [
+    "liberal arts"
+   ],
    "labels": {
     "ko": "전략적 비교",
     "en": "strategic comparison"

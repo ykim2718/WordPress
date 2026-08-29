@@ -88,7 +88,7 @@ final class KWC_Block {
 		}
 
 		$fields = array();
-		foreach ( KWC_Topics::fields() as $name => $count ) {
+		foreach ( KWC_Cloud::known_fields() as $name => $count ) {
 			$fields[] = array( 'name' => (string) $name, 'count' => (int) $count );
 		}
 

@@ -1,6 +1,6 @@
 # Topic Pipeline
 
-Rev. 2 | Created: 2026-08-28 | Updated: 2026-08-28 19:44 CDT
+Rev. 3 | Created: 2026-08-28 | Updated: 2026-08-28 20:31 CDT
 
 `ranking=topics` 로 그릴 topic 을 만드는 script 다섯 개이다. plugin 과 별개로 돌며, zip 에도
 들어가지 않는다. 다섯 script 는 순서대로 실행하고, 앞 단계의 JSON 을 다음 단계가 읽는다.
@@ -81,25 +81,30 @@ Embedding model 의 선택이 결과를 크게 바꾼다. 영어 중심 model �
 
 ```bash
 python tools/label_fields.py --input cluster_keywords.json \
-    --fields "semiconductor, machine learning, applied statistics"
+    --fields "data science, mathematics, semiconductor, sports, liberal arts"
 ```
+
+여기 준 이름은 plugin 설정 화면의 **분야 목록** 과 같아야 한다. 다르면 그 분야의 개수가
+`0` 으로 남는다.
 
 무리 하나가 여러 분야에 들 수 있고, 어디에도 안 드는 무리는 그대로 남는다. 목록에 없는
 이름을 model 이 지어내면 버리고 몇 개를 버렸는지 센다. 어느 분야에도 무리가 남지 않으면
 결과를 쓰지 않고 멈춘다. 그 상태로 올리면 구름이 빈 이유를 site 에서 찾게 된다.
 
-Table 2. Labelling 240 clusters into three fields with `qwen3:8b`
+Table 2. Labelling 240 clusters into five fields with `qwen3:8b`
 
 | Field | Clusters |
 |---|---|
-| applied statistics | 37 |
-| machine learning | 26 |
-| semiconductor | 15 |
-| in none of them | 165 |
+| mathematics | 46 |
+| liberal arts | 45 |
+| data science | 38 |
+| semiconductor | 38 |
+| sports | 7 |
+| in none of them | 70 |
 
-240 개를 20 개씩 묶어 물어 224 초가 걸렸고, 목록에 없는 이름 3 개가 버려졌다. 분야가 둘
-붙은 무리가 있어 열의 합은 240 을 넘는다. 세 분야로 가르면 대부분의 무리는 어디에도 들지
-않는다. 분야를 좁게 잡을수록 그 수는 늘고, 그것이 분야를 고르는 목적이다.
+240 개를 20 개씩 묶어 물었고, 목록에 없는 이름 하나가 버려졌다. 분야가 둘 이상 붙은 무리가
+있어 열의 합은 240 을 넘는다. 어디에도 들지 않는 무리는 분야를 좁게 잡을수록 늘어난다. 세
+분야로 갈랐을 때는 165 개였고, 다섯으로 늘리자 70 개가 되었다.
 
 ### 3.4. Translate
 

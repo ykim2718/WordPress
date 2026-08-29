@@ -24,10 +24,11 @@ flatten the rest. Its tooltip lists the phrases it was folded from.
 
 **Draw one subject, or several.** Each topic carries the fields it belongs to,
 named by you and sorted by the model, so a blog that writes about several
-things can draw them apart: semiconductor and machine learning in one cloud,
-applied statistics in another, on the same page. Tick as many fields as a
-cloud should hold. The list comes from the topics that were uploaded, so it
-grows with the pipeline rather than with the plugin.
+things can draw them apart: data science and semiconductor in one cloud,
+mathematics in another, on the same page. Tick as many fields as a cloud
+should hold. The fields are yours to name on the settings screen, and each one
+shows how many topics have landed in it, `0` included -- a field you cannot
+see is a field you cannot pick, and one nothing would ever be sorted into.
 
 **Korean, English, or both — without losing half the site.** Every topic
 carries both an English and a Korean name, so a topic found in Korean posts is
@@ -86,7 +87,8 @@ reported on the page instead of being silently replaced by a default.
 
 - `language` — `en`, `ko`, or `both`.
 - `fields` — the fields to draw, comma separated. Empty or `*` draws them all.
-  A name no uploaded topic carries is an error listing the ones that exist.
+  A name outside the settings screen's list is an error listing the ones that
+  are in it.
 - `min_posts` — a topic drawn from fewer posts than this is left out.
 - `max` — how many topics to draw, 60 by default.
 - `min_size`, `max_size` — font size range in px, 12 and 44 by default.

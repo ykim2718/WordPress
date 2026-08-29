@@ -74,7 +74,7 @@ final class KWC_Shortcode {
 
 		$fields = KWC_Cloud::parse_fields( $atts['fields'] );
 		if ( is_array( $fields ) ) {
-			$known = array_keys( KWC_Topics::fields() );
+			$known = array_keys( KWC_Cloud::known_fields() );
 			if ( empty( $fields ) ) {
 				return new WP_Error( 'kwc_no_fields', 'fields 에 쓸 수 있는 이름이 하나도 없다. 받은 값: ' . $atts['fields'] );
 			}
@@ -83,8 +83,8 @@ final class KWC_Shortcode {
 			if ( ! empty( $unknown ) ) {
 				return new WP_Error(
 					'kwc_bad_field',
-					'올라온 topic 에 없는 분야다: ' . implode( ', ', $unknown )
-						. '. 쓸 수 있는 분야: ' . ( empty( $known ) ? '없다 (파이프라인이 분야를 붙이지 않았다)' : implode( ', ', $known ) )
+					'없는 분야다: ' . implode( ', ', $unknown )
+						. '. 쓸 수 있는 분야: ' . ( empty( $known ) ? '없다 (설정의 분야 목록이 비었다)' : implode( ', ', $known ) )
 				);
 			}
 		}

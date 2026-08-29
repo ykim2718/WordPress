@@ -86,7 +86,8 @@ final class KWC_Settings {
 
 		$fields = array(
 			array( 'language', '언어', 'kwc_pick', 'field_language' ),
-			array( 'fields', '분야', 'kwc_pick', 'field_fields' ),
+			array( 'field_list', '분야 목록', 'kwc_pick', 'field_field_list' ),
+			array( 'fields', '그릴 분야', 'kwc_pick', 'field_fields' ),
 			array( 'min_posts', '최소 글 수', 'kwc_pick', 'field_min_posts' ),
 			array( 'max_words', '최대 topic 수', 'kwc_pick', 'field_max_words' ),
 			array( 'shape', '모양', 'kwc_style', 'field_shape' ),
@@ -131,8 +132,12 @@ final class KWC_Settings {
 			$errors[] = '언어 값이 잘못됐다: ' . $language;
 		}
 
+		// 목록을 먼저 읽는다. 아래에서 고른 분야가 이 목록에 드는지 보아야 하기 때문이다.
+		$listed = KWC_Cloud::parse_fields( isset( $input['field_list'] ) ? $input['field_list'] : '' );
+		$out['field_list'] = ( null === $listed ) ? '' : implode( ', ', $listed );
+
 		// 체크박스는 고른 것만 온다. 하나도 안 고르면 key 자체가 없고, 그것이 "모든 분야" 다.
-		$known  = array_keys( KWC_Topics::fields() );
+		$known  = array_keys( KWC_Cloud::known_fields() );
 		$picked = array();
 		foreach ( (array) ( isset( $input['fields'] ) ? $input['fields'] : array() ) as $field ) {
 			$field = KWC_Topics::normalize_field( $field );
@@ -140,7 +145,7 @@ final class KWC_Settings {
 				continue;
 			}
 			if ( ! in_array( $field, $known, true ) ) {
-				$errors[] = '올라온 topic 에 없는 분야다: ' . $field;
+				$errors[] = '분야 목록에 없는 이름이다: ' . $field;
 				continue;
 			}
 			$picked[] = $field;
@@ -353,11 +358,23 @@ final class KWC_Settings {
 		);
 	}
 
+	public static function field_field_list() {
+		printf(
+			'<input type="text" name="%s" value="%s" class="large-text code" '
+				. 'placeholder="data science, mathematics, semiconductor">',
+			esc_attr( self::name( 'field_list' ) ),
+			esc_attr( (string) self::value( 'field_list' ) )
+		);
+		echo '<p class="description">고를 수 있는 분야를 쉼표로 적는다. 여기 적은 이름과 '
+			. '<code>tools/label_fields.py --fields</code> 에 준 이름이 같아야 그 분야에 topic 이 든다. '
+			. '비우면 올라온 topic 이 달고 있는 이름을 그대로 쓴다.</p>';
+	}
+
 	public static function field_fields() {
-		$known = KWC_Topics::fields();
+		$known = KWC_Cloud::known_fields();
 		if ( empty( $known ) ) {
-			echo '<p class="description">올라온 topic 에 분야가 붙어 있지 않다. '
-				. '<code>tools/label_fields.py</code> 로 분야를 붙여 다시 올리면 여기에 목록이 생긴다.</p>';
+			echo '<p class="description">분야 목록이 비어 있고 올라온 topic 에도 분야가 없다. '
+				. '위 칸에 분야를 적고 <code>tools/label_fields.py</code> 로 같은 이름을 붙여 올리면 여기에 생긴다.</p>';
 			return;
 		}
 		$chosen = KWC_Cloud::parse_fields( self::value( 'fields' ) );
@@ -373,7 +390,8 @@ final class KWC_Settings {
 			);
 		}
 		echo '<p class="description">고른 분야의 topic 만 그린다. 여럿 골라도 되고, '
-			. '하나도 안 고르면 분야를 가리지 않는다. 괄호 안은 그 분야에 든 topic 수다.</p>';
+			. '하나도 안 고르면 분야를 가리지 않는다. 괄호 안은 그 분야에 든 topic 수이며, '
+			. '0 이면 아직 그 분야로 분류된 topic 이 없다는 뜻이다.</p>';
 	}
 
 	public static function field_min_posts() {
