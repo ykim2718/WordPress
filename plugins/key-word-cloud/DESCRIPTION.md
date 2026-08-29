@@ -25,6 +25,11 @@ ran. Posts written since then count, deleted ones stop counting, and a topic
 that appears nowhere any more is not drawn. Tick nothing to keep the
 pipeline's own numbers.
 
+**RESTRICTED stays out.** A post filed under the RESTRICTED category is not
+counted when a topic is sized, is not in the list a click opens, and is not
+read by the pipeline that writes the topics. The category is found by name,
+whatever its slug is, and the categories under it go with it.
+
 **Sized by reach, not by repetition.** A topic is as large as the number of
 posts it covers, spread on a square-root scale so one broad topic does not
 flatten the rest. Its tooltip lists the phrases it was folded from.

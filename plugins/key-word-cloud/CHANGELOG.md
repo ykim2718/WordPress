@@ -1,3 +1,17 @@
+## 2.14.0
+
+- Posts filed under the **RESTRICTED** category stay out of the cloud. They are
+  not counted when a topic is sized, they are not in the list a click opens,
+  and `tools/llm_keywords.py` no longer reads them, so their words cannot
+  become a topic in the first place. On the rehearsal site 11 of 74 topics were
+  sized against fewer posts afterwards, and a search that had returned 12 posts
+  returned 8. The category is found by name, whatever its slug is, and the
+  categories under it go with it.
+- The Refresh button stays readable under the pointer. A theme that paints
+  `button:hover` -- the theme on this site paints it #215387 -- put dark blue
+  behind the button's dark letters and the word disappeared. It now sets its own
+  hover background, a light grey, and turns bold.
+
 ## 2.13.1
 
 - The counting is done when the topics arrive, not when someone visits. On the

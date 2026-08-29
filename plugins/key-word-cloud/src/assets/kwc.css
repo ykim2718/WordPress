@@ -51,9 +51,13 @@
 	cursor: pointer;
 }
 
+/* 테마가 button:hover 에 짙은 배경을 깔면 그 위의 짙은 글씨가 사라진다. 배경까지 여기서
+   정해야 글씨가 보인다. */
 .kwc-refresh:hover:not([disabled]) {
-	border-color: #1f66bd;
-	color: #1f66bd;
+	border-color: #7a7a74;
+	background: #e6e6e6;
+	color: #1b1b18;
+	font-weight: 700;
 }
 
 .kwc-refresh:focus-visible {

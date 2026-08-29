@@ -16,6 +16,7 @@ environment rather than carried in this file:
     KWC_DB_CONTAINER, KWC_DB_USER, KWC_DB_PASSWORD, KWC_DB_NAME
 
 Changelog
+    0.3.0  Skip posts filed under the RESTRICTED category.
     0.2.0  Take the database connection from the environment.
     0.1.0  Add the topic pass and JSON output.
     0.0.0  First version.
@@ -24,7 +25,7 @@ Changelog
 from __future__ import annotations
 
 __author__ = 'yRocket'
-__version__ = "0.2.0.2026.8.28"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
+__version__ = "0.3.0.2026.8.28"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
 
 import argparse
 import collections
@@ -41,6 +42,10 @@ import urllib.request
 from typing import Union
 
 __all__ = ['fetch_posts', 'extract_keywords', 'build_topics', 'ask_model']
+
+# Posts filed here are kept out of the cloud, so their words must not shape the topics either.
+# Matched by category name, case-insensitively, because the slug differs from site to site.
+RESTRICTED_CATEGORY = 'restricted'
 
 PHRASE_PROMPT = (
     "Read the article below and list the key phrases a reader would use to find it.\n"
@@ -66,6 +71,8 @@ def fetch_posts(*, container: str, db_user: str, db_password: str, db_name: str,
                 limit: int, chars: int) -> list[dict]:
     """Read published posts from the mirror database through the docker CLI.
 
+    Posts filed under RESTRICTED_CATEGORY are left out; the cloud does not draw them either.
+
     Returns a list of {'id': int, 'title': str, 'body': str}.
     """
     # A post body holds newlines and tabs, which would break the row-per-line batch
@@ -75,8 +82,13 @@ def fetch_posts(*, container: str, db_user: str, db_password: str, db_name: str,
         "'body', LEFT(post_content, {chars})) FROM wp_posts "
         "WHERE post_status='publish' AND post_type='post' "
         "AND CHAR_LENGTH(post_content) > 400 "
+        "AND ID NOT IN ("
+        "  SELECT tr.object_id FROM wp_term_relationships tr"
+        "  JOIN wp_term_taxonomy tt ON tt.term_taxonomy_id = tr.term_taxonomy_id"
+        "  JOIN wp_terms t ON t.term_id = tt.term_id"
+        "  WHERE tt.taxonomy = 'category' AND t.name = '{restricted}') "
         "ORDER BY post_date DESC LIMIT {limit}"
-    ).format(chars=chars, limit=limit)
+    ).format(chars=chars, limit=limit, restricted=RESTRICTED_CATEGORY)
 
     completed = subprocess.run(
         ['docker', 'exec', container, 'mariadb', '-u', db_user, f'-p{db_password}',

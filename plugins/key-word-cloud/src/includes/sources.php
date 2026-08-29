@@ -25,6 +25,63 @@ final class KWC_Sources {
 	/** 센 결과를 담아 두는 자리. kwc_ 로 시작해야 캐시 비우기가 같이 지운다. */
 	const CACHE_PREFIX = 'kwc_counts_';
 
+	/** 감출 분류의 이름. 이 분류에 든 글은 세지 않고, 낱말을 눌러 나오는 목록에도 넣지 않는다. */
+	const RESTRICTED = 'restricted';
+
+	/**
+	 * 감출 분류와 그 아래 분류들.
+	 *
+	 * 이름으로 찾는다. 슬러그는 사이트마다 다르게 붙지만 이름은 화면에 보이는 그대로다.
+	 * 이름으로 못 찾으면 슬러그로 한 번 더 찾는다. 대소문자는 가리지 않는다.
+	 *
+	 * @return array term_id 와 term_taxonomy_id 의 쌍들. 그런 분류가 없으면 빈 배열.
+	 */
+	public static function restricted() {
+		static $found = null;
+		if ( null !== $found ) {
+			return $found;
+		}
+		$found = array();
+		$term  = get_term_by( 'name', self::RESTRICTED, 'category' );
+		if ( ! $term || is_wp_error( $term ) ) {
+			$term = get_term_by( 'slug', self::RESTRICTED, 'category' );
+		}
+		if ( ! $term || is_wp_error( $term ) ) {
+			return $found;
+		}
+		// 아래 분류에 든 글도 함께 감춘다. 하나라도 흘리면 감춘 뜻이 없다.
+		$ids = array_merge(
+			array( $term->term_id ),
+			(array) get_term_children( $term->term_id, 'category' )
+		);
+		foreach ( $ids as $id ) {
+			$each = get_term( (int) $id, 'category' );
+			if ( $each && ! is_wp_error( $each ) ) {
+				$found[] = array(
+					'term_id' => (int) $each->term_id,
+					'ttid'    => (int) $each->term_taxonomy_id,
+				);
+			}
+		}
+		return $found;
+	}
+
+	/**
+	 * 감춘 분류의 글을 세지 않게 하는 조건.
+	 *
+	 * @return string 질의 뒤에 붙일 SQL. 감출 분류가 없으면 빈 문자열.
+	 */
+	private static function hidden_clause() {
+		global $wpdb;
+
+		$ttids = wp_list_pluck( self::restricted(), 'ttid' );
+		if ( empty( $ttids ) ) {
+			return '';
+		}
+		return " AND ID NOT IN ( SELECT object_id FROM {$wpdb->term_relationships}"
+			. ' WHERE term_taxonomy_id IN ( ' . implode( ',', array_map( 'intval', $ttids ) ) . ' ) )';
+	}
+
 	/**
 	 * 고른 자리 목록을 읽는다.
 	 *
@@ -104,7 +161,9 @@ final class KWC_Sources {
 	public static function counts( array $topics, array $sources ) {
 		$status = KWC_Topics::status();
 		$key    = self::CACHE_PREFIX . md5(
+			// 세는 규칙이 판마다 달라진다. 판 번호를 넣어야 올린 뒤에 옛 수를 쓰지 않는다.
 			implode( ',', $sources ) . '|' . $status['updated'] . '|' . count( $topics )
+			. '|' . KWC_VERSION
 		);
 
 		$found = get_transient( $key );
@@ -189,7 +248,7 @@ final class KWC_Sources {
 		}
 
 		$sql = "SELECT COUNT(DISTINCT ID) FROM {$wpdb->posts} WHERE post_status = 'publish' AND ( "
-			. implode( ' OR ', $clauses ) . ' )';
+			. implode( ' OR ', $clauses ) . ' )' . self::hidden_clause();
 
 		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- 자리표시자만 넣고 값은 prepare 가 넣는다.
 		$found = $wpdb->get_var( $wpdb->prepare( $sql, $values ) );

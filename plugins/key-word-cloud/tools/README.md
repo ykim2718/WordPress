@@ -1,6 +1,6 @@
 # Topic Pipeline
 
-Rev. 3 | Created: 2026-08-28 | Updated: 2026-08-28 20:31 CDT
+Rev. 4 | Created: 2026-08-28 | Updated: 2026-08-28 22:20 CDT
 
 `ranking=topics` 로 그릴 topic 을 만드는 script 다섯 개이다. plugin 과 별개로 돌며, zip 에도
 들어가지 않는다. 다섯 script 는 순서대로 실행하고, 앞 단계의 JSON 을 다음 단계가 읽는다.
@@ -38,6 +38,9 @@ export KWC_DB_PASSWORD=<DB_PASSWORD>
 
 python tools/llm_keywords.py --limit 300 --chars 3000
 ```
+
+**RESTRICTED** 분류에 든 글은 읽지 않는다. Plugin 이 그 글을 구름에서 빼므로, 그 글의
+말이 topic 이 되면 아무 데에도 나오지 않을 topic 이 된다.
 
 두 번째 pass 가 phrase 를 topic 으로 묶으려 시도하지만, phrase 가 수백 개면 model 이
 지시를 놓치고 목록을 그대로 베낀다. 그래서 묶는 일은 3.2 가 맡는다. 이 단계의 산출물인

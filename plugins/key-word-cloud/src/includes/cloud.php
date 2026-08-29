@@ -360,6 +360,12 @@ final class KWC_Cloud {
 		// sqrt 스케일이 선형보다 차이를 덜 과장한다.
 		$span = sqrt( $max ) - sqrt( $min );
 
+		// 감춘 분류의 글은 세지 않았다. 낱말을 눌러 나오는 목록에서도 빼야 수와 목록이 맞는다.
+		$hidden = array();
+		foreach ( KWC_Sources::restricted() as $term ) {
+			$hidden[] = '-' . (int) $term['term_id'];
+		}
+
 		// 큰 것부터 넘긴다. 타원일 때는 kwc.js 가 이 차례를 보고 가운데부터 채운다.
 		$items = array();
 		$index = 0;
@@ -383,10 +389,14 @@ final class KWC_Cloud {
 			$index++;
 
 			if ( 'search' === $args['link_mode'] ) {
+				$query = array( 's' => $entry['text'] );
+				if ( ! empty( $hidden ) ) {
+					$query['cat'] = implode( ',', $hidden );
+				}
 				$items[] = sprintf(
 					'<a class="%s" href="%s" style="%s" data-tip="%s" data-count="%d">%s</a>',
 					esc_attr( $class ),
-					esc_url( add_query_arg( array( 's' => $entry['text'] ), home_url( '/' ) ) ),
+					esc_url( add_query_arg( $query, home_url( '/' ) ) ),
 					esc_attr( $style ),
 					esc_attr( $entry['tip'] ),
 					(int) $entry['posts'],
