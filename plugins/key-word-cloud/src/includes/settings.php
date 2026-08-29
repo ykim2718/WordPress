@@ -12,6 +12,12 @@ final class KWC_Settings {
 	const GROUP = 'kwc_settings_group';
 	const PAGE  = 'key-word-cloud';
 
+	/** 이미 끝낸 설정 갱신의 목록. 설정과 따로 두어야 flush_cache 가 건드리지 못한다. */
+	const MIGRATION_OPTION = 'kwc_migrations';
+
+	/** 아무도 고른 적 없이 굳은 "모든 분야" 를 기본 분야로 바꾼 갱신. */
+	const FIELD_DEFAULT_MIGRATION = 'fields_default_2_11';
+
 	/**
 	 * 훅 등록.
 	 */
@@ -24,31 +30,41 @@ final class KWC_Settings {
 	}
 
 	/**
-	 * 2.11.0 이전에 저장된 설정을 새 기본값에 맞춘다. 한 번만 돈다.
+	 * 한 번만 도는 설정 갱신.
 	 *
 	 * 저장된 설정은 기본값을 이긴다. 그래야 갱신이 사용자의 선택을 덮지 않는다. 그런데
-	 * 분야 목록이 생기기 전의 사이트는 "분야를 가리지 않음" 을 값으로 저장해 두었고, 그것이
-	 * 이긴 탓에 새로 정한 세 분야가 닿지 않는다. 고른 적이 없는데 고른 것처럼 남아 있는
-	 * 값이라 여기서만 손댄다.
+	 * `KWC_Cloud::flush_cache()` 가 병합된 설정을 통째로 다시 쓰기 때문에, 그때의 기본값이
+	 * 아무도 고른 적 없이 저장된 값으로 굳는다. 2.8.0 에서 2.10.0 사이의 "분야를 가리지
+	 * 않음" 이 그렇게 굳어, 2.11.0 이 정한 세 분야가 새로 설치한 곳에만 닿았다.
 	 *
-	 * 옛 설정인지는 field_list 키가 있는지로 안다. 판 번호로 재면 한 번 건너뛴 사이트를
-	 * 다시 잡지 못한다.
+	 * 그래서 무엇을 이미 했는지는 설정 바깥에 적는다. 설정 안에 적으면 flush_cache 가
+	 * 그것마저 채워 넣어, 하지 않은 일이 한 일로 보인다.
 	 */
 	public static function maybe_upgrade() {
-		$saved = get_option( KWC_OPTION, false );
-		if ( ! is_array( $saved ) || array_key_exists( 'field_list', $saved ) ) {
+		$done = get_option( self::MIGRATION_OPTION, array() );
+		if ( ! is_array( $done ) ) {
+			error_log( '[key-word-cloud] ' . self::MIGRATION_OPTION . ' is not an array; treating it as empty' );
+			$done = array();
+		}
+		if ( in_array( self::FIELD_DEFAULT_MIGRATION, $done, true ) ) {
 			return;
 		}
-		$defaults            = KWC_Defaults::options();
-		$saved['field_list'] = $defaults['field_list'];
-		// 스스로 고른 분야는 그대로 둔다. 비어 있을 때만 새 기본값을 넣는다.
-		if ( empty( $saved['fields'] ) ) {
+
+		$saved = get_option( KWC_OPTION, false );
+		if ( is_array( $saved ) && empty( $saved['fields'] ) ) {
+			// 스스로 고른 분야는 그대로 둔다. 비어 있을 때만 새 기본값을 넣는다.
+			$defaults        = KWC_Defaults::options();
 			$saved['fields'] = $defaults['fields'];
+			update_option( KWC_OPTION, $saved );
+			KWC_Cloud::flush_cache();
+			error_log( '[key-word-cloud] settings that drew every field were given the default fields: '
+				. $saved['fields'] );
 		}
-		update_option( KWC_OPTION, $saved );
-		KWC_Cloud::flush_cache();
-		error_log( '[key-word-cloud] settings saved before 2.11.0 were given the field list; fields = '
-			. $saved['fields'] );
+
+		// 할 일이 없었어도 적어 둔다. 그러지 않으면 나중에 스스로 분야를 다 지운 사람에게
+		// 이 갱신이 다시 걸린다.
+		$done[] = self::FIELD_DEFAULT_MIGRATION;
+		update_option( self::MIGRATION_OPTION, $done, false );
 	}
 
 	/**

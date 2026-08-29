@@ -1,10 +1,17 @@
+## 2.11.2
+
+- The 2.11.1 upgrade did not fire on the sites it was written for. It decided
+  whether the settings were old by looking inside them, and emptying the cache
+  rewrites the settings with whatever the defaults are that day -- so the
+  marker it looked for had already been filled in for it. What has been done is
+  now recorded outside the settings, where nothing else writes.
+
 ## 2.11.1
 
-- A site that had saved its settings before 2.11.0 did not get the three ticked
-  fields. A saved value beats a default, which is what keeps an update from
-  overwriting a choice, but "draw every field" had been saved by sites that
-  never chose it. Settings written before the field list existed are given it
-  once, and the three fields with it -- unless fields were actually picked, in
+- A site whose settings said "draw every field" did not get the three ticked
+  fields of 2.11.0. A saved value beats a default, which is what keeps an
+  update from overwriting a choice, but that value had been saved by sites that
+  never chose it. It is replaced once -- unless fields were actually picked, in
   which case they stand.
 
 ## 2.11.0
