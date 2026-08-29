@@ -22,8 +22,8 @@ final class KWC_Sources {
 	/** 한 topic 을 찾을 때 쓸 낱말 수의 상한. 구절이 많다고 질의가 끝없이 길어지면 안 된다. */
 	const MAX_TERMS = 8;
 
-	/** 센 결과를 담아 두는 자리. kwc_ 로 시작해야 캐시 비우기가 같이 지운다. */
-	const CACHE_PREFIX = 'kwc_counts_';
+	/** 찾은 글을 담아 두는 자리. kwc_ 로 시작해야 캐시 비우기가 같이 지운다. */
+	const CACHE_PREFIX = 'kwc_found_';
 
 	/** 감출 분류의 이름. 이 분류에 든 글은 세지 않고, 낱말을 눌러 나오는 목록에도 넣지 않는다. */
 	const RESTRICTED = 'restricted';
@@ -148,20 +148,24 @@ final class KWC_Sources {
 	}
 
 	/**
-	 * topic 마다 몇 곳에 나오는지 한 번에 세고, 센 것을 담아 둔다.
+	 * topic 마다 어느 글에 나오는지 한 번에 찾고, 찾은 것을 담아 둔다.
 	 *
-	 * 74 개를 세는 데 이 사이트에서 4 초가 걸렸다. 구름의 캐시가 지날 때마다 그 4 초를
-	 * 누군가가 기다리게 되므로 센 것만 따로 하루 담아 둔다. 담아 둔 것은 topic 이 새로
-	 * 올라오거나 캐시를 비우면 함께 지워진다. 색이나 글자 크기를 바꿔도 다시 세지 않는다.
+	 * 글 수만 세지 않고 글 번호를 담는다. 낱말을 누르면 열리는 목록이 바로 이 글들이어야
+	 * 하기 때문이다. 수만 세어 두면 목록은 이름만으로 다시 찾게 되고, 구절로 걸린 글이
+	 * 목록에서 빠져 tooltip 의 수와 목록의 길이가 어긋난다.
+	 *
+	 * 74 개를 찾는 데 이 사이트에서 4 초가 걸렸다. 구름의 캐시가 지날 때마다 그 4 초를
+	 * 누군가가 기다리게 되므로 찾은 것만 따로 하루 담아 둔다. 담아 둔 것은 topic 이 새로
+	 * 올라오거나 캐시를 비우면 함께 지워진다. 색이나 글자 크기를 바꿔도 다시 찾지 않는다.
 	 *
 	 * @param array $topics  올라온 topic 전부.
 	 * @param array $sources 고른 자리.
-	 * @return array topic 이름 => 글 수.
+	 * @return array topic 이름 => 글 번호 배열.
 	 */
-	public static function counts( array $topics, array $sources ) {
+	public static function matches( array $topics, array $sources ) {
 		$status = KWC_Topics::status();
 		$key    = self::CACHE_PREFIX . md5(
-			// 세는 규칙이 판마다 달라진다. 판 번호를 넣어야 올린 뒤에 옛 수를 쓰지 않는다.
+			// 찾는 규칙이 판마다 달라진다. 판 번호를 넣어야 올린 뒤에 옛것을 쓰지 않는다.
 			implode( ',', $sources ) . '|' . $status['updated'] . '|' . count( $topics )
 			. '|' . KWC_VERSION
 		);
@@ -173,10 +177,48 @@ final class KWC_Sources {
 
 		$found = array();
 		foreach ( $topics as $topic ) {
-			$found[ (string) $topic['label'] ] = self::count_posts( $topic, $sources );
+			$found[ (string) $topic['label'] ] = self::find_posts( $topic, $sources );
 		}
 		set_transient( $key, $found, DAY_IN_SECONDS );
 		return $found;
+	}
+
+	/**
+	 * topic 마다 몇 곳에 나오는지.
+	 *
+	 * @param array $topics  올라온 topic 전부.
+	 * @param array $sources 고른 자리.
+	 * @return array topic 이름 => 글 수.
+	 */
+	public static function counts( array $topics, array $sources ) {
+		return array_map( 'count', self::matches( $topics, $sources ) );
+	}
+
+	/**
+	 * 이름이 주어진 topic 이 걸린 글 번호.
+	 *
+	 * 담아 둔 것에서 꺼내고, 없으면 그 topic 만 다시 찾는다. 캐시가 지났다고 목록이 다른
+	 * 글을 보이면 안 되기 때문이다.
+	 *
+	 * @param string $label   topic 의 본디 이름.
+	 * @param array  $sources 고른 자리.
+	 * @return array|null 글 번호 배열. 그런 이름의 topic 이 없으면 null.
+	 */
+	public static function post_ids( $label, array $sources ) {
+		$topics = KWC_Topics::stored();
+		if ( empty( $topics ) ) {
+			return null;
+		}
+		$found = self::matches( $topics, $sources );
+		if ( isset( $found[ $label ] ) ) {
+			return $found[ $label ];
+		}
+		foreach ( $topics as $topic ) {
+			if ( (string) $topic['label'] === (string) $label ) {
+				return self::find_posts( $topic, $sources );
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -212,11 +254,22 @@ final class KWC_Sources {
 	 * @return int 걸린 글 수. 낱말이 없으면 0.
 	 */
 	public static function count_posts( array $topic, array $sources ) {
+		return count( self::find_posts( $topic, $sources ) );
+	}
+
+	/**
+	 * 고른 자리에서 이 topic 이 나오는 글.
+	 *
+	 * @param array $topic   topic.
+	 * @param array $sources 고른 자리.
+	 * @return array 글 번호 배열. 낱말이 없으면 빈 배열.
+	 */
+	public static function find_posts( array $topic, array $sources ) {
 		global $wpdb;
 
 		$terms = self::terms( $topic );
 		if ( empty( $terms ) || empty( $sources ) ) {
-			return 0;
+			return array();
 		}
 
 		// 자리마다 어떤 글종의 어떤 칸을 볼지가 다르다. page 는 본문과 요약문을 함께 본다.
@@ -247,16 +300,16 @@ final class KWC_Sources {
 			}
 		}
 
-		$sql = "SELECT COUNT(DISTINCT ID) FROM {$wpdb->posts} WHERE post_status = 'publish' AND ( "
+		$sql = "SELECT DISTINCT ID FROM {$wpdb->posts} WHERE post_status = 'publish' AND ( "
 			. implode( ' OR ', $clauses ) . ' )' . self::hidden_clause();
 
 		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- 자리표시자만 넣고 값은 prepare 가 넣는다.
-		$found = $wpdb->get_var( $wpdb->prepare( $sql, $values ) );
-		if ( null === $found ) {
-			// 조용히 0 을 돌려주면 topic 이 사라진 이유가 "글이 없어서" 로 보인다.
+		$found = $wpdb->get_col( $wpdb->prepare( $sql, $values ) );
+		if ( ! is_array( $found ) || '' !== $wpdb->last_error ) {
+			// 조용히 빈 것을 돌려주면 topic 이 사라진 이유가 "글이 없어서" 로 보인다.
 			error_log( '[key-word-cloud] counting posts failed: ' . $wpdb->last_error );
-			return 0;
+			return array();
 		}
-		return (int) $found;
+		return array_map( 'intval', $found );
 	}
 }

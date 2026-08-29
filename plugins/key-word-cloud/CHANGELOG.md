@@ -1,3 +1,16 @@
+## 2.15.0
+
+- A click opens the posts the topic was counted from. The tooltip said 12 posts
+  and the search it opened returned 3: the size counts the topic's phrases as
+  well as its name, and the search knew only the name. The link now carries the
+  topic, and the search query is answered with the posts that were counted, so
+  the number and the list are the same thing. Checked on all 72 topics of the
+  rehearsal site: 72 agree, 0 differ; `stochastic optimization` says 11 and
+  lists 11.
+- The heading still reads *Search Results for:* the topic, and a search typed
+  by hand is untouched -- the same address without the topic returns what it
+  always did.
+
 ## 2.14.1
 
 - The settings screen says that posts filed under the RESTRICTED category are

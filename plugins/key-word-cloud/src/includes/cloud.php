@@ -291,6 +291,8 @@ final class KWC_Cloud {
 			$phrases   = isset( $topic['phrases'] ) ? (array) $topic['phrases'] : array();
 			$entries[] = array(
 				'text'  => $text,
+				// 목록은 구절로 걸린 글까지 보여야 하므로, 본디 이름을 링크에 실어 보낸다.
+				'label' => ( null === $sources ) ? '' : (string) $topic['label'],
 				'posts' => $posts,
 				'tip'   => sprintf(
 					/* translators: 1: number of posts, 2: a colon and the phrases the topic was folded from */
@@ -389,14 +391,14 @@ final class KWC_Cloud {
 			$index++;
 
 			if ( 'search' === $args['link_mode'] ) {
-				$query = array( 's' => $entry['text'] );
-				if ( ! empty( $hidden ) ) {
-					$query['cat'] = implode( ',', $hidden );
-				}
 				$items[] = sprintf(
 					'<a class="%s" href="%s" style="%s" data-tip="%s" data-count="%d">%s</a>',
 					esc_attr( $class ),
-					esc_url( add_query_arg( $query, home_url( '/' ) ) ),
+					esc_url( KWC_Search::url(
+						$entry['text'],
+						isset( $entry['label'] ) ? $entry['label'] : '',
+						$hidden
+					) ),
 					esc_attr( $style ),
 					esc_attr( $entry['tip'] ),
 					(int) $entry['posts'],

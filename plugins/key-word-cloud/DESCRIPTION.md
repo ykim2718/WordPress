@@ -25,6 +25,12 @@ ran. Posts written since then count, deleted ones stop counting, and a topic
 that appears nowhere any more is not drawn. Tick nothing to keep the
 pipeline's own numbers.
 
+**A click opens what was counted.** A topic is counted by its name and by the
+phrases it was folded from, so a plain search for the name alone would open a
+shorter list than the size promises. The link carries the topic, and the search
+it opens is answered with the posts that were counted. A search typed by hand
+is untouched.
+
 **RESTRICTED stays out.** A post filed under the RESTRICTED category is not
 counted when a topic is sized, is not in the list a click opens, and is not
 read by the pipeline that writes the topics. The category is found by name,

@@ -591,7 +591,7 @@ final class KWC_Settings {
 	public static function field_link_mode() {
 		self::radio_field(
 			'link_mode',
-			array( 'search' => '그 말로 검색한 글 목록 열기', 'none' => '링크 없음' )
+			array( 'search' => '그 topic 으로 센 글 목록 열기', 'none' => '링크 없음' )
 		);
 	}
 
@@ -663,7 +663,8 @@ final class KWC_Settings {
 			<p>이 사이트가 무엇에 대해 써 왔는지를 구름으로 그린다. 낱말을 세는 것이 아니라,
 				글에서 뽑은 구절을 뜻이 가까운 것끼리 묶어 topic 으로 만들고 그 topic 을 그린다.
 				글자 크기는 그 topic 이 걸친 글 수이고, 색은 이웃을 갈라 보이게 할 뿐 뜻이 없다.
-				낱말을 누르면 그 말로 검색한 글 목록이 열린다.</p>
+				낱말을 누르면 그 topic 으로 센 글 목록이 열린다. 글자 크기가 가리키는 수와 목록의
+				길이가 같다.</p>
 
 			<p>고른 언어로 <strong>번역한 뒤에</strong> 그 언어의 낱말을 찾는다. 영어를 고르면
 				한글로 쓴 글에서 나온 topic 도 영어 이름으로 나오고, 한글을 고르면 그 반대다.
