@@ -639,16 +639,21 @@ final class KWC_Settings {
 				언어를 고르는 일이 글의 절반을 감추는 일이 되지 않게 하려는 것이다.</p>
 
 			<h2>모델</h2>
-			<p>세 가지 일을 한 모델이 나눠 맡는다. 셋 다 GPU 가 있는 기계에서 도는 파이프라인의
-				일이고, 이 사이트는 그 결과만 받아 그린다. 워드프레스가 모델을 부르지 않으므로
-				GPU 도, 외부 API 키도 필요 없다.</p>
-			<table class="widefat striped" style="max-width:52em">
-				<thead><tr><th>Model</th><th>Role</th></tr></thead>
+			<p>구름이 되기까지 네 단계를 거치고, 단계마다 모델이 하나씩 붙는다. 뜻이 가까운 것끼리
+				묶는 두 번째만 임베딩 모델이 맡고 나머지 셋은 언어 모델이 맡는다. 네 단계 모두 GPU 가
+				있는 기계에서 도는 파이프라인의 일이고, 이 사이트는 그 결과만 받아 그린다. 워드프레스가
+				모델을 부르지 않으므로 GPU 도, 외부 API 키도 필요 없다.</p>
+			<table class="widefat striped" style="max-width:56em">
+				<thead><tr><th>Step</th><th>Model</th><th>하는 일</th></tr></thead>
 				<tbody>
-					<tr><td><code>qwen3:8b</code></td><td>글마다 핵심 구절을 뽑고, topic 을 분야로 가르고, 두 언어의 이름을 붙인다</td></tr>
-					<tr><td><code>bge-m3</code></td><td>구절을 벡터로 바꿔 뜻이 가까운 것끼리 묶는다</td></tr>
+					<tr><td>1. 뽑기</td><td><code>qwen3:8b</code></td><td>글마다 핵심 구절을 서너 개씩 뽑는다</td></tr>
+					<tr><td>2. 묶기</td><td><code>bge-m3</code></td><td>구절을 벡터로 바꿔 뜻이 가까운 것끼리 묶어 topic 을 만든다</td></tr>
+					<tr><td>3. 가르기</td><td><code>qwen3:8b</code></td><td>topic 이 어느 분야에 드는지 답한다</td></tr>
+					<tr><td>4. 이름 붙이기</td><td><code>qwen3:8b</code></td><td>topic 마다 영어 이름과 한글 이름을 붙인다</td></tr>
 				</tbody>
 			</table>
+			<p class="description">뽑기가 낸 구절은 글마다 제각각이라 그것만으로는 구름이 되지 않는다.
+				묶기가 그것을 몇 개의 topic 으로 줄이고, 글자 크기는 그 topic 이 걸친 글 수가 된다.</p>
 
 			<h2>숏코드</h2>
 			<p><code>[wpwordcloud]</code> — 속성으로 아래 설정을 개별 페이지에서 덮어쓸 수 있다.<br>

@@ -1,3 +1,10 @@
+## 2.12.2
+
+- The settings screen said one model took three of the jobs without ever saying
+  what the jobs were, and then listed models rather than jobs. It now lists the
+  four steps in the order they run, each with the model that does it, so the
+  sentence and the table say the same thing.
+
 ## 2.12.1
 
 - The menu icon kept its colours. Handed over as a data URI it arrived white
