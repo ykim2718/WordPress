@@ -160,8 +160,8 @@
         var name = item.querySelector('.gig-fn')
                  ? item.querySelector('.gig-fn').getAttribute('title')
                  : item.dataset.name;
-        var raw  = link.getAttribute('href');
         var blob = (root.dataset.blob || '') + '/' + encodeURIComponent(name);
+        var link_addr = blob + '?raw=true';   // 내보내는 그림 주소는 github.com 쪽 blob 주소다
 
         function copy(text) {
           copyText(text).then(function () { toast(TXT.copied || 'Copied'); },
@@ -169,11 +169,11 @@
         }
 
         openMenu(e.clientX, e.clientY, [
-          { label: TXT.copyLink || 'Copy GitHub image link address', run: function () { copy(raw); } },
-          { label: TXT.copyMd   || 'Copy as Markdown',               run: function () { copy('![' + name + '](' + raw + ')'); } },
+          { label: TXT.copyLink || 'Copy GitHub image link address', run: function () { copy(link_addr); } },
+          { label: TXT.copyMd   || 'Copy as Markdown',               run: function () { copy('![' + name + '](' + link_addr + ')'); } },
           { label: TXT.copyName || 'Copy file name',                 run: function () { copy(name); } },
           '-',
-          { label: TXT.openTab  || 'Open image in new tab',          run: function () { window.open(raw, '_blank', 'noopener'); } },
+          { label: TXT.openTab  || 'Open image in new tab',          run: function () { window.open(link_addr, '_blank', 'noopener'); } },
           { label: TXT.openGh   || 'Open on GitHub',                 run: function () { window.open(blob, '_blank', 'noopener'); } }
         ]);
       });

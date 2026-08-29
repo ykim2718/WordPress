@@ -1,3 +1,15 @@
+## 1.1.2
+
+- Hand out one address for the picture everywhere in the right-click menu:
+  `github.com/.../blob/...?raw=true`. **Copy GitHub image link address**,
+  **Copy as Markdown** and **Open image in new tab** used to mix that form with
+  the `raw.githubusercontent.com` one. Both fetch the same file.
+
+## 1.1.1
+
+- Copy the `github.com/.../blob/...?raw=true` address from **Copy GitHub image
+  link address**, not the `raw.githubusercontent.com` one.
+
 ## 1.1.0
 
 - Add a **Refresh** button to the control bar. It throws away the cached
