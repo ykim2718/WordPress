@@ -24,6 +24,34 @@ final class KWC_Settings {
 	}
 
 	/**
+	 * 2.11.0 이전에 저장된 설정을 새 기본값에 맞춘다. 한 번만 돈다.
+	 *
+	 * 저장된 설정은 기본값을 이긴다. 그래야 갱신이 사용자의 선택을 덮지 않는다. 그런데
+	 * 분야 목록이 생기기 전의 사이트는 "분야를 가리지 않음" 을 값으로 저장해 두었고, 그것이
+	 * 이긴 탓에 새로 정한 세 분야가 닿지 않는다. 고른 적이 없는데 고른 것처럼 남아 있는
+	 * 값이라 여기서만 손댄다.
+	 *
+	 * 옛 설정인지는 field_list 키가 있는지로 안다. 판 번호로 재면 한 번 건너뛴 사이트를
+	 * 다시 잡지 못한다.
+	 */
+	public static function maybe_upgrade() {
+		$saved = get_option( KWC_OPTION, false );
+		if ( ! is_array( $saved ) || array_key_exists( 'field_list', $saved ) ) {
+			return;
+		}
+		$defaults            = KWC_Defaults::options();
+		$saved['field_list'] = $defaults['field_list'];
+		// 스스로 고른 분야는 그대로 둔다. 비어 있을 때만 새 기본값을 넣는다.
+		if ( empty( $saved['fields'] ) ) {
+			$saved['fields'] = $defaults['fields'];
+		}
+		update_option( KWC_OPTION, $saved );
+		KWC_Cloud::flush_cache();
+		error_log( '[key-word-cloud] settings saved before 2.11.0 were given the field list; fields = '
+			. $saved['fields'] );
+	}
+
+	/**
 	 * 활성화 시 기본값을 심는다.
 	 */
 	public static function on_activate() {

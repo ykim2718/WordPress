@@ -1,3 +1,12 @@
+## 2.11.1
+
+- A site that had saved its settings before 2.11.0 did not get the three ticked
+  fields. A saved value beats a default, which is what keeps an update from
+  overwriting a choice, but "draw every field" had been saved by sites that
+  never chose it. Settings written before the field list existed are given it
+  once, and the three fields with it -- unless fields were actually picked, in
+  which case they stand.
+
 ## 2.11.0
 
 - The fields are now declared on the settings screen instead of being read back
