@@ -121,6 +121,31 @@ final class KWC_Sources {
 	}
 
 	/**
+	 * 설정된 자리로 미리 세어 둔다. topic 이 새로 저장될 때 부른다.
+	 *
+	 * 세는 일은 이 사이트에서 23 초가 걸렸다. 그것을 방문자가 기다리게 하지 않으려면 글이
+	 * 바뀌는 순간, 곧 topic 을 새로 받은 그 요청에서 세어 두어야 한다. 하루 한 번의
+	 * 가져오기와 새로고침 단추가 모두 이 길을 지난다.
+	 *
+	 * @param array $topics 방금 저장한 topic.
+	 */
+	public static function warm( array $topics ) {
+		$options = KWC_Cloud::options();
+		$sources = self::parse( isset( $options['sources'] ) ? $options['sources'] : '' );
+		if ( null === $sources || empty( $topics ) ) {
+			return;
+		}
+		$started = microtime( true );
+		self::counts( $topics, $sources );
+		error_log( sprintf(
+			'[key-word-cloud] counted %d topics against %s in %.1fs',
+			count( $topics ),
+			implode( ',', $sources ),
+			microtime( true ) - $started
+		) );
+	}
+
+	/**
 	 * 고른 자리에서 이 topic 이 나오는 글 수.
 	 *
 	 * @param array $topic   topic.

@@ -47,6 +47,10 @@ plugins/github-image-gallery/
 2. **contents API** — `index.json`이 없을 때의 대비책. 시간당 60회 한도를 쓰고, 날짜 정렬과
    썸네일 축소가 꺼진다. 이 경우 관리자에게만 안내 문구가 보인다.
 
+목록은 `cache` 분 동안 transient에 담아 둔다. 제어줄의 **Refresh** 단추는 그 transient를
+버리고 GitHub에서 다시 읽는다. 주소에 nonce가 붙어 있고, nonce가 지났으면 캐시를 그대로
+쓴 채 그 사실을 화면에 적는다.
+
 ## group 자동 생성
 
 파일명을 하이픈으로 끊어 `min_group`개 이상 모이는 **가장 긴 prefix**를 group으로 잡는다.
@@ -75,11 +79,12 @@ Lawn Worms Eye 3   Margaret Hunt Hill Bridge 2      Other 43
 | `group_depth` | 2 | group으로 삼을 하이픈 마디 수의 최대값 |
 | `min_group` | 2 | 이 개수 이상 모여야 group으로 인정 |
 | `groups` | `''` | 처음부터 선택해 둘 group slug, 쉼표 구분 |
-| `sort` | `name_asc` | `name_asc` \| `name_desc` \| `date_desc` \| `date_asc` |
+| `sort` | `date_desc` | `name_asc` \| `name_desc` \| `date_desc` \| `date_asc`. 날짜가 없는 목록이면 `name_asc` |
 | `sort_by_date` | 0 | 1이면 날짜 최신순으로 시작 |
 | `show_date` | 0 | caption에 commit 날짜 표시 |
 | `show_name` | 1 | caption에 파일명 표시 |
 | `show_search` | 1 | 검색 입력칸 표시 |
+| `show_refresh` | 1 | Refresh 단추 표시 |
 | `lightbox` | 1 | 클릭 시 overlay. 0이면 새 탭 |
 | `context_menu` | 1 | 0이면 브라우저 기본 오른쪽 메뉴로 되돌린다 |
 | `limit` | 0 | 0이면 전부 |

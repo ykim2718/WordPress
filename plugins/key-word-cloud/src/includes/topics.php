@@ -246,6 +246,8 @@ final class KWC_Topics {
 			'topics'    => $topics,
 		) );
 		KWC_Cloud::flush_cache();
+		// 캐시를 비운 뒤에 세어야 방금 비운 자리에 들어간다.
+		KWC_Sources::warm( $topics );
 
 		if ( ! empty( $rejected ) ) {
 			error_log( '[key-word-cloud] ' . count( $rejected ) . ' topics rejected: '

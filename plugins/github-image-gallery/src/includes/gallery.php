@@ -47,6 +47,27 @@ function gig_raw_base($src) {
          . ($src['path'] !== '' ? '/' . implode('/', array_map('rawurlencode', explode('/', $src['path']))) : '');
 }
 
+/**
+ * 한 폴더를 가리키는 짧은 이름. 캐시 열쇠이자, 한 페이지에 여러 gallery가 있을 때
+ * refresh 단추가 그중 어느 것을 가리키는지 말하는 표기이기도 하다.
+ */
+function gig_source_token($src) {
+    return md5(wp_json_encode($src) . '|' . GIG_VERSION);
+}
+
+/**
+ * refresh 단추가 눌린 요청인가.
+ *   ''      이 gallery에게 온 요청이 아니다
+ *   'ok'    nonce가 맞다. 캐시를 버린다
+ *   'stale' 눌리기는 했으나 nonce가 지났다. 조용히 넘기지 말고 화면에 알린다
+ *           (페이지 캐시가 오래된 주소를 물고 있으면 여기로 온다)
+ */
+function gig_refresh_state($token) {
+    if (empty($_GET['gig_refresh']) || sanitize_text_field(wp_unslash($_GET['gig_refresh'])) !== $token) return '';
+    $nonce = isset($_GET['_gignonce']) ? sanitize_text_field(wp_unslash($_GET['_gignonce'])) : '';
+    return wp_verify_nonce($nonce, 'gig_refresh_' . $token) ? 'ok' : 'stale';
+}
+
 /* ------------------------------------------------------------------ *
  * 2. 목록 읽기 -- index.json 우선, 없으면 contents API
  * ------------------------------------------------------------------ */
@@ -76,10 +97,14 @@ function gig_http($url, $accept_json = true) {
 /**
  * 반환: array('items' => [ name, url, thumb, w, h, date, size ], 'via' => 'index'|'api')
  */
-function gig_fetch($src, $cache_min) {
-    $key = 'gig_l_' . md5(wp_json_encode($src) . '|' . GIG_VERSION);
-    $hit = get_transient($key);
-    if (is_array($hit)) return $hit;
+function gig_fetch($src, $cache_min, $force = false) {
+    $key = 'gig_l_' . gig_source_token($src);
+    if ($force) {
+        delete_transient($key);                  // refresh: 캐시를 버리고 새로 받는다
+    } else {
+        $hit = get_transient($key);
+        if (is_array($hit)) return $hit;
+    }
 
     $out = gig_fetch_index($src);
     if (is_wp_error($out) || empty($out['items'])) {
@@ -238,11 +263,12 @@ function gig_render($atts) {
         'group_depth'  => 2,
         'min_group'    => 2,
         'groups'       => '',
-        'sort'         => 'name_asc',
+        'sort'         => 'date_desc',   // 날짜가 없는 목록이면 아래에서 name_asc로 내려온다
         'sort_by_date' => 0,
         'show_date'    => 0,
         'show_name'    => 1,
         'show_search'  => 1,
+        'show_refresh' => 1,
         'lightbox'     => 1,
         'context_menu' => 1,
         'show_version'  => 1,
@@ -253,14 +279,17 @@ function gig_render($atts) {
     $src = gig_parse_source($a['github_url']);
     if (is_wp_error($src)) return gig_notice($src->get_error_message());
 
-    $data = gig_fetch($src, $a['cache']);
+    $token   = gig_source_token($src);
+    $refresh = gig_refresh_state($token);
+
+    $data = gig_fetch($src, $a['cache'], $refresh === 'ok');
     if (is_wp_error($data)) return gig_notice($data->get_error_message());
 
     $files = $data['items'];
     if (empty($files)) return gig_notice(__('No images found in this folder.', 'github-image-gallery'));
 
     $sort = in_array($a['sort'], array('name_asc', 'name_desc', 'date_desc', 'date_asc'), true)
-          ? $a['sort'] : 'name_asc';
+          ? $a['sort'] : 'date_desc';
     if ((int) $a['sort_by_date'] === 1) $sort = 'date_desc';
 
     $has_dates = false;
@@ -307,6 +336,8 @@ function gig_render($atts) {
      data-menu="<?php echo ((int) $a['context_menu'] === 1) ? '1' : '0'; ?>"
      data-blob="<?php echo esc_attr('https://github.com/' . $src['owner'] . '/' . $src['repo'] . '/blob/' . $src['branch'] . ($src['path'] !== '' ? '/' . $src['path'] : '')); ?>"
      style="--gig-col:<?php echo (int) $col; ?>;--gig-gap:<?php echo (int) $gap; ?>px;--gig-ratio:<?php echo esc_attr($ratio); ?>">
+
+  <span class="gig-anchor" id="<?php echo esc_attr('gig-at-' . $token); ?>"></span>
 
   <?php if ((int) $a['show_version'] === 1) : ?>
   <div class="gig-ver">version <?php echo esc_html(GIG_VERSION); ?></div>
@@ -355,8 +386,30 @@ function gig_render($atts) {
     </div>
     <?php endif; ?>
 
+    <?php if ((int) $a['show_refresh'] === 1) :
+        // 목록 캐시를 버리고 GitHub에서 다시 받아오는 주소. nonce로 이 페이지에서 온 것만 받는다.
+        $refresh_url = add_query_arg(array(
+            'gig_refresh' => $token,
+            '_gignonce'   => wp_create_nonce('gig_refresh_' . $token),
+        )) . '#gig-at-' . $token;    // uid는 새로 그릴 때마다 달라진다: 자리표는 token으로 둔다
+    ?>
+    <div class="gig-field">
+      <a class="gig-refresh" href="<?php echo esc_url($refresh_url); ?>" rel="nofollow"
+         title="<?php esc_attr_e('Read the folder from GitHub again, ignoring the cached listing', 'github-image-gallery'); ?>">
+        <span class="gig-refresh-icon" aria-hidden="true">&#8635;</span>
+        <span><?php esc_html_e('Refresh', 'github-image-gallery'); ?></span>
+      </a>
+    </div>
+    <?php endif; ?>
+
     <div class="gig-count" aria-live="polite"></div>
   </div>
+
+  <?php if ($refresh === 'ok') : ?>
+  <p class="gig-flash" role="status"><?php esc_html_e('Listing read from GitHub again.', 'github-image-gallery'); ?></p>
+  <?php elseif ($refresh === 'stale') : ?>
+  <p class="gig-flash gig-flash-warn" role="status"><?php esc_html_e('That refresh link had expired, so the cached listing is still showing. Reload the page and press Refresh again.', 'github-image-gallery'); ?></p>
+  <?php endif; ?>
 
   <div class="gig-grid">
     <?php foreach ($files as $f) :

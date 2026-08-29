@@ -1,3 +1,14 @@
+## 1.1.0
+
+- Add a **Refresh** button to the control bar. It throws away the cached
+  listing for that folder and reads GitHub again, so a picture added minutes
+  ago shows up without waiting out the `cache` minutes or visiting the plugins
+  screen. The link carries a nonce; an expired one says so instead of quietly
+  serving the cache. `show_refresh=0` hides the button.
+- Start on **Newest first**. `sort` now defaults to `date_desc` rather than
+  `name_asc`. A listing read through the contents API carries no dates, so
+  there the gallery still starts on name order.
+
 ## 1.0.9
 
 - Keep the vertical gap between tiles equal to the horizontal one. Themes

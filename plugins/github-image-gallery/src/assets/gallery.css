@@ -16,11 +16,20 @@
 .gig-grow  { flex: 1 1 180px; min-width: 140px; }
 .gig-lab   { font-size: .72rem; letter-spacing: .04em; opacity: .7; }
 
-.gig-sort, .gig-q, .gig-drop-btn {
+.gig-sort, .gig-q, .gig-drop-btn, .gig-refresh {
   font: inherit; font-size: .9rem; padding: 7px 10px; line-height: 1.2;
   border: 1px solid rgba(128, 128, 128, .45); border-radius: 7px;
   background: transparent; color: inherit; max-width: 100%;
 }
+.gig .gig-refresh {
+  display: inline-flex; align-items: center; gap: 7px; cursor: pointer;
+  text-decoration: none; white-space: nowrap;
+}
+.gig .gig-refresh:hover { background: rgba(128, 128, 128, .14); }
+.gig-refresh-icon { font-size: 1.05em; line-height: 1; }
+.gig-anchor { display: block; height: 0; }
+.gig-flash  { font-size: .8rem; opacity: .7; margin: -8px 0 12px 2px; }
+.gig-flash-warn { color: #b3401f; opacity: .9; }
 .gig-drop-btn { display: flex; align-items: center; gap: 8px; cursor: pointer; min-width: 150px; }
 .gig-caret    { opacity: .6; margin-left: auto; }
 

@@ -1,3 +1,11 @@
+## 2.13.1
+
+- The counting is done when the topics arrive, not when someone visits. On the
+  live site the first page view after an update waited 23 seconds for 74 topics
+  to be counted against 835 posts. That work now happens in the request that
+  stores the topics -- the daily fetch, an upload, or the Refresh button -- so
+  a reader never pays for it. Drawing right after took 0.00s.
+
 ## 2.13.0
 
 - The cloud is counted against the site's own writing. Pick where to look --

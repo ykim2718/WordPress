@@ -23,6 +23,10 @@ full-size original, not the thumbnail.
 
 ![The right-click menu on a thumbnail](context-menu.jpg)
 
+**Refresh** in the control bar throws the cached listing away and reads the
+folder from GitHub again, so a picture pushed a minute ago appears without
+waiting out the cache.
+
 ### How it reads the folder
 
 If the folder contains an `index.json` built by `tools/build_image_index.py`,
@@ -36,9 +40,12 @@ spends the 60-per-hour anonymous rate limit and offers no date sorting.
 
 - `github_url` — required. A `tree`/`blob` URL, or `owner/repo/path`.
 - `column` — most columns to show, 4 by default. Narrow screens use fewer.
-- `sort` — `name_asc`, `name_desc`, `date_desc`, `date_asc`.
+- `sort` — `name_asc`, `name_desc`, `date_desc`, `date_asc`. `date_desc`
+  (newest first) by default, falling back to `name_asc` when the listing
+  carries no dates.
 - `sort_by_date` — `1` starts on newest first.
 - `show_date`, `show_name`, `show_search` — turn caption and search parts off.
+- `show_refresh` — `0` hides the **Refresh** button.
 - `group_depth`, `min_group` — how eagerly names are grouped.
 - `groups` — group slugs to have selected on load.
 - `lightbox` — `0` opens the image in a new tab instead of an overlay.

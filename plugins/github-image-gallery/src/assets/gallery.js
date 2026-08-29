@@ -217,7 +217,19 @@
     apply();
   }
 
+  /* refresh 단추가 주소에 남긴 자국을 지운다. 그냥 새로고침했다고 또 받아오지 않게. */
+  function cleanUrl() {
+    if (!window.history || !history.replaceState || !window.URL) return;
+    var u;
+    try { u = new URL(window.location.href); } catch (e) { return; }
+    if (!u.searchParams || !u.searchParams.has('gig_refresh')) return;
+    u.searchParams.delete('gig_refresh');
+    u.searchParams.delete('_gignonce');
+    history.replaceState(null, '', u.pathname + u.search + u.hash);
+  }
+
   function boot() {
+    cleanUrl();
     Array.prototype.forEach.call(document.querySelectorAll('.gig'), init);
   }
 
