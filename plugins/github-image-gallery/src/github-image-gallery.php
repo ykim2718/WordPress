@@ -3,7 +3,7 @@
  * Plugin Name:       GitHub Image Gallery
  * Plugin URI:        https://github.com/ykim2718/WordPress
  * Description:       Shows a folder of images from a public GitHub repository as a filterable thumbnail gallery. Groups are derived from the file names and offered as a multi-select dropdown.
- * Version:           1.1.2
+ * Version:           1.1.3
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Author:            yRocket
@@ -22,7 +22,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('GIG_VERSION', '1.1.2');
+define('GIG_VERSION', '1.1.3');
 define('GIG_FILE', __FILE__);
 define('GIG_DIR', plugin_dir_path(__FILE__));
 define('GIG_URL', plugin_dir_url(__FILE__));
@@ -50,6 +50,19 @@ function gig_enqueue_assets() {
         'copyFail' => __('Could not copy', 'github-image-gallery'),
     ));
 }
+
+/**
+ * refresh 요청은 page cache를 타지 않게 한다.
+ *
+ * WP Super Cache 같은 page cache는 주소가 같으면 같은 HTML을 돌려준다. refresh 주소는
+ * nonce가 12시간 같으므로 눌러도 늘 같은 주소가 되어, 처음 한 번 캐시된 화면이 그 뒤로
+ * 계속 나왔다. 새 그림이 올라와도 화면이 그대로였던 까닭이 이것이다.
+ */
+add_action('init', function () {
+    if (empty($_GET['gig_refresh'])) return;
+    if (!defined('DONOTCACHEPAGE')) define('DONOTCACHEPAGE', true);
+    nocache_headers();
+});
 
 /** 설정 -> 플러그인 목록에서 캐시를 비울 수 있게 한다 */
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), function ($links) {

@@ -141,6 +141,19 @@
         apply();
       });
     });
+    /* 이 HTML이 page cache에서 나왔다면 gig_t도 옛것이다. 눌리는 순간 지금 시각으로 고쳐
+       주소를 매번 다르게 만든다. 그래야 캐시가 옛 화면을 다시 내주지 못한다. */
+    var refreshLink = root.querySelector('.gig-refresh');
+    if (refreshLink && window.URL) {
+      refreshLink.addEventListener('click', function () {
+        try {
+          var u = new URL(refreshLink.href, window.location.href);
+          u.searchParams.set('gig_t', String(Date.now()));
+          refreshLink.href = u.toString();
+        } catch (e) { /* URL을 못 만들면 서버가 심어 준 주소를 그대로 쓴다 */ }
+      });
+    }
+
     if (sortSel) sortSel.addEventListener('change', apply);
     if (query) {
       var timer;
@@ -225,6 +238,7 @@
     if (!u.searchParams || !u.searchParams.has('gig_refresh')) return;
     u.searchParams.delete('gig_refresh');
     u.searchParams.delete('_gignonce');
+    u.searchParams.delete('gig_t');
     history.replaceState(null, '', u.pathname + u.search + u.hash);
   }
 

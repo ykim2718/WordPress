@@ -285,6 +285,11 @@ function gig_render($atts) {
     $data = gig_fetch($src, $a['cache'], $refresh === 'ok');
     if (is_wp_error($data)) return gig_notice($data->get_error_message());
 
+    // 새 목록을 받았으면 이 글의 page cache도 버린다. 남겨 두면 다음 방문에 옛 화면이 다시 나온다.
+    if ($refresh === 'ok' && function_exists('wpsc_delete_post_cache') && get_the_ID()) {
+        wpsc_delete_post_cache(get_the_ID());
+    }
+
     $files = $data['items'];
     if (empty($files)) return gig_notice(__('No images found in this folder.', 'github-image-gallery'));
 
@@ -388,9 +393,12 @@ function gig_render($atts) {
 
     <?php if ((int) $a['show_refresh'] === 1) :
         // 목록 캐시를 버리고 GitHub에서 다시 받아오는 주소. nonce로 이 페이지에서 온 것만 받는다.
+        // gig_t는 주소를 매번 다르게 만들어 page cache에 걸린 옛 화면을 비켜 간다.
+        // 이 HTML 자체가 캐시에서 나올 수도 있으므로 눌리는 순간 값을 다시 쓴다 (gallery.js).
         $refresh_url = add_query_arg(array(
             'gig_refresh' => $token,
             '_gignonce'   => wp_create_nonce('gig_refresh_' . $token),
+            'gig_t'       => time(),
         )) . '#gig-at-' . $token;    // uid는 새로 그릴 때마다 달라진다: 자리표는 token으로 둔다
     ?>
     <div class="gig-field">

@@ -51,6 +51,11 @@ plugins/github-image-gallery/
 버리고 GitHub에서 다시 읽는다. 주소에 nonce가 붙어 있고, nonce가 지났으면 캐시를 그대로
 쓴 채 그 사실을 화면에 적는다.
 
+캐시는 세 겹이다. 위의 transient, WordPress의 page cache, 그리고 `raw.githubusercontent.com`이
+`index.json`에 거는 5분짜리 CDN 캐시다. Refresh는 앞의 둘을 버리지만 — 요청을 캐시 대상에서
+빼고, 눌린 시각을 주소에 실어 보내고, 그 글의 page cache를 지운다 — 마지막 하나는 어쩌지
+못한다. 그래서 GitHub에 방금 올린 그림은 최대 5분 뒤에 나타난다.
+
 ## group 자동 생성
 
 파일명을 하이픈으로 끊어 `min_group`개 이상 모이는 **가장 긴 prefix**를 group으로 잡는다.

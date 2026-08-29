@@ -1,3 +1,16 @@
+## 1.1.3
+
+- Make **Refresh** work more than once on a site with a page cache. The link
+  carried a nonce that stays the same for twelve hours, so the address never
+  changed; WP Super Cache stored the page from the first press and handed that
+  same HTML back on every later press, however many pictures had arrived
+  meanwhile. The refresh request now declares itself uncacheable, carries a
+  timestamp written at the moment of the press, and drops the cached copy of
+  the post it sits in once the new listing is in.
+- The listing can still be up to five minutes behind GitHub:
+  `raw.githubusercontent.com` serves `index.json` with a five-minute cache that
+  neither a query string nor a `no-cache` header gets past.
+
 ## 1.1.2
 
 - Hand out one address for the picture everywhere in the right-click menu:
