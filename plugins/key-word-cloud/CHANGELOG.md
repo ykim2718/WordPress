@@ -1,3 +1,14 @@
+## 2.12.1
+
+- The menu icon kept its colours. Handed over as a data URI it arrived white
+  and blank: `wp-admin/js/svg-painter.js` takes base64 SVG menu icons and
+  rewrites every `fill` to one admin-scheme colour, which is right for the
+  one-colour icons WordPress ships and left this one a bare cloud. Passing the
+  file's address instead makes WordPress hang it as an `<img>`, which that
+  script does not touch. It costs one request per admin page and the browser
+  caches it.
+- The icon also appears at 56px beside the heading on the plugin's own screen.
+
 ## 2.12.0
 
 - The settings screen says what the plugin is before it starts asking for

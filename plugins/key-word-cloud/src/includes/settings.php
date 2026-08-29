@@ -23,6 +23,7 @@ final class KWC_Settings {
 	 */
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'add_menu' ) );
+		add_action( 'admin_head', array( __CLASS__, 'admin_icon_style' ) );
 		add_action( 'admin_init', array( __CLASS__, 'register_settings' ) );
 		add_action( 'admin_post_kwc_flush_cache', array( __CLASS__, 'handle_flush_cache' ) );
 		add_action( 'admin_post_kwc_pull_now', array( __CLASS__, 'handle_pull_now' ) );
@@ -90,22 +91,36 @@ final class KWC_Settings {
 	}
 
 	/**
-	 * 사이드바에 쓸 아이콘.
+	 * 사이드바에 쓸 아이콘. 주소로 준다.
 	 *
-	 * WordPress 는 icon_url 이 data URI 이면 그대로 배경 그림으로 깔아 준다. 그림 파일
-	 * 주소를 주면 매번 한 번 더 받아 오므로, 작은 SVG 는 그냥 실어 보낸다.
+	 * data URI 로 주면 색이 사라진다. `wp-admin/js/svg-painter.js` 가 base64 SVG 메뉴
+	 * 아이콘을 받아 `fill="..."` 을 전부 관리자 색상 하나로 바꿔 다시 칠하기 때문이다.
+	 * 아이콘을 색 구성에 맞추려는 것인데, 그 결과 이 아이콘은 흰 구름만 남고 KWC 도
+	 * 파랑도 지워졌다.
 	 *
-	 * @return string data URI. 파일이 없으면 기본 아이콘 이름.
+	 * 주소를 주면 WordPress 가 `<img>` 로 걸고 그 script 는 손대지 않는다. 관리 화면마다
+	 * 요청이 하나 늘지만 브라우저가 캐시하고, 그 값으로 색을 산다.
+	 *
+	 * @return string 아이콘 주소. 파일이 없으면 기본 아이콘 이름.
 	 */
 	private static function menu_icon() {
-		$path = KWC_DIR . 'assets/icon.svg';
-		$svg  = is_readable( $path ) ? file_get_contents( $path ) : '';
-		if ( '' === $svg ) {
+		if ( ! is_readable( KWC_DIR . 'assets/icon.svg' ) ) {
 			// 아이콘이 빠진 채 배포되면 메뉴만 조용히 밋밋해진다. 로그에 남긴다.
-			error_log( '[key-word-cloud] assets/icon.svg is missing or unreadable: ' . $path );
+			error_log( '[key-word-cloud] assets/icon.svg is missing or unreadable' );
 			return 'dashicons-tagcloud';
 		}
-		return 'data:image/svg+xml;base64,' . base64_encode( $svg );
+		return KWC_URL . 'assets/icon.svg';
+	}
+
+	/**
+	 * 메뉴 아이콘의 흐림을 걷는다.
+	 *
+	 * 관리 화면은 `<img>` 아이콘을 opacity 0.6 으로 눌러 둔다. 한 가지 색 아이콘에는 맞는
+	 * 값이지만 20px 짜리 글자에는 그만큼 대비를 깎는다.
+	 */
+	public static function admin_icon_style() {
+		echo '<style>#adminmenu #toplevel_page_' . esc_html( self::PAGE )
+			. ' .wp-menu-image img { opacity: 1; padding-top: 7px; }</style>' . "\n";
 	}
 
 	/**
@@ -608,7 +623,11 @@ final class KWC_Settings {
 		$status = KWC_Topics::status();
 		?>
 		<div class="wrap">
-			<h1>Key Word Cloud</h1>
+			<h1 style="display:flex;align-items:center;gap:14px;margin-bottom:.4em">
+				<img src="<?php echo esc_url( KWC_URL . 'assets/icon.svg' ); ?>" alt=""
+					width="56" height="56" style="flex:0 0 56px">
+				<span>Key Word Cloud</span>
+			</h1>
 
 			<p>이 사이트가 무엇에 대해 써 왔는지를 구름으로 그린다. 낱말을 세는 것이 아니라,
 				글에서 뽑은 구절을 뜻이 가까운 것끼리 묶어 topic 으로 만들고 그 topic 을 그린다.
