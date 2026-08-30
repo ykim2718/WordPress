@@ -4,9 +4,11 @@
 The site stores these posts as the markdown already rendered to HTML, wrapped
 in the same container GitHub uses, so the post reads on the site the way the
 document reads on GitHub. A lead image sits above it as a figure, and the same
-image is attached to the post as its featured image.
+image is attached to the post as its featured image. The figure points at that
+attachment rather than at the source the image came from, so the post keeps its
+lead image when that source moves, goes private or is rewritten.
 
-    <figure class="wp-block-image ..."><img src="IMAGE_URL" ...></figure>
+    <figure class="wp-block-image ..."><img src="ATTACHMENT_URL" ...></figure>
     <p><div class="github-readme-container markdown-body">
        <div id="file" class="md" data-path="PATH_IN_REPO">
        <article class="markdown-body entry-content container-lg">RENDERED</article>
@@ -35,12 +37,13 @@ Needs markdown-it-py, mdit-py-plugins and linkify-it-py:
 
 Changelog
     0.0.0  First version.
+    0.1.0  The figure points at the uploaded attachment, not at the source URL.
 """
 
 from __future__ import annotations
 
 __author__ = 'yRocket'
-__version__ = "0.0.0.2026.8.30"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
+__version__ = "0.1.0.2026.8.30"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
 
 import argparse
 import base64
@@ -351,14 +354,19 @@ class Site:
                 return user['id']
         raise SystemExit(f"the site has no user named {name}")
 
-    def attachment_id(self, *, image: bytes, filename: str) -> int:
-        """Reuse the attachment of that name if it is there, otherwise upload it."""
+    def attachment(self, *, image: bytes, filename: str) -> dict:
+        """Reuse the attachment of that name if it is there, otherwise upload it.
+
+        Gives back the id, which the post carries as its featured image, and the
+        URL the site serves the file at, which the post's figure points to.
+        """
         stem = pathlib.Path(filename).stem
-        query = urllib.parse.urlencode({'search': stem, 'per_page': 100, '_fields': 'id,slug'})
+        query = urllib.parse.urlencode({'search': stem, 'per_page': 100,
+                                        '_fields': 'id,slug,source_url'})
         for item in self.call(path=f'/media?{query}'):
             if item['slug'] == stem.lower():
                 print(f"the media library already holds {filename} as {item['id']}")
-                return item['id']
+                return {'id': item['id'], 'source_url': item['source_url']}
         mime = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
         uploaded = self.call(
             path='/media', method='POST', body=image,
@@ -366,7 +374,7 @@ class Site:
                      'Content-Disposition': f'attachment; filename="{filename}"'},
         )
         print(f"uploaded {filename} as attachment {uploaded['id']}")
-        return uploaded['id']
+        return {'id': uploaded['id'], 'source_url': uploaded['source_url']}
 
     def create_post(self, *, payload: dict) -> dict:
         return self.call(path='/posts', method='POST',
@@ -382,17 +390,24 @@ def publish(*, args: argparse.Namespace) -> dict:
     path = repository_path(url=args.markdown_url)
     run_id = hashlib.md5(markdown.encode('utf-8')).hexdigest()
     rendered = render_markdown(markdown=markdown, run_id=run_id)
-    content = build_content(rendered=rendered, path=path, image_url=args.image_url,
-                            image_height=args.image_height)
-    print(f"{title}\n  {path}, {len(markdown)} characters of markdown, "
-          f"{len(content)} of post content")
 
-    if args.write:
-        destination = pathlib.Path(args.write)
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        destination.write_text(content, encoding='utf-8')
-        print(f"  wrote {destination}")
+    def compose(*, image_url: str) -> str:
+        """Wrap the rendered document around that lead image, and report it."""
+        content = build_content(rendered=rendered, path=path, image_url=image_url,
+                                image_height=args.image_height)
+        print(f"{title}\n  {path}, {len(markdown)} characters of markdown, "
+              f"{len(content)} of post content\n  lead image {image_url}")
+        if args.write:
+            destination = pathlib.Path(args.write)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_text(content, encoding='utf-8')
+            print(f"  wrote {destination}")
+        return content
+
     if args.dry_run:
+        # Nothing reaches the media library on a dry run, so there is no
+        # attachment to point at and the figure keeps the URL it was given.
+        compose(image_url=args.image_url)
         print("--dry-run: nothing was sent to the site")
         return {}
 
@@ -400,7 +415,6 @@ def publish(*, args: argparse.Namespace) -> dict:
                 auth=args.auth, timeout=args.timeout)
     payload = {
         'title': title,
-        'content': content,
         'status': args.status,
         'author': site.author_id(name=args.author),
         'categories': site.term_ids(taxonomy='categories', names=args.categories),
@@ -411,11 +425,18 @@ def publish(*, args: argparse.Namespace) -> dict:
         payload['tags'] = site.term_ids(taxonomy='tags', names=args.tags)
     if args.excerpt:
         payload['excerpt'] = args.excerpt
+
+    # The image goes up before the content is built, because the figure points
+    # at the attachment the site serves and not at the source it came from.
+    image_url = args.image_url
     if args.image_url:
         image = read_source(source=raw_url(url=args.image_url), timeout=args.timeout)
         filename = pathlib.Path(urllib.parse.urlsplit(args.image_url).path).name
-        payload['featured_media'] = site.attachment_id(image=image, filename=filename)
+        attachment = site.attachment(image=image, filename=filename)
+        payload['featured_media'] = attachment['id']
+        image_url = attachment['source_url']
 
+    payload['content'] = compose(image_url=image_url)
     post = site.create_post(payload=payload)
     print(f"  post {post['id']} is {post['status']}: {post['link']}")
     return post
