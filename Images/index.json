@@ -1,9 +1,9 @@
 {
- "generated": "2026-08-29T05:32:17Z",
+ "generated": "2026-08-30T02:49:16Z",
  "folder": "Images",
  "thumb_dir": ".thumbs",
  "thumb_width": 480,
- "count": 84,
+ "count": 86,
  "items": [
   {
    "n": "acacia-tree-dune-sunset.webp",
@@ -124,6 +124,26 @@
    "ht": 1500,
    "t": ".thumbs/bull-skull-wall-mount.jpg.webp",
    "e": 0
+  },
+  {
+   "n": "claude-shannon-father-of-the-information-age-400x300.jpg",
+   "s": 44602,
+   "h1": "af84b5d88b17c443529e288c241506b60a6fad0f",
+   "d": 1788058144,
+   "w": 400,
+   "ht": 300,
+   "e": 0,
+   "t": ".thumbs/claude-shannon-father-of-the-information-age-400x300.jpg.webp"
+  },
+  {
+   "n": "claude-shannon-father-of-the-information-age.jpg",
+   "s": 453085,
+   "h1": "dbb914ad1768bae70c7bdbd78fccab19dbebf48d",
+   "d": 1788058144,
+   "w": 1303,
+   "ht": 2000,
+   "e": 0,
+   "t": ".thumbs/claude-shannon-father-of-the-information-age.jpg.webp"
   },
   {
    "n": "clover-field-park-pavilion.jpg",
@@ -752,8 +772,8 @@
    "d": 1787981527,
    "w": 800,
    "ht": 600,
-   "e": 0,
-   "t": ".thumbs/time-series-inference-server-800x600.png.webp"
+   "t": ".thumbs/time-series-inference-server-800x600.png.webp",
+   "e": 0
   },
   {
    "n": "vanilla-cashmere-body-mist-backyard.jpg",
