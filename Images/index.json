@@ -1,9 +1,9 @@
 {
- "generated": "2026-08-30T02:49:16Z",
+ "generated": "2026-08-30T07:21:04Z",
  "folder": "Images",
  "thumb_dir": ".thumbs",
  "thumb_width": 480,
- "count": 86,
+ "count": 87,
  "items": [
   {
    "n": "acacia-tree-dune-sunset.webp",
@@ -132,8 +132,8 @@
    "d": 1788058144,
    "w": 400,
    "ht": 300,
-   "e": 0,
-   "t": ".thumbs/claude-shannon-father-of-the-information-age-400x300.jpg.webp"
+   "t": ".thumbs/claude-shannon-father-of-the-information-age-400x300.jpg.webp",
+   "e": 0
   },
   {
    "n": "claude-shannon-father-of-the-information-age.jpg",
@@ -142,8 +142,8 @@
    "d": 1788058144,
    "w": 1303,
    "ht": 2000,
-   "e": 0,
-   "t": ".thumbs/claude-shannon-father-of-the-information-age.jpg.webp"
+   "t": ".thumbs/claude-shannon-father-of-the-information-age.jpg.webp",
+   "e": 0
   },
   {
    "n": "clover-field-park-pavilion.jpg",
@@ -444,6 +444,16 @@
    "ht": 1500,
    "t": ".thumbs/incheon-bridge-sunset.jpg.webp",
    "e": 0
+  },
+  {
+   "n": "john-larry-kelly-jr-kelly-criterion.jpg",
+   "s": 12305,
+   "h1": "82e2da205543acef4be64b499b2e047ad8476c69",
+   "d": 1788074449,
+   "w": 198,
+   "ht": 246,
+   "e": 0,
+   "t": ".thumbs/john-larry-kelly-jr-kelly-criterion.jpg.webp"
   },
   {
    "n": "lawn-worms-eye-live-oak-sky.jpg",
