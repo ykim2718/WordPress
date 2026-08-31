@@ -1,9 +1,9 @@
 {
- "generated": "2026-08-30T19:13:12Z",
+ "generated": "2026-08-31T16:06:59Z",
  "folder": "Images",
  "thumb_dir": ".thumbs",
  "thumb_width": 480,
- "count": 88,
+ "count": 93,
  "items": [
   {
    "n": "acacia-tree-dune-sunset.webp",
@@ -452,8 +452,8 @@
    "d": 1788117177,
    "w": 400,
    "ht": 300,
-   "e": 0,
-   "t": ".thumbs/john-larry-kelly-jr-kelly-criterion-400x300.jpg.webp"
+   "t": ".thumbs/john-larry-kelly-jr-kelly-criterion-400x300.jpg.webp",
+   "e": 0
   },
   {
    "n": "john-larry-kelly-jr-kelly-criterion.jpg",
@@ -544,6 +544,16 @@
    "ht": 400,
    "t": ".thumbs/mean-variance-and-agreement-metrics-for-regression.png.webp",
    "e": 0
+  },
+  {
+   "n": "office-depot-storefront.jpg",
+   "s": 461652,
+   "h1": "dd42e573c645c080234a72dbed1f97988cf00bec",
+   "d": 1788192399,
+   "w": 2000,
+   "ht": 1500,
+   "e": 0,
+   "t": ".thumbs/office-depot-storefront.jpg.webp"
   },
   {
    "n": "open-prairie-fenceline-clouds.jpg",
@@ -716,6 +726,26 @@
    "e": 0
   },
   {
+   "n": "roundabout-warning-sign-street-view.jpg",
+   "s": 489810,
+   "h1": "64419e7223151fe093d28632bceaa87b1c970c94",
+   "d": 1788192399,
+   "w": 2000,
+   "ht": 1500,
+   "e": 0,
+   "t": ".thumbs/roundabout-warning-sign-street-view.jpg.webp"
+  },
+  {
+   "n": "roundabout-warning-sign.jpg",
+   "s": 425968,
+   "h1": "dfcfe9df096a9332292a7f0c5e89b8367e282e00",
+   "d": 1788192399,
+   "w": 2000,
+   "ht": 1500,
+   "e": 0,
+   "t": ".thumbs/roundabout-warning-sign.jpg.webp"
+  },
+  {
    "n": "santorini-domes-infinity-pool-sunset.webp",
    "s": 147200,
    "h1": "aaa4782b43bab4004bd04531196886955d1bdc79",
@@ -734,6 +764,16 @@
    "ht": 1024,
    "t": ".thumbs/snow-bench-footprints.webp.webp",
    "e": 0
+  },
+  {
+   "n": "speed-limit-25-residential-street.jpg",
+   "s": 427120,
+   "h1": "9ef8f9502d14d68056272c954820a45fbc719d66",
+   "d": 1788192399,
+   "w": 1500,
+   "ht": 1125,
+   "e": 0,
+   "t": ".thumbs/speed-limit-25-residential-street.jpg.webp"
   },
   {
    "n": "spiral-staircase-two-figures.webp",
@@ -864,6 +904,16 @@
    "ht": 300,
    "t": ".thumbs/wide-narrow-doe-400x300.png.webp",
    "e": 0
+  },
+  {
+   "n": "yamajirushi-awase-miso-package.jpg",
+   "s": 361447,
+   "h1": "d64d92d091c6eaabc6edb1e3062d187664d1ebd6",
+   "d": 1788192399,
+   "w": 1000,
+   "ht": 750,
+   "e": 0,
+   "t": ".thumbs/yamajirushi-awase-miso-package.jpg.webp"
   },
   {
    "n": "zernike-pyramid-noll-1200x800.png",
