@@ -56,5 +56,10 @@ passed as one comma-separated string, because a tag name may contain a space:
 Unlike a category, a tag the site does not have yet can be added on the way in
 with `--create-tags true`; the site's one-off tags are made that way.
 
+**Every post needs an excerpt**, written by hand, of roughly 300 characters.
+WordPress falls back to trimming the body when a post has none, but trimming
+strips the shortcode and leaves nothing, so such a post shows no summary
+anywhere on the site. `--excerpt` is required for that reason.
+
 - Publish with `tools/publish_markdown_post.py`.
 - Audit the whole site with `tools/check_post_style.py`.

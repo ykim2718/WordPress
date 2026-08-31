@@ -28,6 +28,11 @@ Categories are matched by name against the site and must already exist; the
 site keeps one tree and this script does not add to it. The author is matched
 by name the same way.
 
+An excerpt is required. WordPress falls back to trimming the post body when a
+post has none, but the body here is a shortcode, and trimming strips it: the
+post would carry no summary at all, in the listings or anywhere else. So the
+one summary this kind of post can have is the one written here.
+
 Tags are matched by name too, but they are written as one comma-separated
 string, because a tag name often has a space in it and a space-separated list
 cannot tell "Time Series" from two tags:
@@ -52,12 +57,13 @@ Changelog
            here, which is what every other post on the site uses, and link the
            lead image from GitHub again to match them.
     0.3.0  Read --tags as a comma-separated string, and add --create-tags.
+    0.4.0  Require --excerpt, which a shortcode post cannot do without.
 """
 
 from __future__ import annotations
 
 __author__ = 'yRocket'
-__version__ = "0.3.0.2026.8.31"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
+__version__ = "0.4.0.2026.8.31"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
 
 import argparse
 import base64
@@ -372,8 +378,7 @@ def publish(*, args: argparse.Namespace) -> dict:
     if tags:
         payload['tags'] = site.term_ids(taxonomy='tags', names=tags,
                                         create=args.create_tags)
-    if args.excerpt:
-        payload['excerpt'] = args.excerpt
+    payload['excerpt'] = args.excerpt
     if args.image_url:
         image = read_source(source=raw_url(url=args.image_url), timeout=args.timeout)
         filename = pathlib.Path(urllib.parse.urlsplit(args.image_url).path).name
@@ -409,7 +414,9 @@ def parse_args() -> argparse.Namespace:
                         help='add a tag the site does not have yet, rather than stopping')
     parser.add_argument('--title', default='',
                         help='override the title taken from the "# " heading')
-    parser.add_argument('--excerpt', default='', help='the post summary')
+    parser.add_argument('--excerpt', required=True,
+                        help='the post summary; required, because trimming a '
+                             'shortcode body leaves nothing to fall back on')
     parser.add_argument('--image-height', type=int, default=500,
                         help='height the figure is drawn at, in pixels')
     parser.add_argument('--dry-run', choices=['true', 'false'], default='false',
