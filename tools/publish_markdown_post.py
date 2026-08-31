@@ -287,12 +287,31 @@ class Site:
         raise SystemExit(f"the site has no user named {name}")
 
     def attachment_id(self, *, image: bytes, filename: str) -> int:
-        """Reuse the attachment of that name if it is there, otherwise upload it."""
+        """Reuse the attachment holding that file if it is there, otherwise upload it.
+
+        Matched on the file the site serves rather than on the slug. A slug
+        drifts -- WordPress will set it to the attachment id -- and a slug that
+        no longer looked like its file name is how a second copy of the same
+        image once reached the library.
+
+        WordPress renames a colliding upload to name-1.jpg, so a suffixed file
+        of the same size counts as the same image; without that, uploading over
+        an earlier duplicate would quietly make a third copy.
+        """
         stem = pathlib.Path(filename).stem
-        query = urllib.parse.urlencode({'search': stem, 'per_page': 100, '_fields': 'id,slug'})
+        suffixed = re.compile(re.escape(stem) + r'-\d+$', re.IGNORECASE)
+        query = urllib.parse.urlencode({'search': stem, 'per_page': 100,
+                                        '_fields': 'id,source_url,media_details'})
         for item in self.call(path=f'/media?{query}'):
-            if item['slug'] == stem.lower():
-                print(f"the media library already holds {filename} as {item['id']}")
+            served = urllib.parse.unquote(item['source_url'].rsplit('/', 1)[-1])
+            size = (item.get('media_details') or {}).get('filesize')
+            same = served.lower() == filename.lower() or (
+                suffixed.fullmatch(pathlib.Path(served).stem)
+                and pathlib.Path(served).suffix.lower() == pathlib.Path(filename).suffix.lower()
+                and size == len(image))
+            if same:
+                note = '' if served.lower() == filename.lower() else f" (as {served})"
+                print(f"the media library already holds {filename} as {item['id']}{note}")
                 return item['id']
         mime = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
         uploaded = self.call(
