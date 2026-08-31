@@ -1,24 +1,28 @@
 #!/usr/bin/env python3
 """Publish a GitHub markdown document as a post on the WordPress site.
 
-The site stores these posts as the markdown already rendered to HTML, wrapped
-in the same container GitHub uses, so the post reads on the site the way the
-document reads on GitHub. A lead image sits above it as a figure, and the same
-image is attached to the post as its featured image. The figure points at that
-attachment rather than at the source the image came from, so the post keeps its
-lead image when that source moves, goes private or is rewritten.
+The site renders these documents with its own [github_file] shortcode, which
+reads the file from GitHub when the page is viewed. A post therefore stores
+just the lead image and one shortcode, and a later edit to the markdown shows
+up on the site without republishing:
 
-    <figure class="wp-block-image ..."><img src="ATTACHMENT_URL" ...></figure>
-    <p><div class="github-readme-container markdown-body">
-       <div id="file" class="md" data-path="PATH_IN_REPO">
-       <article class="markdown-body entry-content container-lg">RENDERED</article>
-       </div></div></p>
+    <!-- wp:image {"width":"auto","height":"500px","sizeSlug":"large"} -->
+    <figure class="wp-block-image size-large is-resized">
+    <img src="IMAGE_URL" alt="" style="width:auto;height:500px"/></figure>
+    <!-- /wp:image -->
 
-GitHub's own renderer is not reachable from a script -- the rendered HTML only
-comes back from the blob page -- so the markdown is rendered here to the same
-shape: heading anchors, `dir="auto"`, tables in <markdown-accessiblity-table>,
-fences in the highlight containers, and math left as $...$ inside a
-<math-renderer> element, which is what the site's KaTeX pass reads.
+    <!-- wp:shortcode -->
+    [github_file user='USER' repo='REPO' file='PATH_IN_REPO']
+    <!-- /wp:shortcode -->
+
+The shortcode names user, repo and file and nothing else, so it always reads
+the repository's default branch. A --markdown-url on any other branch is
+refused rather than published as a post that quietly renders something else.
+
+The lead image is linked from GitHub, the way the site's other posts link it,
+and the same file is uploaded to the media library as the featured image. The
+document is still fetched, but only to read the post title off its "# "
+heading; the site, not this script, renders the markdown.
 
 Categories are matched by name against the site and must already exist; the
 site keeps one tree and this script does not add to it. The author is matched
@@ -31,23 +35,21 @@ site that has no application password for the account:
 
     WP_URL, WP_USERNAME, and WP_APP_PASSWORD or WP_PASSWORD
 
-Needs markdown-it-py, mdit-py-plugins and linkify-it-py:
-
-    pip install markdown-it-py mdit-py-plugins linkify-it-py
-
 Changelog
     0.0.0  First version.
     0.1.0  The figure points at the uploaded attachment, not at the source URL.
+    0.2.0  Post the site's [github_file] shortcode instead of markdown rendered
+           here, which is what every other post on the site uses, and link the
+           lead image from GitHub again to match them.
 """
 
 from __future__ import annotations
 
 __author__ = 'yRocket'
-__version__ = "0.1.0.2026.8.30"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
+__version__ = "0.2.0.2026.8.31"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
 
 import argparse
 import base64
-import hashlib
 import html
 import http.cookiejar
 import json
@@ -60,31 +62,9 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-__all__ = ['render_markdown', 'build_content', 'publish']
+__all__ = ['github_reference', 'build_content', 'publish']
 
 REQUIRED_ENVIRONMENT = ('WP_URL', 'WP_USERNAME')
-
-# The anchor GitHub puts beside every heading, copied so the posts already on
-# the site and the posts this script writes carry the same markup.
-OCTICON = (
-    '<svg data-component="Octicon" class="octicon octicon-link" viewBox="0 0 16 16" '
-    'version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 '
-    '3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 '
-    '1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 '
-    '0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751'
-    '.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 '
-    '3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 '
-    '0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>'
-)
-
-# GitHub names the lexer in the class, and the name is not always the fence's.
-FENCE_LANGUAGE = {
-    'sh': 'shell', 'bash': 'shell', 'zsh': 'shell', 'console': 'shell',
-    'py': 'python', 'js': 'js', 'javascript': 'js', 'ts': 'ts', 'typescript': 'ts',
-    'yml': 'yaml', 'md': 'gfm', 'markdown': 'gfm', 'c++': 'c++', 'cs': 'csharp',
-}
-# Fences GitHub has no lexer for; these get the plain container instead.
-FENCE_PLAIN = {'', 'text', 'txt', 'plain', 'none', 'output', 'log'}
 
 
 def raw_url(*, url: str) -> str:
@@ -99,14 +79,24 @@ def raw_url(*, url: str) -> str:
     return f"https://raw.githubusercontent.com/{owner}/{repository}/{rest}"
 
 
-def repository_path(*, url: str) -> str:
-    """The path of the document inside its repository, for the data-path attribute."""
+def github_reference(*, url: str) -> dict:
+    """Split a GitHub blob or raw URL into the parts the shortcode names."""
     parts = urllib.parse.urlsplit(url)
-    match = re.match(r'^/[^/]+/[^/]+/blob/[^/]+/(.+)$', parts.path)
-    if match:
-        return urllib.parse.unquote(match.group(1))
-    match = re.match(r'^/[^/]+/[^/]+/[^/]+/(.+)$', parts.path)  # raw.githubusercontent.com
-    return urllib.parse.unquote(match.group(1)) if match else parts.path.lstrip('/')
+    if parts.netloc == 'github.com':
+        match = re.match(r'^/([^/]+)/([^/]+)/blob/([^/]+)/(.+)$', parts.path)
+    elif parts.netloc == 'raw.githubusercontent.com':
+        match = re.match(r'^/([^/]+)/([^/]+)/([^/]+)/(.+)$', parts.path)
+    else:
+        raise SystemExit(f"not a GitHub URL, so it has no shortcode to write: {url}")
+    if not match:
+        raise SystemExit(f"cannot read user, repo and file out of {url}")
+    user, repository, branch, path = (urllib.parse.unquote(p) for p in match.groups())
+    # The attributes are single-quoted inside a bracketed shortcode, and there
+    # is no escape for either character, so refuse rather than write it broken.
+    for name, value in (('user', user), ('repo', repository), ('file', path)):
+        if "'" in value or ']' in value:
+            raise SystemExit(f"the shortcode cannot carry {name}={value!r}")
+    return {'user': user, 'repository': repository, 'branch': branch, 'path': path}
 
 
 def fetch(*, url: str, timeout: int) -> bytes:
@@ -121,6 +111,18 @@ def fetch(*, url: str, timeout: int) -> bytes:
         raise SystemExit(f"could not reach {url}: {error}") from error
 
 
+def default_branch(*, user: str, repository: str, timeout: int) -> str:
+    """The branch the shortcode reads, or '' when GitHub will not say."""
+    request = urllib.request.Request(
+        f"https://api.github.com/repos/{user}/{repository}",
+        headers={'User-Agent': 'publish_markdown_post', 'Accept': 'application/vnd.github+json'})
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            return json.loads(response.read().decode('utf-8')).get('default_branch', '')
+    except (urllib.error.HTTPError, urllib.error.URLError, json.JSONDecodeError):
+        return ''  # Rate-limited or private; the caller falls back to a default.
+
+
 def read_source(*, source: str, timeout: int) -> bytes:
     """Read a local path or a URL, whichever was given."""
     if re.match(r'^https?://', source):
@@ -131,111 +133,6 @@ def read_source(*, source: str, timeout: int) -> bytes:
     return path.read_bytes()
 
 
-def slugify(*, text: str) -> str:
-    """The heading id GitHub would give this text."""
-    stripped = re.sub(r'[`*_$]', '', text).strip().lower()
-    stripped = re.sub(r'[^\w\- ]', '', stripped, flags=re.UNICODE)
-    return stripped.replace(' ', '-')
-
-
-def render_markdown(*, markdown: str, run_id: str) -> str:
-    """Render the markdown the way GitHub renders it in a repository page."""
-    try:
-        from markdown_it import MarkdownIt
-        from mdit_py_plugins.dollarmath import dollarmath_plugin
-    except ImportError as error:  # A wrong answer here is a mangled post, so stop.
-        raise SystemExit(
-            'this script needs markdown-it-py, mdit-py-plugins and linkify-it-py:\n'
-            '    pip install markdown-it-py mdit-py-plugins linkify-it-py'
-        ) from error
-
-    parser = MarkdownIt('gfm-like', {'html': True, 'xhtmlOut': False})
-    parser.use(dollarmath_plugin, double_inline=True)
-    rules = parser.renderer.rules
-
-    def math_element(*, kind: str, body: str) -> str:
-        display = 'block' if kind == 'display' else 'inline-block'
-        return (f'<math-renderer class="js-{kind}-math" style="display: {display}" '
-                f'data-run-id="{run_id}">{html.escape(body, quote=False)}</math-renderer>')
-
-    def render_heading_open(tokens, index, options, env):
-        level = tokens[index].tag
-        text = tokens[index + 1].content
-        anchor = slugify(text=text)
-        label = html.escape(re.sub(r'[`*_$]', '', text), quote=True)
-        env['heading_anchor'] = anchor
-        env['heading_label'] = label
-        return (f'<div class="markdown-heading" dir="auto">'
-                f'<{level} class="heading-element" dir="auto">')
-
-    def render_heading_close(tokens, index, options, env):
-        anchor = env.get('heading_anchor', '')
-        label = env.get('heading_label', '')
-        return (f'</{tokens[index].tag}>'
-                f'<a id="user-content-{anchor}" class="anchor" aria-label="Permalink: {label}" '
-                f'href="#{anchor}">{OCTICON}</a></div>\n')
-
-    def render_fence(tokens, index, options, env):
-        token = tokens[index]
-        language = (token.info or '').strip().split()[0].lower() if token.info.strip() else ''
-        code = html.escape(token.content, quote=False)
-        copyable = html.escape(token.content, quote=True)
-        if language in FENCE_PLAIN:
-            return (f'<div class="snippet-clipboard-content notranslate position-relative '
-                    f'overflow-auto" dir="auto" data-snippet-clipboard-copy-content="{copyable}">'
-                    f'<pre class="notranslate"><code>{code}</code></pre></div>\n')
-        lexer = FENCE_LANGUAGE.get(language, language)
-        return (f'<div class="highlight highlight-source-{html.escape(lexer, quote=True)} '
-                f'notranslate position-relative overflow-auto" dir="auto" '
-                f'data-snippet-clipboard-copy-content="{copyable}">'
-                f'<pre>{code}</pre></div>\n')
-
-    def render_with_direction(tokens, index, options, env):
-        tokens[index].attrSet('dir', 'auto')
-        return parser.renderer.renderToken(tokens, index, options, env)
-
-    def render_cell_open(tokens, index, options, env):
-        """GitHub writes the column alignment as an attribute, not as a style."""
-        token = tokens[index]
-        style = token.attrGet('style') or ''
-        alignment = re.search(r'text-align:\s*(\w+)', style)
-        if alignment:
-            token.attrs = {k: v for k, v in token.attrs.items() if k != 'style'}
-            token.attrSet('align', alignment.group(1))
-        return parser.renderer.renderToken(tokens, index, options, env)
-
-    def render_link_open(tokens, index, options, env):
-        token = tokens[index]
-        href = token.attrGet('href') or ''
-        if re.match(r'^https?://', href):
-            token.attrSet('rel', 'nofollow')
-        return parser.renderer.renderToken(tokens, index, options, env)
-
-    rules['heading_open'] = render_heading_open
-    rules['heading_close'] = render_heading_close
-    rules['fence'] = render_fence
-    rules['code_block'] = render_fence
-    rules['paragraph_open'] = render_with_direction
-    rules['bullet_list_open'] = render_with_direction
-    rules['ordered_list_open'] = render_with_direction
-    rules['th_open'] = render_cell_open
-    rules['td_open'] = render_cell_open
-    rules['link_open'] = render_link_open
-    rules['table_open'] = lambda *a: '<markdown-accessiblity-table><table>\n'
-    rules['table_close'] = lambda *a: '</table></markdown-accessiblity-table>\n'
-    rules['math_inline'] = lambda tokens, index, *a: math_element(
-        kind='inline', body=f'${tokens[index].content}$')
-    rules['math_inline_double'] = lambda tokens, index, *a: math_element(
-        kind='display', body=f'$${tokens[index].content}$$')
-    rules['math_block'] = lambda tokens, index, *a: '<p dir="auto">' + math_element(
-        kind='display', body=f'$${tokens[index].content.strip()}$$') + '</p>\n'
-
-    rendered = parser.render(markdown)
-    # GitHub's sanitizer namespaces the ids an author writes by hand, so that a
-    # link target in the document cannot collide with an id on the page.
-    return re.sub(r'(<a\b[^>]*?\bid=")(?!user-content-)', r'\1user-content-', rendered)
-
-
 def document_title(*, markdown: str) -> str:
     """The first level-one heading, which is the post's title."""
     for line in markdown.splitlines():
@@ -244,24 +141,22 @@ def document_title(*, markdown: str) -> str:
     raise SystemExit('the document has no "# " heading to take the post title from')
 
 
-def build_content(*, rendered: str, path: str, image_url: str, image_height: int) -> str:
-    """Wrap the rendered markdown and the lead image the way the site's posts are wrapped."""
+def build_content(*, reference: dict, image_url: str, image_height: int) -> str:
+    """The lead image and the shortcode, in the blocks the site's posts use."""
     figure = (
-        '<!-- wp:image {"sizeSlug":"large","linkDestination":"none","className":"is-resized"} -->\n'
+        f'<!-- wp:image {{"width":"auto","height":"{image_height}px","sizeSlug":"large"}} -->\n'
         f'<figure class="wp-block-image size-large is-resized">'
         f'<img src="{html.escape(image_url, quote=True)}" alt="" '
         f'style="width:auto;height:{image_height}px"/></figure>\n'
         '<!-- /wp:image -->'
     )
-    article = (
-        '<!-- wp:html -->\n'
-        '<p><div class="github-readme-container markdown-body">'
-        f'<div id="file" class="md" data-path="{html.escape(path, quote=True)}">'
-        '<article class="markdown-body entry-content container-lg" itemprop="text">'
-        f'{rendered}</article></div></div></p>\n'
-        '<!-- /wp:html -->'
+    shortcode = (
+        '<!-- wp:shortcode -->\n'
+        f"[github_file user='{reference['user']}' repo='{reference['repository']}' "
+        f"file='{reference['path']}']\n"
+        '<!-- /wp:shortcode -->'
     )
-    return f"{figure}\n\n{article}"
+    return f"{figure}\n\n{shortcode}"
 
 
 class Site:
@@ -354,19 +249,14 @@ class Site:
                 return user['id']
         raise SystemExit(f"the site has no user named {name}")
 
-    def attachment(self, *, image: bytes, filename: str) -> dict:
-        """Reuse the attachment of that name if it is there, otherwise upload it.
-
-        Gives back the id, which the post carries as its featured image, and the
-        URL the site serves the file at, which the post's figure points to.
-        """
+    def attachment_id(self, *, image: bytes, filename: str) -> int:
+        """Reuse the attachment of that name if it is there, otherwise upload it."""
         stem = pathlib.Path(filename).stem
-        query = urllib.parse.urlencode({'search': stem, 'per_page': 100,
-                                        '_fields': 'id,slug,source_url'})
+        query = urllib.parse.urlencode({'search': stem, 'per_page': 100, '_fields': 'id,slug'})
         for item in self.call(path=f'/media?{query}'):
             if item['slug'] == stem.lower():
                 print(f"the media library already holds {filename} as {item['id']}")
-                return {'id': item['id'], 'source_url': item['source_url']}
+                return item['id']
         mime = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
         uploaded = self.call(
             path='/media', method='POST', body=image,
@@ -374,7 +264,7 @@ class Site:
                      'Content-Disposition': f'attachment; filename="{filename}"'},
         )
         print(f"uploaded {filename} as attachment {uploaded['id']}")
-        return {'id': uploaded['id'], 'source_url': uploaded['source_url']}
+        return uploaded['id']
 
     def create_post(self, *, payload: dict) -> dict:
         return self.call(path='/posts', method='POST',
@@ -383,31 +273,31 @@ class Site:
 
 
 def publish(*, args: argparse.Namespace) -> dict:
-    """Render the document, then write it to the site as one post."""
+    """Point a post at the document, then write it to the site."""
+    reference = github_reference(url=args.markdown_url)
+    branch = default_branch(user=reference['user'], repository=reference['repository'],
+                            timeout=args.timeout) or 'main'
+    if reference['branch'] != branch:
+        raise SystemExit(
+            f"the shortcode carries only user, repo and file, so it renders "
+            f"{reference['repository']}@{branch}, but this URL is on "
+            f"{reference['branch']!r}. Publish the document from {branch!r}."
+        )
+
     markdown = read_source(source=raw_url(url=args.markdown_url),
                            timeout=args.timeout).decode('utf-8')
     title = args.title or document_title(markdown=markdown)
-    path = repository_path(url=args.markdown_url)
-    run_id = hashlib.md5(markdown.encode('utf-8')).hexdigest()
-    rendered = render_markdown(markdown=markdown, run_id=run_id)
+    content = build_content(reference=reference, image_url=args.image_url,
+                            image_height=args.image_height)
+    print(f"{title}\n  {reference['repository']}@{branch} {reference['path']}\n"
+          f"  {len(content)} characters of post content")
 
-    def compose(*, image_url: str) -> str:
-        """Wrap the rendered document around that lead image, and report it."""
-        content = build_content(rendered=rendered, path=path, image_url=image_url,
-                                image_height=args.image_height)
-        print(f"{title}\n  {path}, {len(markdown)} characters of markdown, "
-              f"{len(content)} of post content\n  lead image {image_url}")
-        if args.write:
-            destination = pathlib.Path(args.write)
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            destination.write_text(content, encoding='utf-8')
-            print(f"  wrote {destination}")
-        return content
-
+    if args.write:
+        destination = pathlib.Path(args.write)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_text(content, encoding='utf-8')
+        print(f"  wrote {destination}")
     if args.dry_run:
-        # Nothing reaches the media library on a dry run, so there is no
-        # attachment to point at and the figure keeps the URL it was given.
-        compose(image_url=args.image_url)
         print("--dry-run: nothing was sent to the site")
         return {}
 
@@ -415,6 +305,7 @@ def publish(*, args: argparse.Namespace) -> dict:
                 auth=args.auth, timeout=args.timeout)
     payload = {
         'title': title,
+        'content': content,
         'status': args.status,
         'author': site.author_id(name=args.author),
         'categories': site.term_ids(taxonomy='categories', names=args.categories),
@@ -425,18 +316,11 @@ def publish(*, args: argparse.Namespace) -> dict:
         payload['tags'] = site.term_ids(taxonomy='tags', names=args.tags)
     if args.excerpt:
         payload['excerpt'] = args.excerpt
-
-    # The image goes up before the content is built, because the figure points
-    # at the attachment the site serves and not at the source it came from.
-    image_url = args.image_url
     if args.image_url:
         image = read_source(source=raw_url(url=args.image_url), timeout=args.timeout)
         filename = pathlib.Path(urllib.parse.urlsplit(args.image_url).path).name
-        attachment = site.attachment(image=image, filename=filename)
-        payload['featured_media'] = attachment['id']
-        image_url = attachment['source_url']
+        payload['featured_media'] = site.attachment_id(image=image, filename=filename)
 
-    payload['content'] = compose(image_url=image_url)
     post = site.create_post(payload=payload)
     print(f"  post {post['id']} is {post['status']}: {post['link']}")
     return post
@@ -450,7 +334,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument('-v', '--version', action='version', version=__version__)
     parser.add_argument('--markdown-url', required=True,
-                        help='GitHub URL of the markdown document, or a local path')
+                        help='GitHub URL of the markdown document, on its default branch')
     parser.add_argument('--image-url', required=True,
                         help='URL of the lead image, used as the figure and the featured image')
     parser.add_argument('--categories', nargs='+', required=True,
@@ -468,7 +352,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--image-height', type=int, default=500,
                         help='height the figure is drawn at, in pixels')
     parser.add_argument('--dry-run', choices=['true', 'false'], default='false',
-                        help='render the post and stop without sending it')
+                        help='build the post and stop without sending it')
     parser.add_argument('--write', default='', help='also write the post content here')
     parser.add_argument('--timeout', type=int, default=60, help='seconds to wait for a request')
 
@@ -492,7 +376,7 @@ def parse_args() -> argparse.Namespace:
                 + '\n  WP_USERNAME      the login name'
                 + '\n  WP_APP_PASSWORD  xxxx xxxx xxxx xxxx, for --auth application-password'
                 + '\n  WP_PASSWORD      the account password, for --auth cookie'
-                + '\nUse --dry-run true to render the post without sending it.'
+                + '\nUse --dry-run true to build the post without sending it.'
             )
     return args
 
