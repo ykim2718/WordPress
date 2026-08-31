@@ -28,6 +28,16 @@ Categories are matched by name against the site and must already exist; the
 site keeps one tree and this script does not add to it. The author is matched
 by name the same way.
 
+Tags are matched by name too, but they are written as one comma-separated
+string, because a tag name often has a space in it and a space-separated list
+cannot tell "Time Series" from two tags:
+
+    --tags 'github-hosted, Time Series, PCA'
+
+Several --tags arguments, and commas inside them, come to the same list. A tag
+the site does not have stops the run, the way a category does; --create-tags
+true adds it instead, which is how the site's one-off tags get made.
+
 Credentials are taken from the environment so they never reach the shell
 history. --auth application-password sends WP_APP_PASSWORD on the REST route;
 --auth cookie signs in at wp-login.php with the account's own password, for a
@@ -41,12 +51,13 @@ Changelog
     0.2.0  Post the site's [github_file] shortcode instead of markdown rendered
            here, which is what every other post on the site uses, and link the
            lead image from GitHub again to match them.
+    0.3.0  Read --tags as a comma-separated string, and add --create-tags.
 """
 
 from __future__ import annotations
 
 __author__ = 'yRocket'
-__version__ = "0.2.0.2026.8.31"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
+__version__ = "0.3.0.2026.8.31"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
 
 import argparse
 import base64
@@ -62,7 +73,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-__all__ = ['github_reference', 'build_content', 'publish']
+__all__ = ['github_reference', 'tag_names', 'build_content', 'publish']
 
 REQUIRED_ENVIRONMENT = ('WP_URL', 'WP_USERNAME')
 
@@ -97,6 +108,23 @@ def github_reference(*, url: str) -> dict:
         if "'" in value or ']' in value:
             raise SystemExit(f"the shortcode cannot carry {name}={value!r}")
     return {'user': user, 'repository': repository, 'branch': branch, 'path': path}
+
+
+def tag_names(*, values: list[str]) -> list[str]:
+    """Split --tags on commas, keeping the order and dropping repeats.
+
+    Space-separated words cannot carry a tag like "Time Series", so the names
+    are written as one comma-separated string. Taking several arguments as well
+    costs nothing and keeps an older command line working.
+    """
+    names, seen = [], set()
+    for value in values:
+        for name in value.split(','):
+            name = name.strip()
+            if name and name.casefold() not in seen:
+                seen.add(name.casefold())
+                names.append(name)
+    return names
 
 
 def fetch(*, url: str, timeout: int) -> bytes:
@@ -223,8 +251,8 @@ class Site:
         except urllib.error.URLError as error:
             raise SystemExit(f"could not reach {self.root}{path}: {error}") from error
 
-    def term_ids(self, *, taxonomy: str, names: list[str]) -> list[int]:
-        """Look the terms up by name; every one of them has to exist already."""
+    def term_ids(self, *, taxonomy: str, names: list[str], create: bool = False) -> list[int]:
+        """Look the terms up by name, adding the missing ones only when asked."""
         found, missing = [], []
         for name in names:
             query = urllib.parse.urlencode({'search': name, 'per_page': 100})
@@ -233,12 +261,21 @@ class Site:
             exact = [t for t in matches if t['name'].strip().lower().replace('-', ' ') == wanted]
             if exact:
                 found.append(exact[0]['id'])
+            elif create:
+                made = self.call(path=f'/{taxonomy}', method='POST',
+                                 body=json.dumps({'name': name}).encode('utf-8'),
+                                 headers={'Content-Type': 'application/json'})
+                singular = {'tags': 'tag', 'categories': 'category'}.get(taxonomy, taxonomy)
+                print(f"created the {singular} {name!r} as {made['id']}")
+                found.append(made['id'])
             else:
                 missing.append(name)
         if missing:
+            addition = ('' if taxonomy != 'tags'
+                        else ' Pass --create-tags true to add them instead.')
             raise SystemExit(
                 f"the site has no {taxonomy} named: {', '.join(missing)}. "
-                f"Create the term first, or name an existing one."
+                f"Create the term first, or name an existing one.{addition}"
             )
         return found
 
@@ -312,8 +349,10 @@ def publish(*, args: argparse.Namespace) -> dict:
         'comment_status': 'open',
         'ping_status': 'open',
     }
-    if args.tags:
-        payload['tags'] = site.term_ids(taxonomy='tags', names=args.tags)
+    tags = tag_names(values=args.tags)
+    if tags:
+        payload['tags'] = site.term_ids(taxonomy='tags', names=tags,
+                                        create=args.create_tags)
     if args.excerpt:
         payload['excerpt'] = args.excerpt
     if args.image_url:
@@ -345,7 +384,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--auth', default='application-password',
                         choices=['application-password', 'cookie'],
                         help='application password on the REST route, or a wp-login.php sign-in')
-    parser.add_argument('--tags', nargs='*', default=[], help='tag names, which must already exist')
+    parser.add_argument('--tags', nargs='*', default=[], metavar='NAMES',
+                        help="comma-separated tag names, e.g. 'github-hosted, Time Series'")
+    parser.add_argument('--create-tags', choices=['true', 'false'], default='false',
+                        help='add a tag the site does not have yet, rather than stopping')
     parser.add_argument('--title', default='',
                         help='override the title taken from the "# " heading')
     parser.add_argument('--excerpt', default='', help='the post summary')
@@ -362,6 +404,7 @@ def parse_args() -> argparse.Namespace:
 
     args = parser.parse_args()
     args.dry_run = args.dry_run == 'true'
+    args.create_tags = args.create_tags == 'true'
     if args.image_height < 1:
         parser.error('--image-height must be at least 1')
 

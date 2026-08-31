@@ -46,5 +46,15 @@ When checking what a post actually stores, read `content.raw` over
 tell the two apart — this is how a batch of baked posts once went unnoticed
 through several rounds of "verification".
 
+Every post carrying a document also carries the `github-hosted` tag. Tags are
+passed as one comma-separated string, because a tag name may contain a space:
+
+```
+--tags 'github-hosted, Time Series, PCA'
+```
+
+Unlike a category, a tag the site does not have yet can be added on the way in
+with `--create-tags true`; the site's one-off tags are made that way.
+
 - Publish with `tools/publish_markdown_post.py`.
 - Audit the whole site with `tools/check_post_style.py`.
