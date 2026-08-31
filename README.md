@@ -24,7 +24,7 @@ Two things follow from that, and they are worth saying plainly:
 plugins/          finished enough to install: one folder per plugin
 Images/           photographs and generated thumbnails, plus index.json
 tools/            Python: builds the artifacts in plugins/*/dist and Images/,
-                  publishes posts, and audits what the posts store
+                  and audits what the posts store
 Shortcode/        single-file shortcodes pasted into Code Snippets
 Custom Block/     a dynamic block, same story
 Post Guard/       keeps a post on the [github_file] shortcode
@@ -70,11 +70,16 @@ the gallery plugin, or the build scripts, and commits whatever it regenerates.
 |---|---|
 | `tools/build_image_index.py` | `Images/index.json` and 480px WebP thumbnails under `Images/.thumbs/`. Unchanged pictures are skipped by sha1. |
 | `tools/build_plugin_dist.py` | `plugins/<slug>/dist/` — the zip, plus `version.json` with the two documents rendered to HTML. Rebuilds only when the version in the plugin header changed. |
-| `tools/publish_markdown_post.py` | Publishes a GitHub markdown document as a post on the site, rendered to the same HTML shape GitHub uses. |
 
 `index.json` is why the gallery costs no GitHub API quota: the plugin fetches
 that one static file from `raw.githubusercontent.com` instead of walking the
 contents API, and gets commit dates, pixel sizes and thumbnail paths with it.
+
+`tools/check_post_style.py` builds nothing and runs on its own. It reads the
+site and reports any post that stores rendered markdown instead of the
+`[github_file]` shortcode, reading the stored body rather than the rendered
+page, because the two look alike once rendered. `tools/workflows/post-style.yml`
+runs it weekly once copied into `.github/workflows/`.
 
 ## Branches
 

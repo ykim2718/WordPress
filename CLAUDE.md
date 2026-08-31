@@ -37,8 +37,9 @@ same on the page but freezes at publication, so editing the document on GitHub
 stops reaching the site. Every post on the site uses the shortcode; a stored
 post is a few hundred characters, not tens of thousands.
 
-The shortcode takes `user`, `repo` and `file` and nothing else, so it always
-reads the repository's default branch.
+The shortcode takes `user`, `repo` and `file`, and reads the default branch.
+Every post on the site names only those three; a document on another branch
+takes a fourth, `branch`, between `repo` and `file`.
 
 When checking what a post actually stores, read `content.raw` over
 `?context=edit`, never `content.rendered`. The shortcode expands into the same
@@ -46,20 +47,14 @@ When checking what a post actually stores, read `content.raw` over
 tell the two apart — this is how a batch of baked posts once went unnoticed
 through several rounds of "verification".
 
-Every post carrying a document also carries the `github-hosted` tag. Tags are
-passed as one comma-separated string, because a tag name may contain a space:
+Every post carrying a document also carries the `github-hosted` tag.
 
-```
---tags 'github-hosted, Time Series, PCA'
-```
-
-Unlike a category, a tag the site does not have yet can be added on the way in
-with `--create-tags true`; the site's one-off tags are made that way.
-
-**Every post needs an excerpt**, written by hand, of roughly 300 characters.
+**Every post needs an excerpt**, written by hand, of about fifty English words.
 WordPress falls back to trimming the body when a post has none, but trimming
 strips the shortcode and leaves nothing, so such a post shows no summary
-anywhere on the site. `--excerpt` is required for that reason.
+anywhere on the site.
 
-- Publish with `tools/publish_markdown_post.py`.
+- Publish with the `github-to-wp-post` skill, which is the procedure for these
+  posts and carries its own script. It does not upload the lead image to the
+  media library; the site makes the featured image itself on the next save.
 - Audit the whole site with `tools/check_post_style.py`.
