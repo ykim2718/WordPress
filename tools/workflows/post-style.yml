@@ -1,0 +1,54 @@
+name: Check post style
+
+# 이 파일은 소스다. 실제로 돌리려면 .github/workflows/ 로 복사해야 한다.
+#   (토큰에 workflow 권한이 없으면 .github/workflows/ 는 push가 거부된다)
+# 사이트가 self-hosted라서 runner가 닿지 않을 수 있다. 저장소 secrets에
+# WP_URL, WP_USERNAME, WP_APP_PASSWORD 를 넣어야 실제로 검사한다.
+
+# The site, not this repository, holds the posts, so nothing here can drift on
+# a push. This runs on a schedule instead, and on demand.
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: post-style
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # The site is self-hosted, so a runner can only reach it once these are
+      # set. Without them there is nothing to check, and a red run every Monday
+      # would say nothing; skip instead.
+      - name: Skip when the site credentials are not configured
+        id: configured
+        env:
+          WP_URL: ${{ secrets.WP_URL }}
+        run: |
+          if [ -z "$WP_URL" ]; then
+            echo 'WP_URL is not set; add WP_URL, WP_USERNAME and WP_APP_PASSWORD'
+            echo 'to the repository secrets to turn this check on.'
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Report posts that store rendered markdown
+        if: steps.configured.outputs.ready == 'true'
+        env:
+          WP_URL: ${{ secrets.WP_URL }}
+          WP_USERNAME: ${{ secrets.WP_USERNAME }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+        run: python3 tools/check_post_style.py

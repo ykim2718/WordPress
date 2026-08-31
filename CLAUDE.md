@@ -22,3 +22,29 @@ git pull origin main
 git commit -m "..."
 git push -u origin main
 ```
+
+## WordPress posts
+
+A post that carries a GitHub document carries the site's `[github_file]`
+shortcode, which reads the file from GitHub when the page is viewed:
+
+```
+[github_file user='ykim2718' repo='AIML' file='EDA/Outlier/outlier_detection.md']
+```
+
+**Never store the rendered markdown in the post.** A baked-in copy looks the
+same on the page but freezes at publication, so editing the document on GitHub
+stops reaching the site. Every post on the site uses the shortcode; a stored
+post is a few hundred characters, not tens of thousands.
+
+The shortcode takes `user`, `repo` and `file` and nothing else, so it always
+reads the repository's default branch.
+
+When checking what a post actually stores, read `content.raw` over
+`?context=edit`, never `content.rendered`. The shortcode expands into the same
+`github-readme-container` markup a baked copy uses, so the rendered HTML cannot
+tell the two apart — this is how a batch of baked posts once went unnoticed
+through several rounds of "verification".
+
+- Publish with `tools/publish_markdown_post.py`.
+- Audit the whole site with `tools/check_post_style.py`.

@@ -23,9 +23,11 @@ Two things follow from that, and they are worth saying plainly:
 ```
 plugins/          finished enough to install: one folder per plugin
 Images/           photographs and generated thumbnails, plus index.json
-tools/            Python that builds the artifacts in plugins/*/dist and Images/
+tools/            Python: builds the artifacts in plugins/*/dist and Images/,
+                  publishes posts, and audits what the posts store
 Shortcode/        single-file shortcodes pasted into Code Snippets
 Custom Block/     a dynamic block, same story
+Post Guard/       keeps a post on the [github_file] shortcode
 Mongo REST API/   a chart fed from MongoDB over REST
 WP Statistics/    a visitor map
 YouTube/          latest-video embed
