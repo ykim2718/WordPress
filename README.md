@@ -27,7 +27,6 @@ tools/            Python: builds the artifacts in plugins/*/dist and Images/,
                   and audits what the posts store
 Shortcode/        single-file shortcodes pasted into Code Snippets
 Custom Block/     a dynamic block, same story
-Post Guard/       keeps a post on the [github_file] shortcode
 Mongo REST API/   a chart fed from MongoDB over REST
 WP Statistics/    a visitor map
 YouTube/          latest-video embed
