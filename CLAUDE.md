@@ -54,7 +54,6 @@ WordPress falls back to trimming the body when a post has none, but trimming
 strips the shortcode and leaves nothing, so such a post shows no summary
 anywhere on the site.
 
-- Publish with the `github-to-wp-post` skill, which is the procedure for these
-  posts and carries its own script. It does not upload the lead image to the
-  media library; the site makes the featured image itself on the next save.
-- Audit the whole site with `tools/check_post_style.py`.
+Publish with the `github-to-wp-post` skill, which is the procedure for these
+posts and carries its own script. It does not upload the lead image to the
+media library; the site makes the featured image itself on the next save.
