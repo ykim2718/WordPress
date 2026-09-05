@@ -1,0 +1,40 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "green-grass/green-grass",
+	"title": "Green Grass",
+	"category": "yrocket",
+	"icon": "grid-view",
+	"description": "Draws a stretch of days as GitHub's contribution calendar. Leave a field empty to use the saved setting.",
+	"keywords": ["grass", "calendar", "heatmap", "contribution", "activity", "잔디"],
+	"textdomain": "green-grass",
+	"supports": {
+		"html": false,
+		"align": ["wide", "full"]
+	},
+	"attributes": {
+		"source": { "type": "string", "default": "" },
+		"user": { "type": "string", "default": "" },
+		"post_types": { "type": "string", "default": "" },
+		"orientation": { "type": "string", "default": "" },
+		"period": { "type": "string", "default": "" },
+		"months": { "type": "string", "default": "" },
+		"from": { "type": "string", "default": "" },
+		"to": { "type": "string", "default": "" },
+		"week_start": { "type": "string", "default": "" },
+		"cell": { "type": "string", "default": "" },
+		"gap": { "type": "string", "default": "" },
+		"radius": { "type": "string", "default": "" },
+		"palette": { "type": "string", "default": "" },
+		"color": { "type": "string", "default": "" },
+		"empty": { "type": "string", "default": "" },
+		"scale": { "type": "string", "default": "" },
+		"show_months": { "type": "string", "default": "" },
+		"show_days": { "type": "string", "default": "" },
+		"show_legend": { "type": "string", "default": "" },
+		"show_total": { "type": "string", "default": "" },
+		"link": { "type": "string", "default": "" },
+		"cache": { "type": "string", "default": "" }
+	},
+	"editorScript": "file:./editor.js"
+}

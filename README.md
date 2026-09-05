@@ -35,13 +35,14 @@ wordpress php functions (priority=1).php    debug helpers loaded first
 
 ## Plugins
 
-Two, both real enough to install from a zip and both updating themselves from
+Three, all real enough to install from a zip and all updating themselves from
 this repository rather than from tags or releases.
 
 | Plugin | What it does |
 |---|---|
 | [`github-image-gallery`](plugins/github-image-gallery) | Renders a folder of a public GitHub repository as a filterable thumbnail grid. Groups are derived from the file names and offered as a multi-select dropdown. |
 | [`key-word-cloud`](plugins/key-word-cloud) | Draws a site's topics as a word cloud. The topics are prepared off-site by a language model and uploaded over REST; the site only stores and draws them. |
+| [`green-grass`](plugins/green-grass) | Draws a stretch of days as GitHub's contribution calendar. Counts the site's own posts or comments, or a GitHub account's contributions, and lays the weeks out horizontally or vertically. |
 
 Each plugin folder has the same shape. Only `src/` is zipped, so the documents
 and screenshots never reach the download.

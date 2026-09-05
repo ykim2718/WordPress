@@ -1,0 +1,177 @@
+/* Green Grass 0.0.0 */
+
+/* 칸 크기와 색은 전부 PHP 가 인라인 사용자 정의 속성으로 얹는다. 이 파일에는 배치만
+   있고, 설정을 바꿔도 여기는 손대지 않는다. */
+.gg {
+	display: block;
+	margin: 1em 0;
+	/* 테마가 이 자리를 flex 로 두면 내용에 맞춰 줄어들어 가로 스크롤이 생기지 않는다. */
+	width: 100%;
+	line-height: 1.4;
+}
+
+/* 격자만큼만 넓다. 눈금과 요약을 격자의 오른쪽 끝에 맞추려는 것이다. 이것이 없으면
+   구간이 짧아 격자가 좁을 때도 Less/More 가 본문 오른쪽 끝까지 밀려 따로 논다.
+   격자가 칸보다 넓으면 max-width 가 잡아 세워 아래의 스크롤이 대신 받는다. */
+.gg-inner {
+	width: max-content;
+	max-width: 100%;
+}
+
+/* 한 해치 가로 잔디는 800px 쯤 된다. 좁은 화면에서는 이 안에서만 밀리게 한다.
+   페이지 전체가 옆으로 밀리면 본문까지 따라 움직인다. */
+.gg-scroll {
+	overflow-x: auto;
+	overflow-y: hidden;
+	/* 스크롤이 생겼을 때 마지막 칸이 테두리에 닿아 잘려 보이지 않게. */
+	padding-bottom: 2px;
+}
+
+/* 두 줄 두 칸. 왼쪽 위는 비고, 나머지 셋에 띠 둘과 격자가 든다. 자식이 놓이는 차례가
+   곧 자리이므로, 가로와 세로는 PHP 가 띠 둘을 내놓는 차례만 바꾼다. */
+.gg-body {
+	display: grid;
+	grid-template-columns: auto auto;
+	grid-template-rows: auto auto;
+	gap: var(--gg-gap, 3px);
+	/* 칸의 합보다 좁아지지 않게. 이것이 없으면 격자가 눌려 칸이 겹친다. */
+	width: max-content;
+}
+
+.gg-corner,
+.gg-strip-off {
+	/* 자리만 지킨다. 빈 칸이 없으면 띠와 격자가 한 줄씩 밀려 어긋난다. */
+	min-width: 0;
+	min-height: 0;
+}
+
+/* --- 칸 ------------------------------------------------------------------ */
+
+.gg-grid {
+	display: grid;
+	gap: var(--gg-gap, 3px);
+}
+
+/* 가로: 요일이 줄, 주가 칸. 주의 수는 자료가 정하므로 암시적 칸에 맡긴다. */
+.gg-horizontal .gg-grid {
+	grid-template-rows: repeat(7, var(--gg-cell, 12px));
+	grid-auto-columns: var(--gg-cell, 12px);
+	grid-auto-flow: column;
+}
+
+/* 세로: 축만 바뀐다. */
+.gg-vertical .gg-grid {
+	grid-template-columns: repeat(7, var(--gg-cell, 12px));
+	grid-auto-rows: var(--gg-cell, 12px);
+	grid-auto-flow: row;
+}
+
+.gg-day {
+	display: block;
+	box-sizing: border-box;
+	width: var(--gg-cell, 12px);
+	height: var(--gg-cell, 12px);
+	border-radius: var(--gg-radius, 2px);
+	background: var(--gg-l0, #ebedf0);
+	/* 가장 옅은 칸이 흰 바탕에서 사라지지 않게 안쪽으로 실선을 한 겹 둔다.
+	   border 로 두면 칸이 커져 격자가 어긋나므로 outline 을 안으로 접는다. */
+	outline: 1px solid rgba(27, 31, 35, 0.06);
+	outline-offset: -1px;
+}
+
+.gg-day.gg-l1 { background: var(--gg-l1, #9be9a8); }
+.gg-day.gg-l2 { background: var(--gg-l2, #40c463); }
+.gg-day.gg-l3 { background: var(--gg-l3, #30a14e); }
+.gg-day.gg-l4 { background: var(--gg-l4, #216e39); }
+
+/* 칸이 링크일 때. 테마의 a 규칙이 밑줄과 색과 그림자를 얹으면 칸이 칸으로 안 보인다. */
+a.gg-day {
+	text-decoration: none;
+	box-shadow: none;
+	border: 0;
+}
+
+a.gg-day:hover,
+a.gg-day:focus-visible {
+	outline: 2px solid rgba(27, 31, 35, 0.55);
+	outline-offset: 0;
+}
+
+/* --- 띠 ------------------------------------------------------------------ */
+
+.gg-months,
+.gg-weekdays {
+	display: grid;
+	gap: var(--gg-gap, 3px);
+	font-size: clamp(8px, calc(var(--gg-cell, 12px) * 0.82), 12px);
+	color: #57606a;
+	white-space: nowrap;
+	user-select: none;
+}
+
+.gg-horizontal .gg-months {
+	grid-auto-columns: var(--gg-cell, 12px);
+	grid-auto-flow: column;
+	align-items: end;
+}
+
+.gg-vertical .gg-months {
+	grid-auto-rows: var(--gg-cell, 12px);
+	grid-auto-flow: row;
+	justify-items: end;
+	align-items: center;
+}
+
+.gg-horizontal .gg-weekdays {
+	grid-template-rows: repeat(7, var(--gg-cell, 12px));
+	justify-items: end;
+	align-items: center;
+}
+
+.gg-vertical .gg-weekdays {
+	grid-template-columns: repeat(7, var(--gg-cell, 12px));
+	justify-items: center;
+	align-items: end;
+}
+
+/* 이름이 제 칸보다 길어도 칸을 넓히지 않는다. 이것이 없으면 "September" 한 마디에
+   그 주의 칸까지 함께 넓어져 달 이름과 격자가 어긋난다. GitHub 도 넘치게 둔다. */
+.gg-month {
+	min-width: 0;
+	overflow: visible;
+}
+
+.gg-weekday {
+	min-width: 0;
+}
+
+/* --- 눈금과 요약 --------------------------------------------------------- */
+
+.gg-legend {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 3px;
+	margin: 8px 0 0;
+	font-size: 12px;
+	color: #57606a;
+}
+
+.gg-legend-text {
+	margin: 0 4px;
+}
+
+.gg-total {
+	margin: 6px 0 0;
+	font-size: 13px;
+	color: #57606a;
+}
+
+.gg-error {
+	margin: 1em 0;
+	padding: 8px 12px;
+	border-left: 4px solid #b3202e;
+	background: #fdf3f4;
+	color: #7a1620;
+	font-size: 14px;
+}
