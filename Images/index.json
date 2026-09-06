@@ -1,9 +1,9 @@
 {
- "generated": "2026-09-06T18:38:54Z",
+ "generated": "2026-09-06T18:41:47Z",
  "folder": "Images",
  "thumb_dir": ".thumbs",
  "thumb_width": 480,
- "count": 111,
+ "count": 112,
  "items": [
   {
    "n": "acacia-tree-dune-sunset.webp",
@@ -112,8 +112,8 @@
    "d": 1788719919,
    "w": 765,
    "ht": 574,
-   "e": 0,
-   "t": ".thumbs/bondi-icebergs-ocean-pool.webp.webp"
+   "t": ".thumbs/bondi-icebergs-ocean-pool.webp.webp",
+   "e": 0
   },
   {
    "n": "box-truck-liftgate-open.jpg",
@@ -664,6 +664,16 @@
    "ht": 400,
    "t": ".thumbs/mean-variance-and-agreement-metrics-for-regression.png.webp",
    "e": 0
+  },
+  {
+   "n": "notre-dame-de-grace-sports-centre-pool.jpg",
+   "s": 474102,
+   "h1": "de90ab544f185a32409e3e73b6a38439bfae414e",
+   "d": 1788720093,
+   "w": 2000,
+   "ht": 1500,
+   "e": 0,
+   "t": ".thumbs/notre-dame-de-grace-sports-centre-pool.jpg.webp"
   },
   {
    "n": "office-depot-storefront.jpg",
