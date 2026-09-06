@@ -1,9 +1,9 @@
 {
- "generated": "2026-09-05T06:36:43Z",
+ "generated": "2026-09-06T18:38:54Z",
  "folder": "Images",
  "thumb_dir": ".thumbs",
  "thumb_width": 480,
- "count": 110,
+ "count": 111,
  "items": [
   {
    "n": "acacia-tree-dune-sunset.webp",
@@ -104,6 +104,16 @@
    "ht": 1500,
    "t": ".thumbs/barn-marquee-letters.jpg.webp",
    "e": 0
+  },
+  {
+   "n": "bondi-icebergs-ocean-pool.webp",
+   "s": 118598,
+   "h1": "d5b0be3579ae64a738a4279298269cc0a7deff49",
+   "d": 1788719919,
+   "w": 765,
+   "ht": 574,
+   "e": 0,
+   "t": ".thumbs/bondi-icebergs-ocean-pool.webp.webp"
   },
   {
    "n": "box-truck-liftgate-open.jpg",
@@ -232,8 +242,8 @@
    "d": 1788590188,
    "w": 2000,
    "ht": 1500,
-   "e": 0,
-   "t": ".thumbs/dicks-sporting-goods-cedar-park-storefront.jpg.webp"
+   "t": ".thumbs/dicks-sporting-goods-cedar-park-storefront.jpg.webp",
+   "e": 0
   },
   {
    "n": "diet-dr-pepper-3-liter-shelf.jpg",
@@ -492,8 +502,8 @@
    "d": 1788590188,
    "w": 1500,
    "ht": 1125,
-   "e": 0,
-   "t": ".thumbs/in-n-out-cedar-park-corner-patio.jpg.webp"
+   "t": ".thumbs/in-n-out-cedar-park-corner-patio.jpg.webp",
+   "e": 0
   },
   {
    "n": "in-n-out-cedar-park-entrance.jpg",
@@ -502,8 +512,8 @@
    "d": 1788590188,
    "w": 2000,
    "ht": 1500,
-   "e": 0,
-   "t": ".thumbs/in-n-out-cedar-park-entrance.jpg.webp"
+   "t": ".thumbs/in-n-out-cedar-park-entrance.jpg.webp",
+   "e": 0
   },
   {
    "n": "in-n-out-cedar-park-menu-board.jpg",
@@ -512,8 +522,8 @@
    "d": 1788590188,
    "w": 2000,
    "ht": 1500,
-   "e": 0,
-   "t": ".thumbs/in-n-out-cedar-park-menu-board.jpg.webp"
+   "t": ".thumbs/in-n-out-cedar-park-menu-board.jpg.webp",
+   "e": 0
   },
   {
    "n": "in-n-out-cedar-park-neon-quality-sign.jpg",
