@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-07T16:47:52Z",
+ "generated": "2026-09-07T17:09:33Z",
  "folder": "Images",
  "thumb_dir": ".thumbs",
  "thumb_width": 480,
@@ -817,21 +817,21 @@
   },
   {
    "n": "red-chairs-long-data.webp",
-   "s": 21556,
-   "h1": "343d7523e911c5f568c32cb0fcaf9ab4b06da677",
-   "d": 1788799660,
-   "w": 1050,
-   "ht": 1500,
+   "s": 40730,
+   "h1": "f896e254c196a9c3a8728b007ec7c7c0b0336bed",
+   "d": 1788800960,
+   "w": 1600,
+   "ht": 1200,
    "e": 0,
    "t": ".thumbs/red-chairs-long-data.webp.webp"
   },
   {
    "n": "red-chairs-wide-data.webp",
-   "s": 66558,
-   "h1": "0dd3fbef087205ce53a18e3d953a61c94e30e462",
-   "d": 1788799660,
-   "w": 2400,
-   "ht": 900,
+   "s": 53154,
+   "h1": "230a749237c00f41edfa0683e2f187025bd0ca9e",
+   "d": 1788800960,
+   "w": 1600,
+   "ht": 1200,
    "e": 0,
    "t": ".thumbs/red-chairs-wide-data.webp.webp"
   },
