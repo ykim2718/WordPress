@@ -1,22 +1,23 @@
 """Build the long-data and wide-data chair pictures from the red-chairs studio photograph.
 
-The source photograph is a three by three grid of red chairs on a white studio backdrop. One chair
-is cut out of it and re-placed on a backdrop rebuilt from the same photograph, twice: once as a
-column receding toward the horizon, and once as a row running past both edges of the frame.
+The source photograph is a three by three grid of red chairs on a white studio backdrop. One chair is
+cut out of it and re-placed on a backdrop rebuilt from the same photograph, twice. Both pictures use
+the same ground-plane camera, so they differ only in the shape of the grid standing on it: the long
+one is three columns running far back, the wide one three rows running far out to each side.
 
 Changelog:
+- 0.1.0 one shared camera for both pictures, each a grid of rows by columns in a 4:3 frame.
 - 0.0.0 initial release.
 """
 
 __author__ = 'yRocket'
-__version__ = "0.0.0.2026.9.7"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
+__version__ = "0.1.0.2026.9.7"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
 
-__all__ = ['read_backdrop_profile', 'cut_chair', 'paint_backdrop', 'build_long', 'build_wide']
+__all__ = ['read_backdrop_profile', 'cut_chair', 'paint_backdrop', 'place_grid', 'build_long', 'build_wide']
 
 import argparse
 import pathlib
-import sys
-from typing import Union
+from typing import Sequence
 
 import numpy as np
 from PIL import Image
@@ -30,21 +31,16 @@ SOURCE_HORIZON: int = 281                     # row of the backdrop seam in the 
 BACKDROP_COLUMNS: tuple = (80, 560)           # a chair-free band the backdrop profile is read from
 ALPHA_SCALE: float = 30.0                     # luma drop, in levels, that counts as fully opaque
 
-LONG_SIZE: tuple = (1050, 1500)
-LONG_HORIZON: int = 430
-LONG_NEAR_BASE: int = 1330                    # image row the nearest chair stands on
-LONG_NEAR_HEIGHT: int = 340
-LONG_NEAR_X: int = 430                        # column the nearest chair is centred on
-LONG_VANISH_X: int = 700                      # column the receding line converges to
-LONG_COUNT: int = 16
-LONG_DEPTH_STEP: float = 0.62                 # ground spacing as a fraction of the distance to the first chair
-
-WIDE_SIZE: tuple = (2400, 900)
-WIDE_HORIZON: int = 250
-WIDE_BASE: int = 760
-WIDE_HEIGHT: int = 360
-WIDE_COUNT: int = 14
-WIDE_PITCH: int = 215
+CANVAS_SIZE: tuple = (1600, 1200)             # 4:3, shared by both pictures
+CANVAS_HORIZON: int = 330
+NEAR_BASE: int = 1080                         # image row the nearest row of chairs stands on
+NEAR_HEIGHT: int = 280                        # chair height at the nearest row
+NEAR_PITCH: int = 360                         # column spacing at the nearest row
+LONG_COLUMNS: int = 3
+LONG_DEPTHS: tuple = tuple(row * 0.55 for row in range(11))    # ground distance of each row, in camera distances
+WIDE_COLUMNS: int = 13
+WIDE_DEPTHS: tuple = (0.0, 0.6, 1.6)          # widening, so no row hides behind the backs of the one in front
+WIDE_TILT: int = -195                         # rows the wide scene is raised by, the camera aimed lower
 
 WEBP_QUALITY: int = 92
 
@@ -81,8 +77,8 @@ def cut_chair(source: Image.Image = None, box: tuple = CHAIR_BOX,
     return Image.fromarray(rgba.round().astype(np.uint8), mode='RGBA')
 
 
-def paint_backdrop(profile: np.ndarray = None, size: tuple = None, horizon: int = None,
-                   source_horizon: int = SOURCE_HORIZON) -> Image.Image:
+def paint_backdrop(profile: np.ndarray = None, size: tuple = CANVAS_SIZE,
+                   horizon: int = CANVAS_HORIZON, source_horizon: int = SOURCE_HORIZON) -> Image.Image:
     """The source backdrop resampled onto a new canvas, with its seam moved to the given row.
 
     Above and below the seam are stretched separately so that the sky band and the floor keep their
@@ -105,39 +101,44 @@ def paint_backdrop(profile: np.ndarray = None, size: tuple = None, horizon: int 
     return Image.fromarray(canvas.round().astype(np.uint8), mode='RGB')
 
 
-def _place(canvas: Image.Image = None, chair: Image.Image = None, centre_x: float = None,
-           base_y: float = None, height: float = None) -> None:
-    """Paste one chair scaled to the given height, standing on base_y and centred on centre_x."""
-    scale = height / chair.height
-    size = (max(1, round(chair.width * scale)), max(1, round(height)))
-    scaled = chair.resize(size, resample=Image.LANCZOS)
-    canvas.alpha_composite(scaled, dest=(round(centre_x - size[0] / 2), round(base_y - size[1])))
+def place_grid(chair: Image.Image = None, profile: np.ndarray = None,
+               depths: Sequence = None, columns: int = None, tilt: int = 0) -> Image.Image:
+    """A rows-by-columns grid of chairs on the ground plane, seen by the shared camera.
+
+    depths gives the ground distance of each row beyond the nearest one, in units of the distance to
+    that nearest row, so a row at depth d is drawn at scale 1 / (1 + d) — what linear perspective does
+    to a ground plane. The column spacing shrinks with the same scale, so the columns converge. Rows
+    are drawn far to near, letting a near chair occlude the one behind it, and tilt moves the whole
+    scene, horizon included, up or down the frame: it aims the same camera, it does not move it.
+    """
+    horizon = CANVAS_HORIZON + tilt
+    canvas = paint_backdrop(profile=profile, horizon=horizon).convert('RGBA')
+    span = NEAR_BASE - CANVAS_HORIZON
+    centre_offsets = [index - (columns - 1) / 2 for index in range(columns)]
+
+    for depth in reversed(depths):
+        scale = 1.0 / (1.0 + depth)
+        base_y = horizon + span * scale
+        height = NEAR_HEIGHT * scale
+        size = (max(1, round(chair.width * height / chair.height)), max(1, round(height)))
+        scaled = chair.resize(size, resample=Image.LANCZOS)
+
+        for offset in centre_offsets:
+            centre_x = CANVAS_SIZE[0] / 2 + offset * NEAR_PITCH * scale
+            canvas.alpha_composite(scaled, dest=(round(centre_x - size[0] / 2), round(base_y - size[1])))
+
+    return canvas.convert('RGB')
 
 
 def build_long(chair: Image.Image = None, profile: np.ndarray = None) -> Image.Image:
-    """Chairs receding toward the horizon in one column — one row of a table after another."""
-    canvas = paint_backdrop(profile=profile, size=LONG_SIZE, horizon=LONG_HORIZON).convert('RGBA')
-    span = LONG_NEAR_BASE - LONG_HORIZON
-
-    for index in reversed(range(LONG_COUNT)):                     # far to near, so the near chair occludes
-        scale = 1.0 / (1.0 + index * LONG_DEPTH_STEP)             # a ground plane seen in linear perspective
-        _place(canvas=canvas, chair=chair,
-               centre_x=LONG_VANISH_X + (LONG_NEAR_X - LONG_VANISH_X) * scale,
-               base_y=LONG_HORIZON + span * scale, height=LONG_NEAR_HEIGHT * scale)
-
-    return canvas.convert('RGB')
+    """Three columns running far back — one row of a table after another."""
+    return place_grid(chair=chair, profile=profile, depths=LONG_DEPTHS, columns=LONG_COLUMNS)
 
 
 def build_wide(chair: Image.Image = None, profile: np.ndarray = None) -> Image.Image:
-    """Chairs in one row running past both edges of the frame — one column of a table after another."""
-    canvas = paint_backdrop(profile=profile, size=WIDE_SIZE, horizon=WIDE_HORIZON).convert('RGBA')
-    first = WIDE_SIZE[0] / 2 - WIDE_PITCH * (WIDE_COUNT - 1) / 2
-
-    for index in range(WIDE_COUNT):
-        _place(canvas=canvas, chair=chair, centre_x=first + index * WIDE_PITCH,
-               base_y=WIDE_BASE, height=WIDE_HEIGHT)
-
-    return canvas.convert('RGB')
+    """Three rows running past both edges of the frame — one column of a table after another."""
+    return place_grid(chair=chair, profile=profile, depths=WIDE_DEPTHS, columns=WIDE_COLUMNS,
+                      tilt=WIDE_TILT)
 
 
 def parse_args() -> argparse.Namespace:
