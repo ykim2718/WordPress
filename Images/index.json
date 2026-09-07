@@ -1,9 +1,9 @@
 {
- "generated": "2026-09-06T18:41:47Z",
+ "generated": "2026-09-07T16:47:52Z",
  "folder": "Images",
  "thumb_dir": ".thumbs",
  "thumb_width": 480,
- "count": 112,
+ "count": 114,
  "items": [
   {
    "n": "acacia-tree-dune-sunset.webp",
@@ -672,8 +672,8 @@
    "d": 1788720093,
    "w": 2000,
    "ht": 1500,
-   "e": 0,
-   "t": ".thumbs/notre-dame-de-grace-sports-centre-pool.jpg.webp"
+   "t": ".thumbs/notre-dame-de-grace-sports-centre-pool.jpg.webp",
+   "e": 0
   },
   {
    "n": "office-depot-storefront.jpg",
@@ -814,6 +814,26 @@
    "ht": 1116,
    "t": ".thumbs/red-chairs-grid-white.webp.webp",
    "e": 0
+  },
+  {
+   "n": "red-chairs-long-data.webp",
+   "s": 21556,
+   "h1": "343d7523e911c5f568c32cb0fcaf9ab4b06da677",
+   "d": 1788799660,
+   "w": 1050,
+   "ht": 1500,
+   "e": 0,
+   "t": ".thumbs/red-chairs-long-data.webp.webp"
+  },
+  {
+   "n": "red-chairs-wide-data.webp",
+   "s": 66558,
+   "h1": "0dd3fbef087205ce53a18e3d953a61c94e30e462",
+   "d": 1788799660,
+   "w": 2400,
+   "ht": 900,
+   "e": 0,
+   "t": ".thumbs/red-chairs-wide-data.webp.webp"
   },
   {
    "n": "regal-cinema-entrance-dusk.jpg",
