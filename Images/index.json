@@ -1,9 +1,9 @@
 {
- "generated": "2026-09-07T17:16:35Z",
+ "generated": "2026-09-08T21:25:08Z",
  "folder": "Images",
  "thumb_dir": ".thumbs",
  "thumb_width": 480,
- "count": 114,
+ "count": 122,
  "items": [
   {
    "n": "acacia-tree-dune-sunset.webp",
@@ -16,6 +16,16 @@
    "e": 0
   },
   {
+   "n": "airline-passengers-actual-vs-predicted.png",
+   "s": 332260,
+   "h1": "61a62abca3bce81d8ed2e050afd5d29b7b753b54",
+   "d": 1788902682,
+   "w": 1631,
+   "ht": 988,
+   "e": 0,
+   "t": ".thumbs/airline-passengers-actual-vs-predicted.png.webp"
+  },
+  {
    "n": "anderson-mill-pool-lap-lanes.jpg",
    "s": 440841,
    "h1": "b9d3f2454883bf90e54dd4d9b8eb34675e7abfc6",
@@ -24,6 +34,16 @@
    "ht": 1500,
    "t": ".thumbs/anderson-mill-pool-lap-lanes.jpg.webp",
    "e": 0
+  },
+  {
+   "n": "anomaly-detection-peaks-troughs-sketch.png",
+   "s": 103271,
+   "h1": "1933b4ea390cebb0d8cde47e90c1414b9394a28f",
+   "d": 1788902682,
+   "w": 999,
+   "ht": 666,
+   "e": 0,
+   "t": ".thumbs/anomaly-detection-peaks-troughs-sketch.png.webp"
   },
   {
    "n": "apex-center-entrance.jpg",
@@ -116,6 +136,16 @@
    "e": 0
   },
   {
+   "n": "box-plot-anatomy-diagram.jpg",
+   "s": 77687,
+   "h1": "9a0d94bd17aca88614eece7338fb47e4d27d1eec",
+   "d": 1788902682,
+   "w": 2000,
+   "ht": 770,
+   "e": 0,
+   "t": ".thumbs/box-plot-anatomy-diagram.jpg.webp"
+  },
+  {
    "n": "box-truck-liftgate-open.jpg",
    "s": 375781,
    "h1": "2172a6a7a7458a120cffd83736669375faf44d1b",
@@ -164,6 +194,16 @@
    "ht": 1500,
    "t": ".thumbs/clover-field-park-pavilion.jpg.webp",
    "e": 0
+  },
+  {
+   "n": "concordance-correlation-coefficient-formula.png",
+   "s": 13073,
+   "h1": "4fb1f1873e80e9bec3464e219ad4a921a08d0c01",
+   "d": 1788902682,
+   "w": 600,
+   "ht": 400,
+   "e": 0,
+   "t": ".thumbs/concordance-correlation-coefficient-formula.png.webp"
   },
   {
    "n": "crossover-amha-texas-wall-sign.jpg",
@@ -666,6 +706,16 @@
    "e": 0
   },
   {
+   "n": "medallion-architecture-bronze-silver-gold.png",
+   "s": 359141,
+   "h1": "16d008affa147e3c0aa471b5ca453f4907c6b25f",
+   "d": 1788902682,
+   "w": 900,
+   "ht": 600,
+   "e": 0,
+   "t": ".thumbs/medallion-architecture-bronze-silver-gold.png.webp"
+  },
+  {
    "n": "notre-dame-de-grace-sports-centre-pool.jpg",
    "s": 474102,
    "h1": "de90ab544f185a32409e3e73b6a38439bfae414e",
@@ -684,6 +734,16 @@
    "ht": 1500,
    "t": ".thumbs/office-depot-storefront.jpg.webp",
    "e": 0
+  },
+  {
+   "n": "one-hot-encoding-diagram.png",
+   "s": 16014,
+   "h1": "9d2d745f0dfdb65a140a7f427526ba7970dcb981",
+   "d": 1788902682,
+   "w": 400,
+   "ht": 300,
+   "e": 0,
+   "t": ".thumbs/one-hot-encoding-diagram.png.webp"
   },
   {
    "n": "open-prairie-fenceline-clouds.jpg",
@@ -832,8 +892,8 @@
    "d": 1788801382,
    "w": 1600,
    "ht": 1200,
-   "e": 0,
-   "t": ".thumbs/red-chairs-wide-data.webp.webp"
+   "t": ".thumbs/red-chairs-wide-data.webp.webp",
+   "e": 0
   },
   {
    "n": "regal-cinema-entrance-dusk.jpg",
@@ -1036,6 +1096,16 @@
    "e": 0
   },
   {
+   "n": "time-series-decomposition-components.webp",
+   "s": 134364,
+   "h1": "491644f94b1088b5d059fccae1db129799e60697",
+   "d": 1788902682,
+   "w": 1247,
+   "ht": 1407,
+   "e": 0,
+   "t": ".thumbs/time-series-decomposition-components.webp.webp"
+  },
+  {
    "n": "time-series-inference-server-800x600.png",
    "s": 72035,
    "h1": "55b6446b03ce905493be96d3d7401a8480c6b225",
@@ -1124,6 +1194,16 @@
    "ht": 750,
    "t": ".thumbs/yamajirushi-awase-miso-package.jpg.webp",
    "e": 0
+  },
+  {
+   "n": "zernike-modes-ascii-grid.png",
+   "s": 104978,
+   "h1": "00710428aa50bc33bd77789124005a441dac8eef",
+   "d": 1788902682,
+   "w": 800,
+   "ht": 800,
+   "e": 0,
+   "t": ".thumbs/zernike-modes-ascii-grid.png.webp"
   },
   {
    "n": "zernike-pyramid-noll-1200x800.png",
