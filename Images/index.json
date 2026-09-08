@@ -1,9 +1,9 @@
 {
- "generated": "2026-09-08T21:25:08Z",
+ "generated": "2026-09-08T21:25:55Z",
  "folder": "Images",
  "thumb_dir": ".thumbs",
  "thumb_width": 480,
- "count": 122,
+ "count": 125,
  "items": [
   {
    "n": "acacia-tree-dune-sunset.webp",
@@ -22,8 +22,8 @@
    "d": 1788902682,
    "w": 1631,
    "ht": 988,
-   "e": 0,
-   "t": ".thumbs/airline-passengers-actual-vs-predicted.png.webp"
+   "t": ".thumbs/airline-passengers-actual-vs-predicted.png.webp",
+   "e": 0
   },
   {
    "n": "anderson-mill-pool-lap-lanes.jpg",
@@ -42,8 +42,8 @@
    "d": 1788902682,
    "w": 999,
    "ht": 666,
-   "e": 0,
-   "t": ".thumbs/anomaly-detection-peaks-troughs-sketch.png.webp"
+   "t": ".thumbs/anomaly-detection-peaks-troughs-sketch.png.webp",
+   "e": 0
   },
   {
    "n": "apex-center-entrance.jpg",
@@ -142,8 +142,8 @@
    "d": 1788902682,
    "w": 2000,
    "ht": 770,
-   "e": 0,
-   "t": ".thumbs/box-plot-anatomy-diagram.jpg.webp"
+   "t": ".thumbs/box-plot-anatomy-diagram.jpg.webp",
+   "e": 0
   },
   {
    "n": "box-truck-liftgate-open.jpg",
@@ -202,8 +202,8 @@
    "d": 1788902682,
    "w": 600,
    "ht": 400,
-   "e": 0,
-   "t": ".thumbs/concordance-correlation-coefficient-formula.png.webp"
+   "t": ".thumbs/concordance-correlation-coefficient-formula.png.webp",
+   "e": 0
   },
   {
    "n": "crossover-amha-texas-wall-sign.jpg",
@@ -712,8 +712,8 @@
    "d": 1788902682,
    "w": 900,
    "ht": 600,
-   "e": 0,
-   "t": ".thumbs/medallion-architecture-bronze-silver-gold.png.webp"
+   "t": ".thumbs/medallion-architecture-bronze-silver-gold.png.webp",
+   "e": 0
   },
   {
    "n": "notre-dame-de-grace-sports-centre-pool.jpg",
@@ -742,8 +742,8 @@
    "d": 1788902682,
    "w": 400,
    "ht": 300,
-   "e": 0,
-   "t": ".thumbs/one-hot-encoding-diagram.png.webp"
+   "t": ".thumbs/one-hot-encoding-diagram.png.webp",
+   "e": 0
   },
   {
    "n": "open-prairie-fenceline-clouds.jpg",
@@ -986,6 +986,36 @@
    "e": 0
   },
   {
+   "n": "semiconductor-die-micrograph.png",
+   "s": 371566,
+   "h1": "1549bf83ce254f113cfed5e5641cd2b244486f4c",
+   "d": 1788902741,
+   "w": 355,
+   "ht": 396,
+   "e": 0,
+   "t": ".thumbs/semiconductor-die-micrograph.png.webp"
+  },
+  {
+   "n": "semiconductor-standard-cell-layout.png",
+   "s": 21162,
+   "h1": "7506a7ecc7e57f3ad5508e4510f45264ffd22044",
+   "d": 1788902741,
+   "w": 200,
+   "ht": 100,
+   "e": 0,
+   "t": ".thumbs/semiconductor-standard-cell-layout.png.webp"
+  },
+  {
+   "n": "semiconductor-wafer-dies-closeup.jpg",
+   "s": 23046,
+   "h1": "7fa1aa19b2212ce011fd1979a3f3b963f2a12521",
+   "d": 1788902741,
+   "w": 328,
+   "ht": 219,
+   "e": 0,
+   "t": ".thumbs/semiconductor-wafer-dies-closeup.jpg.webp"
+  },
+  {
    "n": "snow-bench-footprints.webp",
    "s": 159322,
    "h1": "f0f064a44dd229a163564759c398d9a5eaa47192",
@@ -1102,8 +1132,8 @@
    "d": 1788902682,
    "w": 1247,
    "ht": 1407,
-   "e": 0,
-   "t": ".thumbs/time-series-decomposition-components.webp.webp"
+   "t": ".thumbs/time-series-decomposition-components.webp.webp",
+   "e": 0
   },
   {
    "n": "time-series-inference-server-800x600.png",
@@ -1202,8 +1232,8 @@
    "d": 1788902682,
    "w": 800,
    "ht": 800,
-   "e": 0,
-   "t": ".thumbs/zernike-modes-ascii-grid.png.webp"
+   "t": ".thumbs/zernike-modes-ascii-grid.png.webp",
+   "e": 0
   },
   {
    "n": "zernike-pyramid-noll-1200x800.png",
