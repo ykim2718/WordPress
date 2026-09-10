@@ -7,10 +7,11 @@ edge is the difference between the signal and an arbitrary entry, not the market
 
 Changelog:
 - 0.0.0.2026.9.10: initial release
+- 0.1.0.2026.9.10: add the daily equity curve, its cumulative and annualized return, and Fig 2
 """
 
 __author__ = 'yRocket'
-__version__ = "0.0.0.2026.9.10"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
+__version__ = "0.1.0.2026.9.10"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
 
 __all__ = [
     'RuleParams',
@@ -22,8 +23,12 @@ __all__ = [
     'find_signals',
     'run_trades',
     'summarize',
+    'equity_curve',
+    'index_curve',
+    'portfolio_stats',
     'run_grid',
     'plot_results',
+    'plot_equity',
 ]
 
 import argparse
@@ -47,6 +52,7 @@ MA_WINDOWS: tuple = (5, 20, 60, 120)
 VOLUME_WINDOW: int = 20
 CONTROL_DRAWS_PER_SIGNAL: int = 10   # the control is oversampled so its mean is the tighter of the two
 FIGSIZE: tuple = (15.0, 4.6)
+EQUITY_FIGSIZE: tuple = (10.0, 5.0)
 REFERENCE_WIDTH: float = 9.0     # the width BASE_FONT_SIZE was chosen for
 BASE_FONT_SIZE: float = 9.0
 TRADING_DAYS_PER_YEAR: int = 252
@@ -291,6 +297,79 @@ def summarize(trades: pd.DataFrame) -> dict:
     }
 
 
+def equity_curve(prices: pd.DataFrame, trades: pd.DataFrame) -> pd.DataFrame:
+    """Turn one arm of trades into the daily curve of a portfolio that splits capital evenly.
+
+    On a given day the capital is spread over the positions open that day and sits in cash, earning
+    nothing, on the days with no position. A position earns close/open on its entry day, close on
+    close while it is held, and the recorded exit price against the previous close on its exit day.
+
+    Returns a pd.DataFrame indexed by 'date' with the columns
+    ['daily_return', 'open_positions', 'equity'], where equity starts at 1.0 before the first day.
+    """
+    calendar = np.sort(prices['date'].unique())
+    series = {ticker: (frame['date'].to_numpy(), frame['open'].to_numpy(), frame['close'].to_numpy())
+              for ticker, frame in prices.groupby('ticker', sort=False)}
+    total = np.zeros(len(calendar))
+    count = np.zeros(len(calendar))
+
+    for row in trades.itertuples(index=False):
+        ticker = getattr(row, TradeColumn.TICKER)
+        if ticker not in series:
+            raise ValueError(f"trade on {ticker} has no price series; the trades and the prices disagree")
+        dates, open_, close = series[ticker]
+        entry_pos = int(np.searchsorted(dates, np.datetime64(getattr(row, TradeColumn.ENTRY_DATE))))
+        exit_pos = int(np.searchsorted(dates, np.datetime64(getattr(row, TradeColumn.EXIT_DATE))))
+        exit_price = float(getattr(row, TradeColumn.EXIT_PRICE))
+
+        returns = np.empty(exit_pos - entry_pos + 1)
+        if exit_pos == entry_pos:
+            returns[0] = exit_price / open_[entry_pos] - 1.0
+        else:
+            returns[0] = close[entry_pos] / open_[entry_pos] - 1.0
+            held = np.arange(entry_pos + 1, exit_pos)
+            returns[1:-1] = close[held] / close[held - 1] - 1.0
+            returns[-1] = exit_price / close[exit_pos - 1] - 1.0
+
+        slots = np.searchsorted(calendar, dates[entry_pos:exit_pos + 1])
+        total[slots] += returns
+        count[slots] += 1.0
+
+    daily = np.where(count > 0.0, total / np.where(count > 0.0, count, 1.0), 0.0)
+    curve = pd.DataFrame({'daily_return': daily, 'open_positions': count.astype(int),
+                          'equity': (1.0 + daily).cumprod()}, index=pd.Index(calendar, name='date'))
+    return curve
+
+
+def index_curve(index_level: pd.Series) -> pd.DataFrame:
+    """Cast the equal weight index into the same shape as an equity curve, so both are read alike.
+
+    Returns a pd.DataFrame indexed by 'date' with the columns
+    ['daily_return', 'open_positions', 'equity'].
+    """
+    daily = index_level.pct_change().fillna(0.0)
+    return pd.DataFrame({'daily_return': daily.to_numpy(),
+                         'open_positions': np.ones(len(daily), dtype=int),
+                         'equity': (1.0 + daily).cumprod().to_numpy()},
+                        index=pd.Index(index_level.index, name='date'))
+
+
+def portfolio_stats(curve: pd.DataFrame) -> dict:
+    """Reduce one equity curve to its cumulative return, annualized return and drawdown."""
+    equity = curve['equity'].to_numpy()
+    years = len(equity) / TRADING_DAYS_PER_YEAR
+    drawdown = equity / np.maximum.accumulate(equity) - 1.0
+    return {
+        'days': int(len(equity)),
+        'years': round(float(years), 2),
+        'total_return_pct': round(100.0 * float(equity[-1] - 1.0), 2),
+        'cagr_pct': round(100.0 * float(equity[-1] ** (1.0 / years) - 1.0), 2),
+        'max_drawdown_pct': round(100.0 * float(drawdown.min()), 2),
+        'time_in_market_pct': round(100.0 * float((curve['open_positions'] > 0).mean()), 1),
+        'mean_open_positions': round(float(curve['open_positions'].mean()), 1),
+    }
+
+
 def buy_and_hold(prices: pd.DataFrame) -> dict:
     """Return the equal weight buy and hold statistics of the universe over the whole sample."""
     first = prices.groupby('ticker')['close'].first()
@@ -380,6 +459,30 @@ def plot_results(trades: pd.DataFrame, grid: pd.DataFrame, base_hold: int, fig_p
     plt.close(fig)
 
 
+def plot_equity(curves: dict, fig_path: pathlib.Path) -> None:
+    """Draw the equity of every named curve on one axis, each labelled with its annualized return."""
+    font_size = BASE_FONT_SIZE * EQUITY_FIGSIZE[0] / REFERENCE_WIDTH
+    colors = list(matplotlib.colors.TABLEAU_COLORS.values())
+    fig, axis = plt.subplots(nrows=1, ncols=1, figsize=EQUITY_FIGSIZE)
+
+    for index, (name, curve) in enumerate(curves.items()):
+        stats = portfolio_stats(curve=curve)
+        axis.plot(curve.index, curve['equity'], color=colors[index],
+                  label=f"{name} (total {stats['total_return_pct']:.1f}%, CAGR {stats['cagr_pct']:.1f}%)")
+
+    axis.axhline(1.0, color='black', linewidth=0.8)
+    axis.set_xlabel('Date', fontsize=font_size)
+    axis.set_ylabel('Equity, starting at 1.0', fontsize=font_size)
+    axis.tick_params(labelsize=font_size)
+    axis.grid(alpha=0.25)
+    axis.legend(fontsize=font_size, loc='upper left')
+
+    fig.subplots_adjust(left=0.08, right=0.98, bottom=0.14, top=0.96)
+    fig_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(fig_path, dpi=300)
+    plt.close(fig)
+
+
 def parse_args() -> argparse.Namespace:
     """Parse the command line options."""
     parser = argparse.ArgumentParser(
@@ -430,9 +533,17 @@ if __name__ == '__main__':
 
     base = RuleParams(conv_max=cli.conv_max, vol_mult=cli.vol_mult,
                       body_min=cli.body_min, hold_days=cli.hold_days)
+    market = build_market_index(prices=price_table)
     base_trades = run_trades(prices=price_table, params=base, seed=cli.seed)
-    base_trades = add_excess_return(trades=base_trades, index_level=build_market_index(prices=price_table))
+    base_trades = add_excess_return(trades=base_trades, index_level=market)
     base_trades.to_csv(cli.output_folder / 'trades.csv', index=False)
+
+    curves: dict = {str(arm): equity_curve(prices=price_table,
+                                           trades=base_trades[base_trades[TradeColumn.ARM] == arm])
+                    for arm in (Arm.SIGNAL, Arm.RANDOM)}
+    curves['index'] = index_curve(index_level=market)
+    pd.concat({name: curve for name, curve in curves.items()}, axis=1).to_csv(cli.output_folder / 'equity.csv')
+    plot_equity(curves=curves, fig_path=cli.output_folder / 'fig2.png')
 
     report: dict = {
         'data_url': DATA_URL,
@@ -446,6 +557,7 @@ if __name__ == '__main__':
         'buy_and_hold': buy_and_hold(prices=price_table),
         'arms': {str(arm): summarize(trades=base_trades[base_trades[TradeColumn.ARM] == arm])
                  for arm in (Arm.SIGNAL, Arm.RANDOM)},
+        'portfolio': {name: portfolio_stats(curve=curve) for name, curve in curves.items()},
     }
 
     if cli.grid:

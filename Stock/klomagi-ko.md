@@ -1,5 +1,5 @@
 # Klomagi Moving Average Convergence Breakout
-Rev. 0 | Created: 2026-09-10 | Updated: 2026-09-10 21:40 UTC
+Rev. 1 | Created: 2026-09-10 | Updated: 2026-09-10 22:15 UTC
 
 ## 1. Purpose
 
@@ -10,6 +10,8 @@ Rev. 0 | Created: 2026-09-10 | Updated: 2026-09-10 21:40 UTC
 ## 2. Summary
 
 이 기법의 초과수익은 시장 상승분을 걷어내면 사실상 사라진다. 2013-02-08 ~ 2018-02-07 S&P 500 505종목에서 base 조건이 만든 매매는 174건, 한 건당 평균 +2.53%로 무작위 진입의 +1.40%를 앞섰다. 그러나 같은 날짜의 지수 수익을 뺀 초과수익은 +0.35% 대 +0.20% 로 차이가 +0.16%p 에 그쳤고 (Welch t=0.23), 표본을 606건으로 늘린 완화 조건에서도 차이는 +0.35%p (t=0.86) 였다. 원수익의 차이는 대부분 보유기간 차이 (42.5일 대 32.5일) 가 만든 시장 노출이다.
+
+신호가 난 종목에 자본을 균등 배분해 5년을 굴리면 누적 +39.12%, 연환산 6.83% 로, 같은 기간 등가중 지수의 누적 +90.18%, 연환산 13.73% 에 못 미친다. 최대 낙폭은 -18.5% 로 지수의 -16.71% 보다 깊다.
 
 남는 것은 승률이다. 20일 보유 기준으로 신호 매매의 승률은 53~63%, 무작위 진입은 42~49% 로, 조사한 18개 조건 조합 모두에서 신호 쪽이 높았다. 즉 이 기법은 **이길 확률을 높이는 진입 조건이지 수익률을 높이는 기법이 아니다**. 수치의 근거는 [Appendix B](#appendix-b-backtest) 에 있다.
 
@@ -71,7 +73,9 @@ Table 1. Rule conditions and the base values used in this document
 - **band**: 5일·20일·60일·120일 이동평균 네 개가 이루는 띠. 상단은 넷 중 최대, 하단은 최소.
 - **base 조건**: 이 문서가 기준으로 삼은 조건 한 벌. 수렴 3%, 거래량 2.0배, 몸통 3%, 보유 한도 60 거래일.
 - **excess return**: 매매 수익에서 같은 진입일·청산일 사이 등가중 지수 수익을 뺀 값.
+- **max drawdown**: 계좌 잔고가 그때까지의 최고점 대비 가장 크게 줄어든 폭.
 - **profit factor**: 이익 매매 수익의 합을 손실 매매 손실의 합의 절댓값으로 나눈 값.
+- **time in market**: 전체 거래일 중 매매를 하나라도 들고 있던 날의 비율.
 - **Welch t**: 분산이 다른 두 집단의 평균 차이를 검정하는 t 통계량.
 - **정배열**: 단기 이평선이 위, 장기 이평선이 아래에 차례로 놓인 상태.
 - **장대양봉**: 시가보다 종가가 크게 높아 몸통이 긴 양봉.
@@ -137,20 +141,44 @@ Fig 1. Trade return distribution and parameter sweep. (a) density of trade retur
 
 Fig 1 (a) 에서 두 팔의 분포는 폭과 위치가 거의 같고, 신호 쪽이 오른쪽으로 조금 더 두껍다. (b) 의 원수익은 모든 조합에서 무작위 진입선 위에 있으나, (c) 의 초과수익에서는 선에 붙거나 아래로 내려가는 조합이 나온다. Summary 의 결론은 (b) 와 (c) 의 이 차이를 말한 것이다.
 
-### B.4 Reproduction
+### B.4 Cumulative and annualized return
+
+건당 수익을 자본의 성장으로 바꾸려면 매매를 한 계좌로 묶어야 한다. 이 문서는 그날 열려 있는 매매에 자본을 균등 배분하고, 열린 매매가 없는 날은 현금으로 두어 아무것도 벌지 않는 계좌를 가정한다. 매매는 진입일에 시가로 사서 종가까지, 그 뒤로는 종가에서 종가까지, 청산일에는 직전 종가에서 청산 가격까지의 수익을 낸다. 이 일별 수익을 곱해 쌓은 것이 아래의 누적 수익이고, 연환산은 표본 전체 거래일 1,259일을 252로 나눈 5.0년으로 환산한 값이다.
+
+Table 4. Portfolio result of the base parameter set, 2013-02-08 to 2018-02-07
+
+| Metric | Signal | Random entry | Equal weight index |
+| --- | --- | --- | --- |
+| Cumulative return (%) | 39.12 | 69.19 | 90.18 |
+| Annualized return (%) | 6.83 | 11.10 | 13.73 |
+| Max drawdown (%) | -18.50 | -17.90 | -16.71 |
+| Time in market (%) | 98.1 | 90.4 | 100.0 |
+| Mean open positions | 6.0 | 34.3 | 1.0 |
+
+신호 계좌는 지수보다 51.06%p 적게 벌면서 낙폭은 1.79%p 더 깊었다. 원인은 건당 수익이 아니라 분산이다. 신호는 5년 동안 174건뿐이어서 하루 평균 6개 종목만 들고 있었고, 대조군은 같은 규칙으로 1,289건을 벌려 34.3개를 들고 있었다. 종목 수가 적으면 개별 종목의 손실이 계좌 전체를 흔들고 복리로 쌓는 과정에서 깎이는 몫이 커진다. 건당 평균의 우위 (+2.53% 대 +1.40%) 가 누적에서 유지되지 않은 결과가 Table 4 다.
+
+지수의 누적 +90.18% 는 Comparison 의 단순 보유 평균 +92.97% 와 다르다. 앞의 값은 매일 등가중으로 재조정한 계좌의 복리 수익이고, 뒤의 값은 종목별 5년 총수익의 산술평균이다.
+
+<img src="klomagi-ko_fig/fig2.png" width="1000" style="max-width: 100%;" alt="Fig 2">
+
+Fig 2. Equity of the signal portfolio, the random entry portfolio and the equal weight index, all starting at 1.0.
+
+Fig 2 에서 신호 계좌는 2015년 중반까지 지수를 따라가다가 그 뒤로 벌어진다. 계좌가 현금으로 쉰 날은 전체의 1.9% 뿐이므로 격차는 쉰 시간이 아니라 종목 수에서 온다. 하루 평균 6개를 들고 있는 계좌는 그중 한 종목이 손절될 때마다 잔고의 1/6이 흔들리고, 그 자리를 다음 신호가 채울 때까지 상승분을 받지 못한다.
+
+### B.5 Reproduction
 
 ```bash
 python3 klomagi_backtest.py --data-csv all_stocks_5yr.csv --output-folder klomagi_backtest_out
 ```
 
-`--data-csv` 가 가리키는 파일이 없으면 References 의 주소에서 내려받는다. 출력은 매매 한 건이 한 행인 `trades.csv`, 조건 조합별 집계인 `grid.csv`, Fig 1 의 `fig1.png`, 그리고 표본과 조건과 집계를 담은 `summary.json` 이다. 대조군의 무작위 진입일은 `--seed` 로 고정되며, 이 문서의 수치는 기본값 20260910 으로 얻은 것이다.
+`--data-csv` 가 가리키는 파일이 없으면 References 의 주소에서 내려받는다. 출력은 매매 한 건이 한 행인 `trades.csv`, 조건 조합별 집계인 `grid.csv`, 세 계좌의 일별 수익과 보유 종목 수인 `equity.csv`, Fig 1 의 `fig1.png` 와 Fig 2 의 `fig2.png`, 그리고 표본과 조건과 집계를 담은 `summary.json` 이다. 대조군의 무작위 진입일은 `--seed` 로 고정되며, 이 문서의 수치는 기본값 20260910 으로 얻은 것이다.
 
 ## Appendix C. Backtest script
 
 ```python
 # Stock/klomagi_backtest.py
 __author__ = 'yRocket'
-__version__ = "0.0.0.2026.9.10"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
+__version__ = "0.1.0.2026.9.10"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
 
 __all__ = [
     'RuleParams',
@@ -162,8 +190,12 @@ __all__ = [
     'find_signals',
     'run_trades',
     'summarize',
+    'equity_curve',
+    'index_curve',
+    'portfolio_stats',
     'run_grid',
     'plot_results',
+    'plot_equity',
 ]
 
 import argparse
@@ -187,6 +219,7 @@ MA_WINDOWS: tuple = (5, 20, 60, 120)
 VOLUME_WINDOW: int = 20
 CONTROL_DRAWS_PER_SIGNAL: int = 10   # the control is oversampled so its mean is the tighter of the two
 FIGSIZE: tuple = (15.0, 4.6)
+EQUITY_FIGSIZE: tuple = (10.0, 5.0)
 REFERENCE_WIDTH: float = 9.0     # the width BASE_FONT_SIZE was chosen for
 BASE_FONT_SIZE: float = 9.0
 TRADING_DAYS_PER_YEAR: int = 252
@@ -431,6 +464,79 @@ def summarize(trades: pd.DataFrame) -> dict:
     }
 
 
+def equity_curve(prices: pd.DataFrame, trades: pd.DataFrame) -> pd.DataFrame:
+    """Turn one arm of trades into the daily curve of a portfolio that splits capital evenly.
+
+    On a given day the capital is spread over the positions open that day and sits in cash, earning
+    nothing, on the days with no position. A position earns close/open on its entry day, close on
+    close while it is held, and the recorded exit price against the previous close on its exit day.
+
+    Returns a pd.DataFrame indexed by 'date' with the columns
+    ['daily_return', 'open_positions', 'equity'], where equity starts at 1.0 before the first day.
+    """
+    calendar = np.sort(prices['date'].unique())
+    series = {ticker: (frame['date'].to_numpy(), frame['open'].to_numpy(), frame['close'].to_numpy())
+              for ticker, frame in prices.groupby('ticker', sort=False)}
+    total = np.zeros(len(calendar))
+    count = np.zeros(len(calendar))
+
+    for row in trades.itertuples(index=False):
+        ticker = getattr(row, TradeColumn.TICKER)
+        if ticker not in series:
+            raise ValueError(f"trade on {ticker} has no price series; the trades and the prices disagree")
+        dates, open_, close = series[ticker]
+        entry_pos = int(np.searchsorted(dates, np.datetime64(getattr(row, TradeColumn.ENTRY_DATE))))
+        exit_pos = int(np.searchsorted(dates, np.datetime64(getattr(row, TradeColumn.EXIT_DATE))))
+        exit_price = float(getattr(row, TradeColumn.EXIT_PRICE))
+
+        returns = np.empty(exit_pos - entry_pos + 1)
+        if exit_pos == entry_pos:
+            returns[0] = exit_price / open_[entry_pos] - 1.0
+        else:
+            returns[0] = close[entry_pos] / open_[entry_pos] - 1.0
+            held = np.arange(entry_pos + 1, exit_pos)
+            returns[1:-1] = close[held] / close[held - 1] - 1.0
+            returns[-1] = exit_price / close[exit_pos - 1] - 1.0
+
+        slots = np.searchsorted(calendar, dates[entry_pos:exit_pos + 1])
+        total[slots] += returns
+        count[slots] += 1.0
+
+    daily = np.where(count > 0.0, total / np.where(count > 0.0, count, 1.0), 0.0)
+    curve = pd.DataFrame({'daily_return': daily, 'open_positions': count.astype(int),
+                          'equity': (1.0 + daily).cumprod()}, index=pd.Index(calendar, name='date'))
+    return curve
+
+
+def index_curve(index_level: pd.Series) -> pd.DataFrame:
+    """Cast the equal weight index into the same shape as an equity curve, so both are read alike.
+
+    Returns a pd.DataFrame indexed by 'date' with the columns
+    ['daily_return', 'open_positions', 'equity'].
+    """
+    daily = index_level.pct_change().fillna(0.0)
+    return pd.DataFrame({'daily_return': daily.to_numpy(),
+                         'open_positions': np.ones(len(daily), dtype=int),
+                         'equity': (1.0 + daily).cumprod().to_numpy()},
+                        index=pd.Index(index_level.index, name='date'))
+
+
+def portfolio_stats(curve: pd.DataFrame) -> dict:
+    """Reduce one equity curve to its cumulative return, annualized return and drawdown."""
+    equity = curve['equity'].to_numpy()
+    years = len(equity) / TRADING_DAYS_PER_YEAR
+    drawdown = equity / np.maximum.accumulate(equity) - 1.0
+    return {
+        'days': int(len(equity)),
+        'years': round(float(years), 2),
+        'total_return_pct': round(100.0 * float(equity[-1] - 1.0), 2),
+        'cagr_pct': round(100.0 * float(equity[-1] ** (1.0 / years) - 1.0), 2),
+        'max_drawdown_pct': round(100.0 * float(drawdown.min()), 2),
+        'time_in_market_pct': round(100.0 * float((curve['open_positions'] > 0).mean()), 1),
+        'mean_open_positions': round(float(curve['open_positions'].mean()), 1),
+    }
+
+
 def buy_and_hold(prices: pd.DataFrame) -> dict:
     """Return the equal weight buy and hold statistics of the universe over the whole sample."""
     first = prices.groupby('ticker')['close'].first()
@@ -515,6 +621,30 @@ def plot_results(trades: pd.DataFrame, grid: pd.DataFrame, base_hold: int, fig_p
         box = axis.get_position()
         fig.text(box.x0 + box.width / 2.0, 0.05, label, ha='center', va='center', fontsize=font_size + 1)
 
+    fig_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(fig_path, dpi=300)
+    plt.close(fig)
+
+
+def plot_equity(curves: dict, fig_path: pathlib.Path) -> None:
+    """Draw the equity of every named curve on one axis, each labelled with its annualized return."""
+    font_size = BASE_FONT_SIZE * EQUITY_FIGSIZE[0] / REFERENCE_WIDTH
+    colors = list(matplotlib.colors.TABLEAU_COLORS.values())
+    fig, axis = plt.subplots(nrows=1, ncols=1, figsize=EQUITY_FIGSIZE)
+
+    for index, (name, curve) in enumerate(curves.items()):
+        stats = portfolio_stats(curve=curve)
+        axis.plot(curve.index, curve['equity'], color=colors[index],
+                  label=f"{name} (total {stats['total_return_pct']:.1f}%, CAGR {stats['cagr_pct']:.1f}%)")
+
+    axis.axhline(1.0, color='black', linewidth=0.8)
+    axis.set_xlabel('Date', fontsize=font_size)
+    axis.set_ylabel('Equity, starting at 1.0', fontsize=font_size)
+    axis.tick_params(labelsize=font_size)
+    axis.grid(alpha=0.25)
+    axis.legend(fontsize=font_size, loc='upper left')
+
+    fig.subplots_adjust(left=0.08, right=0.98, bottom=0.14, top=0.96)
     fig_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(fig_path, dpi=300)
     plt.close(fig)

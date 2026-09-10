@@ -48,5 +48,34 @@
       "t_stat": 5.56,
       "stop_exit_pct": 56.9
     }
+  },
+  "portfolio": {
+    "signal": {
+      "days": 1259,
+      "years": 5.0,
+      "total_return_pct": 39.12,
+      "cagr_pct": 6.83,
+      "max_drawdown_pct": -18.5,
+      "time_in_market_pct": 98.1,
+      "mean_open_positions": 6.0
+    },
+    "random": {
+      "days": 1259,
+      "years": 5.0,
+      "total_return_pct": 69.19,
+      "cagr_pct": 11.1,
+      "max_drawdown_pct": -17.9,
+      "time_in_market_pct": 90.4,
+      "mean_open_positions": 34.3
+    },
+    "index": {
+      "days": 1259,
+      "years": 5.0,
+      "total_return_pct": 90.18,
+      "cagr_pct": 13.73,
+      "max_drawdown_pct": -16.71,
+      "time_in_market_pct": 100.0,
+      "mean_open_positions": 1.0
+    }
   }
 }
