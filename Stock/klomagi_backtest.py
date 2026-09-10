@@ -9,10 +9,11 @@ Changelog:
 - 0.0.0.2026.9.10: initial release
 - 0.1.0.2026.9.10: add the daily equity curve, its cumulative and annualized return, and Fig 2
 - 0.2.0.2026.9.10: compare against the S&P 500 index read from a second daily csv
+- 0.2.1.2026.9.10: split position_returns out of equity_curve so other portfolio rules can reuse it
 """
 
 __author__ = 'yRocket'
-__version__ = "0.2.0.2026.9.10"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
+__version__ = "0.2.1.2026.9.10"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
 
 __all__ = [
     'RuleParams',
@@ -24,6 +25,7 @@ __all__ = [
     'find_signals',
     'run_trades',
     'summarize',
+    'position_returns',
     'equity_curve',
     'load_index_level',
     'index_curve',
@@ -300,15 +302,14 @@ def summarize(trades: pd.DataFrame) -> dict:
     }
 
 
-def equity_curve(prices: pd.DataFrame, trades: pd.DataFrame) -> pd.DataFrame:
-    """Turn one arm of trades into the daily curve of a portfolio that splits capital evenly.
+def position_returns(prices: pd.DataFrame, trades: pd.DataFrame) -> tuple:
+    """Spread the trades over the calendar and add up what the open positions earn each day.
 
-    On a given day the capital is spread over the positions open that day and sits in cash, earning
-    nothing, on the days with no position. A position earns close/open on its entry day, close on
-    close while it is held, and the recorded exit price against the previous close on its exit day.
+    A position earns close/open on its entry day, close on close while it is held, and the recorded
+    exit price against the previous close on its exit day.
 
-    Returns a pd.DataFrame indexed by 'date' with the columns
-    ['daily_return', 'open_positions', 'equity'], where equity starts at 1.0 before the first day.
+    Returns (calendar, summed daily return of the open positions, number of open positions), the
+    last two as float arrays aligned with the calendar.
     """
     calendar = np.sort(prices['date'].unique())
     series = {ticker: (frame['date'].to_numpy(), frame['open'].to_numpy(), frame['close'].to_numpy())
@@ -338,10 +339,22 @@ def equity_curve(prices: pd.DataFrame, trades: pd.DataFrame) -> pd.DataFrame:
         total[slots] += returns
         count[slots] += 1.0
 
+    return calendar, total, count
+
+
+def equity_curve(prices: pd.DataFrame, trades: pd.DataFrame) -> pd.DataFrame:
+    """Turn one arm of trades into the daily curve of a portfolio that splits capital evenly.
+
+    On a given day the capital is spread over the positions open that day and sits in cash, earning
+    nothing, on the days with no position.
+
+    Returns a pd.DataFrame indexed by 'date' with the columns
+    ['daily_return', 'open_positions', 'equity'], where equity starts at 1.0 before the first day.
+    """
+    calendar, total, count = position_returns(prices=prices, trades=trades)
     daily = np.where(count > 0.0, total / np.where(count > 0.0, count, 1.0), 0.0)
-    curve = pd.DataFrame({'daily_return': daily, 'open_positions': count.astype(int),
-                          'equity': (1.0 + daily).cumprod()}, index=pd.Index(calendar, name='date'))
-    return curve
+    return pd.DataFrame({'daily_return': daily, 'open_positions': count.astype(int),
+                         'equity': (1.0 + daily).cumprod()}, index=pd.Index(calendar, name='date'))
 
 
 def load_index_level(csv_path: pathlib.Path, calendar: np.ndarray, url: str = INDEX_URL) -> pd.Series:
