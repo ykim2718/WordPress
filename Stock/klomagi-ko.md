@@ -1,5 +1,5 @@
 # Klomagi Moving Average Convergence Breakout
-Rev. 1 | Created: 2026-09-10 | Updated: 2026-09-10 22:15 UTC
+Rev. 2 | Created: 2026-09-10 | Updated: 2026-09-10 22:25 UTC
 
 ## 1. Purpose
 
@@ -11,7 +11,7 @@ Rev. 1 | Created: 2026-09-10 | Updated: 2026-09-10 22:15 UTC
 
 이 기법의 초과수익은 시장 상승분을 걷어내면 사실상 사라진다. 2013-02-08 ~ 2018-02-07 S&P 500 505종목에서 base 조건이 만든 매매는 174건, 한 건당 평균 +2.53%로 무작위 진입의 +1.40%를 앞섰다. 그러나 같은 날짜의 지수 수익을 뺀 초과수익은 +0.35% 대 +0.20% 로 차이가 +0.16%p 에 그쳤고 (Welch t=0.23), 표본을 606건으로 늘린 완화 조건에서도 차이는 +0.35%p (t=0.86) 였다. 원수익의 차이는 대부분 보유기간 차이 (42.5일 대 32.5일) 가 만든 시장 노출이다.
 
-신호가 난 종목에 자본을 균등 배분해 5년을 굴리면 누적 +39.12%, 연환산 6.83% 로, 같은 기간 등가중 지수의 누적 +90.18%, 연환산 13.73% 에 못 미친다. 최대 낙폭은 -18.5% 로 지수의 -16.71% 보다 깊다.
+신호가 난 종목에 자본을 균등 배분해 5년을 굴리면 누적 +39.12%, 연환산 6.83% 다. 같은 기간 S&P 500 지수는 누적 +76.67%, 연환산 12.06% 이고 505종목 등가중 지수는 +90.18%, 13.73% 이므로, 기법은 지수를 사서 들고 있는 것보다 37.55%p 적게 벌었다. 최대 낙폭도 -18.50% 로 지수의 -14.16% 보다 깊다.
 
 남는 것은 승률이다. 20일 보유 기준으로 신호 매매의 승률은 53~63%, 무작위 진입은 42~49% 로, 조사한 18개 조건 조합 모두에서 신호 쪽이 높았다. 즉 이 기법은 **이길 확률을 높이는 진입 조건이지 수익률을 높이는 기법이 아니다**. 수치의 근거는 [Appendix B](#appendix-b-backtest) 에 있다.
 
@@ -64,7 +64,9 @@ Table 1. Rule conditions and the base values used in this document
 ## References
 
 <a id="ref-1"></a>
-[1] Plotly. [S&P 500 daily prices, 2013-02-08 to 2018-02-07 (`all_stocks_5yr.csv`)](https://raw.githubusercontent.com/plotly/datasets/master/all_stocks_5yr.csv). plotly/datasets repository.
+[1] Plotly. [S&P 500 daily prices, 2013-02-08 to 2018-02-07 (`all_stocks_5yr.csv`)](https://raw.githubusercontent.com/plotly/datasets/master/all_stocks_5yr.csv). plotly/datasets repository.<br>
+<a id="ref-2"></a>
+[2] Vega. [S&P 500 index daily prices since 2000 (`sp500-2000.csv`)](https://raw.githubusercontent.com/vega/vega-datasets/main/data/sp500-2000.csv). vega/vega-datasets repository.
 
 ---
 
@@ -86,7 +88,7 @@ Table 1. Rule conditions and the base values used in this document
 
 표본은 S&P 500 505종목의 2013-02-08 ~ 2018-02-07 일별 OHLCV 619,029행이다 [[1](#ref-1)]. OHLCV 중 하나라도 빠진 11행은 버렸다. 종목별로 이동평균 네 개와 직전 20일 평균 거래량을 만들고, Table 1 의 조건을 모두 만족한 날을 신호로 삼아 다음 날 시가에 매수했다. 매도는 종가가 신호일 뭉치 하단 아래로 내려간 다음 날 시가, 또는 60 거래일 한도 다음 날 시가 중 먼저 오는 쪽이다. 한 종목에서 매매는 겹치지 않으며, 앞 매매가 끝난 뒤의 신호만 받는다.
 
-대조군은 같은 종목에서 신호 건수의 10배만큼 진입일을 균일 무작위로 뽑아 동일한 매도 규칙으로 청산한 매매다. 두 팔의 차이가 곧 진입 조건의 값이며, 시장 상승분은 양쪽에 똑같이 들어간다. 초과수익은 505종목 등가중 지수를 만들어 매매의 진입일과 청산일 사이 지수 수익을 뺀 값이다.
+S&P 500 지수는 같은 날짜의 일별 종가를 따로 읽어 썼다 [[2](#ref-2)]. 대조군은 같은 종목에서 신호 건수의 10배만큼 진입일을 균일 무작위로 뽑아 동일한 매도 규칙으로 청산한 매매다. 두 팔의 차이가 곧 진입 조건의 값이며, 시장 상승분은 양쪽에 똑같이 들어간다. 초과수익은 505종목 등가중 지수를 만들어 매매의 진입일과 청산일 사이 지수 수익을 뺀 값이다.
 
 ### B.2 Result of the base parameter set
 
@@ -147,38 +149,41 @@ Fig 1 (a) 에서 두 팔의 분포는 폭과 위치가 거의 같고, 신호 쪽
 
 Table 4. Portfolio result of the base parameter set, 2013-02-08 to 2018-02-07
 
-| Metric | Signal | Random entry | Equal weight index |
-| --- | --- | --- | --- |
-| Cumulative return (%) | 39.12 | 69.19 | 90.18 |
-| Annualized return (%) | 6.83 | 11.10 | 13.73 |
-| Max drawdown (%) | -18.50 | -17.90 | -16.71 |
-| Time in market (%) | 98.1 | 90.4 | 100.0 |
-| Mean open positions | 6.0 | 34.3 | 1.0 |
+| Metric | Signal | Random entry | S&P 500 index | Equal weight index |
+| --- | --- | --- | --- | --- |
+| Cumulative return (%) | 39.12 | 69.19 | 76.67 | 90.18 |
+| Annualized return (%) | 6.83 | 11.10 | 12.06 | 13.73 |
+| Max drawdown (%) | -18.50 | -17.90 | -14.16 | -16.71 |
+| Time in market (%) | 98.1 | 90.4 | 100.0 | 100.0 |
+| Mean open positions | 6.0 | 34.3 | 1.0 | 1.0 |
 
-신호 계좌는 지수보다 51.06%p 적게 벌면서 낙폭은 1.79%p 더 깊었다. 원인은 건당 수익이 아니라 분산이다. 신호는 5년 동안 174건뿐이어서 하루 평균 6개 종목만 들고 있었고, 대조군은 같은 규칙으로 1,289건을 벌려 34.3개를 들고 있었다. 종목 수가 적으면 개별 종목의 손실이 계좌 전체를 흔들고 복리로 쌓는 과정에서 깎이는 몫이 커진다. 건당 평균의 우위 (+2.53% 대 +1.40%) 가 누적에서 유지되지 않은 결과가 Table 4 다.
+신호 계좌는 S&P 500 지수보다 37.55%p, 등가중 지수보다 51.06%p 적게 벌면서 낙폭은 S&P 500 지수보다 4.34%p 더 깊었다. 원인은 건당 수익이 아니라 분산이다. 신호는 5년 동안 174건뿐이어서 하루 평균 6개 종목만 들고 있었고, 대조군은 같은 규칙으로 1,289건을 벌려 34.3개를 들고 있었다. 종목 수가 적으면 개별 종목의 손실이 계좌 전체를 흔들고 복리로 쌓는 과정에서 깎이는 몫이 커진다. 건당 평균의 우위 (+2.53% 대 +1.40%) 가 누적에서 유지되지 않은 결과가 Table 4 다.
 
-지수의 누적 +90.18% 는 Comparison 의 단순 보유 평균 +92.97% 와 다르다. 앞의 값은 매일 등가중으로 재조정한 계좌의 복리 수익이고, 뒤의 값은 종목별 5년 총수익의 산술평균이다.
+두 지수는 만드는 방식이 다르다. S&P 500 은 시가총액 가중이고 편입·퇴출이 반영된 실제 지수인 반면, 등가중 지수는 표본이 담은 505종목을 매일 같은 비중으로 재조정한 것이다. 표본의 종목은 마지막 날 505개가 모두 살아 있지만 첫날에는 476개뿐이므로, 이 목록은 구간 끝에 남은 종목만 담은 셈이고 등가중 지수가 13.51%p 높은 데에는 그 편향이 들어 있다. 기법의 성적을 지수와 견줄 때 S&P 500 쪽을 기준으로 삼는 이유가 여기 있다. 둘 다 배당을 뺀 가격 지수이며, 계좌의 수익도 배당 없이 가격만으로 계산했다.
+
+등가중 지수의 누적 +90.18% 는 Comparison 의 단순 보유 평균 +92.97% 와도 다르다. 앞의 값은 매일 재조정한 계좌의 복리 수익이고, 뒤의 값은 종목별 5년 총수익의 산술평균이다.
 
 <img src="klomagi-ko_fig/fig2.png" width="1000" style="max-width: 100%;" alt="Fig 2">
 
-Fig 2. Equity of the signal portfolio, the random entry portfolio and the equal weight index, all starting at 1.0.
+Fig 2. Equity of the signal portfolio, the random entry portfolio, the S&P 500 index and the equal weight index, all starting at 1.0.
 
-Fig 2 에서 신호 계좌는 2015년 중반까지 지수를 따라가다가 그 뒤로 벌어진다. 계좌가 현금으로 쉰 날은 전체의 1.9% 뿐이므로 격차는 쉰 시간이 아니라 종목 수에서 온다. 하루 평균 6개를 들고 있는 계좌는 그중 한 종목이 손절될 때마다 잔고의 1/6이 흔들리고, 그 자리를 다음 신호가 채울 때까지 상승분을 받지 못한다.
+Fig 2 에서 신호 계좌는 2015년 중반까지 두 지수와 함께 가다가 그 뒤로 벌어진다. 계좌가 현금으로 쉰 날은 전체의 1.9% 뿐이므로 격차는 쉰 시간이 아니라 종목 수에서 온다. 하루 평균 6개를 들고 있는 계좌는 그중 한 종목이 손절될 때마다 잔고의 1/6이 흔들리고, 그 자리를 다음 신호가 채울 때까지 상승분을 받지 못한다.
 
 ### B.5 Reproduction
 
 ```bash
-python3 klomagi_backtest.py --data-csv all_stocks_5yr.csv --output-folder klomagi_backtest_out
+python3 klomagi_backtest.py --data-csv all_stocks_5yr.csv --index-csv sp500-2000.csv \
+    --output-folder klomagi_backtest_out
 ```
 
-`--data-csv` 가 가리키는 파일이 없으면 References 의 주소에서 내려받는다. 출력은 매매 한 건이 한 행인 `trades.csv`, 조건 조합별 집계인 `grid.csv`, 세 계좌의 일별 수익과 보유 종목 수인 `equity.csv`, Fig 1 의 `fig1.png` 와 Fig 2 의 `fig2.png`, 그리고 표본과 조건과 집계를 담은 `summary.json` 이다. 대조군의 무작위 진입일은 `--seed` 로 고정되며, 이 문서의 수치는 기본값 20260910 으로 얻은 것이다.
+`--data-csv` 와 `--index-csv` 가 가리키는 파일이 없으면 References 의 주소에서 내려받는다. 출력은 매매 한 건이 한 행인 `trades.csv`, 조건 조합별 집계인 `grid.csv`, 네 계좌의 일별 수익과 보유 종목 수인 `equity.csv`, Fig 1 의 `fig1.png` 와 Fig 2 의 `fig2.png`, 그리고 표본과 조건과 집계를 담은 `summary.json` 이다. 대조군의 무작위 진입일은 `--seed` 로 고정되며, 이 문서의 수치는 기본값 20260910 으로 얻은 것이다.
 
 ## Appendix C. Backtest script
 
 ```python
 # Stock/klomagi_backtest.py
 __author__ = 'yRocket'
-__version__ = "0.1.0.2026.9.10"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
+__version__ = "0.2.0.2026.9.10"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
 
 __all__ = [
     'RuleParams',
@@ -191,6 +196,7 @@ __all__ = [
     'run_trades',
     'summarize',
     'equity_curve',
+    'load_index_level',
     'index_curve',
     'portfolio_stats',
     'run_grid',
@@ -215,6 +221,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt  # noqa: E402  matplotlib requires the backend to be set before pyplot
 
 DATA_URL: str = 'https://raw.githubusercontent.com/plotly/datasets/master/all_stocks_5yr.csv'
+INDEX_URL: str = 'https://raw.githubusercontent.com/vega/vega-datasets/main/data/sp500-2000.csv'
 MA_WINDOWS: tuple = (5, 20, 60, 120)
 VOLUME_WINDOW: int = 20
 CONTROL_DRAWS_PER_SIGNAL: int = 10   # the control is oversampled so its mean is the tighter of the two
@@ -508,6 +515,33 @@ def equity_curve(prices: pd.DataFrame, trades: pd.DataFrame) -> pd.DataFrame:
     return curve
 
 
+def load_index_level(csv_path: pathlib.Path, calendar: np.ndarray, url: str = INDEX_URL) -> pd.Series:
+    """Read a daily index csv and return its close on exactly the given calendar.
+
+    A calendar day the file does not cover is an error rather than a gap, because a curve drawn
+    over a partial index would still look like a full comparison.
+
+    Returns a pd.Series named 'index_level' indexed by 'date'.
+    """
+    if not csv_path.exists():
+        csv_path.parent.mkdir(parents=True, exist_ok=True)
+        print(f"downloading {url} -> {csv_path}", flush=True)
+        urllib.request.urlretrieve(url, csv_path)
+
+    frame = pd.read_csv(csv_path, parse_dates=['date'])
+    missing = {'date', 'close'} - set(frame.columns)
+    if missing:
+        raise ValueError(f"{csv_path} lacks columns {sorted(missing)}; got {sorted(frame.columns)}")
+
+    level = frame.set_index('date')['close'].sort_index().reindex(pd.Index(calendar, name='date'))
+    absent = level[level.isna()]
+    if not absent.empty:
+        raise ValueError(f"{csv_path} misses {len(absent)} of the {len(calendar)} sample days, "
+                         f"first {absent.index[0].date()}; the index does not cover the sample")
+    level.name = 'index_level'
+    return level
+
+
 def index_curve(index_level: pd.Series) -> pd.DataFrame:
     """Cast the equal weight index into the same shape as an equity curve, so both are read alike.
 
@@ -660,6 +694,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('-v', '--version', action='version', version=f"{pathlib.Path(__file__).name} {__version__}")
     parser.add_argument('--data-csv', type=str, required=True,
                         help="daily OHLCV csv; downloaded from the public dataset when absent")
+    parser.add_argument('--index-csv', type=str, required=True,
+                        help="daily S&P 500 index csv; downloaded from the public dataset when absent")
     parser.add_argument('--output-folder', type=str, required=True,
                         help="root folder of every output file")
     parser.add_argument('--conv-max', type=float, default=0.03,
@@ -681,6 +717,7 @@ def parse_args() -> argparse.Namespace:
 
     args = parser.parse_args()
     args.data_csv = pathlib.Path(args.data_csv)
+    args.index_csv = pathlib.Path(args.index_csv)
     args.output_folder = pathlib.Path(args.output_folder)
     args.grid = args.grid == 'true'
     if args.hold_days < 1:

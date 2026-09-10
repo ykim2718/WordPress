@@ -8,10 +8,11 @@ edge is the difference between the signal and an arbitrary entry, not the market
 Changelog:
 - 0.0.0.2026.9.10: initial release
 - 0.1.0.2026.9.10: add the daily equity curve, its cumulative and annualized return, and Fig 2
+- 0.2.0.2026.9.10: compare against the S&P 500 index read from a second daily csv
 """
 
 __author__ = 'yRocket'
-__version__ = "0.1.0.2026.9.10"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
+__version__ = "0.2.0.2026.9.10"  # Semantic Versioning: Major.Minor.Patch.Date(YYYY.M.D)
 
 __all__ = [
     'RuleParams',
@@ -24,6 +25,7 @@ __all__ = [
     'run_trades',
     'summarize',
     'equity_curve',
+    'load_index_level',
     'index_curve',
     'portfolio_stats',
     'run_grid',
@@ -48,6 +50,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt  # noqa: E402  matplotlib requires the backend to be set before pyplot
 
 DATA_URL: str = 'https://raw.githubusercontent.com/plotly/datasets/master/all_stocks_5yr.csv'
+INDEX_URL: str = 'https://raw.githubusercontent.com/vega/vega-datasets/main/data/sp500-2000.csv'
 MA_WINDOWS: tuple = (5, 20, 60, 120)
 VOLUME_WINDOW: int = 20
 CONTROL_DRAWS_PER_SIGNAL: int = 10   # the control is oversampled so its mean is the tighter of the two
@@ -341,6 +344,33 @@ def equity_curve(prices: pd.DataFrame, trades: pd.DataFrame) -> pd.DataFrame:
     return curve
 
 
+def load_index_level(csv_path: pathlib.Path, calendar: np.ndarray, url: str = INDEX_URL) -> pd.Series:
+    """Read a daily index csv and return its close on exactly the given calendar.
+
+    A calendar day the file does not cover is an error rather than a gap, because a curve drawn
+    over a partial index would still look like a full comparison.
+
+    Returns a pd.Series named 'index_level' indexed by 'date'.
+    """
+    if not csv_path.exists():
+        csv_path.parent.mkdir(parents=True, exist_ok=True)
+        print(f"downloading {url} -> {csv_path}", flush=True)
+        urllib.request.urlretrieve(url, csv_path)
+
+    frame = pd.read_csv(csv_path, parse_dates=['date'])
+    missing = {'date', 'close'} - set(frame.columns)
+    if missing:
+        raise ValueError(f"{csv_path} lacks columns {sorted(missing)}; got {sorted(frame.columns)}")
+
+    level = frame.set_index('date')['close'].sort_index().reindex(pd.Index(calendar, name='date'))
+    absent = level[level.isna()]
+    if not absent.empty:
+        raise ValueError(f"{csv_path} misses {len(absent)} of the {len(calendar)} sample days, "
+                         f"first {absent.index[0].date()}; the index does not cover the sample")
+    level.name = 'index_level'
+    return level
+
+
 def index_curve(index_level: pd.Series) -> pd.DataFrame:
     """Cast the equal weight index into the same shape as an equity curve, so both are read alike.
 
@@ -493,6 +523,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('-v', '--version', action='version', version=f"{pathlib.Path(__file__).name} {__version__}")
     parser.add_argument('--data-csv', type=str, required=True,
                         help="daily OHLCV csv; downloaded from the public dataset when absent")
+    parser.add_argument('--index-csv', type=str, required=True,
+                        help="daily S&P 500 index csv; downloaded from the public dataset when absent")
     parser.add_argument('--output-folder', type=str, required=True,
                         help="root folder of every output file")
     parser.add_argument('--conv-max', type=float, default=0.03,
@@ -514,6 +546,7 @@ def parse_args() -> argparse.Namespace:
 
     args = parser.parse_args()
     args.data_csv = pathlib.Path(args.data_csv)
+    args.index_csv = pathlib.Path(args.index_csv)
     args.output_folder = pathlib.Path(args.output_folder)
     args.grid = args.grid == 'true'
     if args.hold_days < 1:
@@ -541,12 +574,15 @@ if __name__ == '__main__':
     curves: dict = {str(arm): equity_curve(prices=price_table,
                                            trades=base_trades[base_trades[TradeColumn.ARM] == arm])
                     for arm in (Arm.SIGNAL, Arm.RANDOM)}
-    curves['index'] = index_curve(index_level=market)
+    curves['equal weight index'] = index_curve(index_level=market)
+    curves['S&P 500 index'] = index_curve(
+        index_level=load_index_level(csv_path=cli.index_csv, calendar=np.sort(price_table['date'].unique())))
     pd.concat({name: curve for name, curve in curves.items()}, axis=1).to_csv(cli.output_folder / 'equity.csv')
     plot_equity(curves=curves, fig_path=cli.output_folder / 'fig2.png')
 
     report: dict = {
         'data_url': DATA_URL,
+        'index_url': INDEX_URL,
         'sample': {
             'rows': int(len(price_table)),
             'tickers': int(price_table['ticker'].nunique()),

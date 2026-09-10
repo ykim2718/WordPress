@@ -1,5 +1,6 @@
 {
   "data_url": "https://raw.githubusercontent.com/plotly/datasets/master/all_stocks_5yr.csv",
+  "index_url": "https://raw.githubusercontent.com/vega/vega-datasets/main/data/sp500-2000.csv",
   "sample": {
     "rows": 619029,
     "tickers": 505,
@@ -68,12 +69,21 @@
       "time_in_market_pct": 90.4,
       "mean_open_positions": 34.3
     },
-    "index": {
+    "equal weight index": {
       "days": 1259,
       "years": 5.0,
       "total_return_pct": 90.18,
       "cagr_pct": 13.73,
       "max_drawdown_pct": -16.71,
+      "time_in_market_pct": 100.0,
+      "mean_open_positions": 1.0
+    },
+    "S&P 500 index": {
+      "days": 1259,
+      "years": 5.0,
+      "total_return_pct": 76.67,
+      "cagr_pct": 12.06,
+      "max_drawdown_pct": -14.16,
       "time_in_market_pct": 100.0,
       "mean_open_positions": 1.0
     }
