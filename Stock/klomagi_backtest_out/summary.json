@@ -1,0 +1,52 @@
+{
+  "data_url": "https://raw.githubusercontent.com/plotly/datasets/master/all_stocks_5yr.csv",
+  "sample": {
+    "rows": 619029,
+    "tickers": 505,
+    "first_date": "2013-02-08",
+    "last_date": "2018-02-07"
+  },
+  "params": {
+    "conv_max": 0.03,
+    "vol_mult": 2.0,
+    "body_min": 0.03,
+    "hold_days": 60
+  },
+  "buy_and_hold": {
+    "tickers": 505,
+    "mean_total_return_pct": 92.97,
+    "median_total_return_pct": 69.13,
+    "years": 4.86,
+    "mean_return_per_60_days_pct": 4.551
+  },
+  "arms": {
+    "signal": {
+      "trades": 174,
+      "win_rate_pct": 48.85,
+      "mean_return_pct": 2.532,
+      "median_return_pct": -0.209,
+      "std_return_pct": 10.399,
+      "mean_win_pct": 11.283,
+      "mean_loss_pct": -5.827,
+      "profit_factor": 1.849,
+      "mean_hold_days": 42.5,
+      "mean_excess_pct": 0.354,
+      "t_stat": 3.21,
+      "stop_exit_pct": 45.4
+    },
+    "random": {
+      "trades": 1289,
+      "win_rate_pct": 43.37,
+      "mean_return_pct": 1.399,
+      "median_return_pct": -0.64,
+      "std_return_pct": 9.033,
+      "mean_win_pct": 8.717,
+      "mean_loss_pct": -4.205,
+      "profit_factor": 1.587,
+      "mean_hold_days": 32.5,
+      "mean_excess_pct": 0.195,
+      "t_stat": 5.56,
+      "stop_exit_pct": 56.9
+    }
+  }
+}
