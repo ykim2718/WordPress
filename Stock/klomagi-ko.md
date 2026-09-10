@@ -1,5 +1,5 @@
 # Klomagi Moving Average Convergence Breakout
-Rev. 2 | Created: 2026-09-10 | Updated: 2026-09-10 22:25 UTC
+Rev. 3 | Created: 2026-09-10 | Updated: 2026-09-10 23:20 UTC
 
 ## 1. Purpose
 
@@ -74,6 +74,7 @@ Table 1. Rule conditions and the base values used in this document
 
 - **band**: 5일·20일·60일·120일 이동평균 네 개가 이루는 띠. 상단은 넷 중 최대, 하단은 최소.
 - **base 조건**: 이 문서가 기준으로 삼은 조건 한 벌. 수렴 3%, 거래량 2.0배, 몸통 3%, 보유 한도 60 거래일.
+- **equal weight index**: 표본의 505종목을 매일 같은 비중으로 들고 있는 가상의 계좌. 하루 수익은 그날 값이 있는 모든 종목의 종가 수익률의 단순 평균이며, 그것을 곱해 쌓은 것이 지수 수준이다. 시가총액 가중인 S&P 500 지수와 다르다.
 - **excess return**: 매매 수익에서 같은 진입일·청산일 사이 등가중 지수 수익을 뺀 값.
 - **max drawdown**: 계좌 잔고가 그때까지의 최고점 대비 가장 크게 줄어든 폭.
 - **profit factor**: 이익 매매 수익의 합을 손실 매매 손실의 합의 절댓값으로 나눈 값.
